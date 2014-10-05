@@ -15,7 +15,6 @@ public class RPGMethods {
 	public static boolean isSozinsComet(World world) {
 		WorldEvents comet = WorldEvents.SozinsComet;
 		if (!getEnabled(WorldEvents.SozinsComet)) return false;
-		if (!Methods.isDay(world)) return false;
 		int freq = getFrequency(comet);
 		
 		long days = world.getFullTime() / 24000;
@@ -26,7 +25,6 @@ public class RPGMethods {
 	public static boolean isLunarEclipse(World world) {
 		WorldEvents eclipse = WorldEvents.LunarEclipse;
 		if (!getEnabled(eclipse)) return false;
-		if (!Methods.isNight(world)) return false;
 		int freq = getFrequency(eclipse);
 		
 		long days = world.getFullTime() / 24000;
@@ -37,7 +35,6 @@ public class RPGMethods {
 	public static boolean isSolarEclipse(World world) {
 		WorldEvents eclipse = WorldEvents.SolarEclipse;
 		if (!getEnabled(eclipse)) return false;
-		if (!Methods.isDay(world)) return false;
 		int freq = getFrequency(eclipse);
 		
 		long days = world.getFullTime() / 24000;

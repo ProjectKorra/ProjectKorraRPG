@@ -7,4 +7,5 @@ public class RPGMethods {
 	public RPGMethods(ProjectKorraRPG plugin) {
 		RPGMethods.plugin = plugin;
 	}
+	
 }

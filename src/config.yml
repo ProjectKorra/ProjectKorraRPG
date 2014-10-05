@@ -1,0 +1,19 @@
+WorldEvents:
+  SolarEclipse:
+    Enabled: true
+    Frequency: 20
+    Factor: 0.0
+    Element: Fire
+    Time: Day
+  LunarEclipse:
+    Enabled: true
+    Frequency: 40
+    Factor: 0.0
+    Element: Water
+    Time: Night
+  SozinsComet:
+    Enabled: true
+    Frequency: 100
+    Factor: 5.0
+    Element: Fire
+    Time: Day

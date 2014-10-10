@@ -31,6 +31,8 @@ public class ConfigManager {
 		config.addDefault("WorldEvents.SozinsComet.Factor", 5.0);
 		config.addDefault("WorldEvents.SozinsComet.Element", "Fire");
 		config.addDefault("WorldEvents.SozinsComet.Time", "Day");
+		
+		config.addDefault("Abilities.AvatarStateOnFinalBlow", true);
 	}
 
 }

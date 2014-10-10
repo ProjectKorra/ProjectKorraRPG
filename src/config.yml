@@ -17,3 +17,5 @@ WorldEvents:
     Factor: 5.0
     Element: Fire
     Time: Day
+Abilities:
+  AvatarStateOnFinalBlow: true

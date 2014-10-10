@@ -19,3 +19,12 @@ WorldEvents:
     Time: Day
 Abilities:
   AvatarStateOnFinalBlow: true
+ElementAssign:
+  Enabled: true
+  Default: Earth
+  Percentages:
+    Air: 0.205
+    Fire: 0.205
+    Water: 0.205
+    Earth: 0.205
+    Chi: 0.18

@@ -33,6 +33,14 @@ public class ConfigManager {
 		config.addDefault("WorldEvents.SozinsComet.Time", "Day");
 		
 		config.addDefault("Abilities.AvatarStateOnFinalBlow", true);
+		
+		config.addDefault("ElementAssign.Enabled", true);
+		config.addDefault("ElementAssign.Default", "Earth");
+		config.addDefault("ElementAssign.Percentages.Earth", 0.205);
+		config.addDefault("ElementAssign.Percentages.Water", 0.205);
+		config.addDefault("ElementAssign.Percentages.Air", 0.205);
+		config.addDefault("ElementAssign.Percentages.Fire", 0.205);
+		config.addDefault("ElementAssign.Percentages.Earth", 0.18);
 	}
 
 }

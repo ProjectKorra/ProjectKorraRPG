@@ -14,8 +14,20 @@ public class ProjectKorraRPG extends JavaPlugin {
 	public void onEnable() {
 		ProjectKorraRPG.log = this.getLogger();
 		plugin = this;
-		
+		new ConfigManager(this);
+
 		new RPGMethods(this);
+		
+		ConfigManager.configCheck();
+		
+		DBConnection.engine = getConfig().getString("Storage.engine");
+		DBConnection.host = getConfig().getString("Storage.MySQL.host");
+		DBConnection.port = getConfig().getInt("Storage.MySQL.port");
+		DBConnection.pass = getConfig().getString("Storage.MySQL.pass");
+		DBConnection.db = getConfig().getString("Storage.MySQL.db");
+		DBConnection.user = getConfig().getString("Storage.MySQL.user");
+		
+		DBConnection.init();
 		
 		try {
 	        MetricsLite metrics = new MetricsLite(this);
@@ -24,12 +36,6 @@ public class ProjectKorraRPG extends JavaPlugin {
 	        // Failed to submit the stats :-(
 	    }
 		
-		/*
-		 *TODO Register Listeners
-		 *Create DBConnection class / Register it
-		 *ConfigManager
-		 *config.yml
-		 */
 	}
 	
 	@Override

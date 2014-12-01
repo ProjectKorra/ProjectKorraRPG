@@ -34,13 +34,24 @@ public class ConfigManager {
 		
 		config.addDefault("Abilities.AvatarStateOnFinalBlow", true);
 		
-		config.addDefault("ElementAssign.Enabled", true);
+		config.addDefault("ElementAssign.Enabled", false);
 		config.addDefault("ElementAssign.Default", "Earth");
 		config.addDefault("ElementAssign.Percentages.Earth", 0.205);
 		config.addDefault("ElementAssign.Percentages.Water", 0.205);
 		config.addDefault("ElementAssign.Percentages.Air", 0.205);
 		config.addDefault("ElementAssign.Percentages.Fire", 0.205);
 		config.addDefault("ElementAssign.Percentages.Earth", 0.18);
+		
+		config.addDefault("Storage.engine", "sqlite");
+
+		config.addDefault("Storage.MySQL.host", "localhost");
+		config.addDefault("Storage.MySQL.port", 3306);
+		config.addDefault("Storage.MySQL.pass", "");
+		config.addDefault("Storage.MySQL.db", "minecraft");
+		config.addDefault("Storage.MySQL.user", "root");
+		
+		config.options().copyDefaults(true);
+		plugin.saveConfig();
 	}
 
 }

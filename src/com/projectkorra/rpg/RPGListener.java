@@ -1,7 +1,9 @@
 package com.projectkorra.rpg;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -32,9 +34,9 @@ public class RPGListener implements Listener{
 		}
 	}
 	
-	@EventHandler
+	@EventHandler(priority = EventPriority.HIGHEST)
 	public void randomElementAssign(PlayerJoinEvent event) {
-		
+
 		if(!ProjectKorraRPG.plugin.getConfig().getBoolean("ElementAssign.Enabled")) return;
 		
 		if(Methods.getBendingPlayer(event.getPlayer().getName()) != null) {

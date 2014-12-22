@@ -77,22 +77,22 @@ public class RPGMethods {
 				return;
 			}
 
-			if (rand < waterchance) {
+			if (rand < waterchance + earthchance) {
 				assignElement(player, Element.Water, false);
 				return;
 			}
 
-			if (rand < airchance) {
+			if (rand < airchance + waterchance + earthchance) {
 				assignElement(player, Element.Air, false);
 				return;
 			}
 
-			if (rand < firechance) {
+			if (rand < firechance + airchance + waterchance + earthchance) {
 				assignElement(player, Element.Fire, false);
 				return;
 			}
 
-			if (rand < chichance) {
+			if (rand < chichance + firechance + airchance + waterchance + earthchance) {
 				assignElement(player, Element.Chi, true);
 				return;
 			}
@@ -117,6 +117,7 @@ public class RPGMethods {
 
 	private static void assignElement(BendingPlayer player, Element e, Boolean chiblocker) {
 		player.setElement(e);
+		Methods.saveElements(player);
 		if(!chiblocker) {
 			if(e.toString().equalsIgnoreCase("Earth")) Bukkit.getPlayer(player.getUUID()).sendMessage(ChatColor.RED + "You have been born as an " + Methods.getEarthColor() + e.toString() + "bender!");
 			if(e.toString().equalsIgnoreCase("Fire")) Bukkit.getPlayer(player.getUUID()).sendMessage(ChatColor.RED + "You have been born as a " + Methods.getFireColor() + e.toString() + "bender!");

@@ -3,6 +3,7 @@ package com.projectkorra.rpg;
 import java.io.IOException;
 import java.util.logging.Logger;
 
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class ProjectKorraRPG extends JavaPlugin {
@@ -28,6 +29,8 @@ public class ProjectKorraRPG extends JavaPlugin {
 		DBConnection.user = getConfig().getString("Storage.MySQL.user");
 		
 		DBConnection.init();
+		
+		Bukkit.getServer().getPluginManager().registerEvents(new RPGListener(), this);
 		
 		try {
 	        MetricsLite metrics = new MetricsLite(this);

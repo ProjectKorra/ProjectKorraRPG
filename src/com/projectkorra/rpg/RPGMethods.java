@@ -64,6 +64,7 @@ public class RPGMethods {
 	}
 
 	public static void randomAssign(BendingPlayer player) {
+		double rand = Math.random();
 		double earthchance = ProjectKorraRPG.plugin.getConfig().getDouble("ElementAssign.Percentages.Earth");
 		double firechance = ProjectKorraRPG.plugin.getConfig().getDouble("ElementAssign.Percentages.Fire");
 		double airchance = ProjectKorraRPG.plugin.getConfig().getDouble("ElementAssign.Percentages.Air");
@@ -71,27 +72,27 @@ public class RPGMethods {
 		double chichance = ProjectKorraRPG.plugin.getConfig().getDouble("ElementAssign.Percentages.Chi");
 
 		if(ProjectKorraRPG.plugin.getConfig().getBoolean("ElementAssign.Enabled")) {
-			if (Math.random() < earthchance) {
+			if (rand < earthchance) {
 				assignElement(player, Element.Earth, false);
 				return;
 			}
 
-			if (Math.random() < waterchance) {
+			if (rand < waterchance) {
 				assignElement(player, Element.Water, false);
 				return;
 			}
 
-			if (Math.random() < airchance) {
+			if (rand < airchance) {
 				assignElement(player, Element.Air, false);
 				return;
 			}
 
-			if (Math.random() < firechance) {
+			if (rand < firechance) {
 				assignElement(player, Element.Fire, false);
 				return;
 			}
 
-			if (Math.random() < chichance) {
+			if (rand < chichance) {
 				assignElement(player, Element.Chi, true);
 				return;
 			}

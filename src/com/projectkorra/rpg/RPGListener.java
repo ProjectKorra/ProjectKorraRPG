@@ -10,6 +10,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 
 import com.projectkorra.ProjectKorra.BendingPlayer;
 import com.projectkorra.ProjectKorra.Methods;
+import com.projectkorra.ProjectKorra.ProjectKorra;
 import com.projectkorra.ProjectKorra.Ability.AvatarState;
 
 public class RPGListener implements Listener{
@@ -24,8 +25,14 @@ public class RPGListener implements Listener{
 				if (Methods.getBendingPlayer(player.getName()) != null && (RPGMethods.isCurrentAvatar(player.getUniqueId()) || RPGMethods.hasBeenAvatar(player.getUniqueId()))) {
 					BendingPlayer bP = Methods.getBendingPlayer(player.getName());
 					
-					if (bP.isOnCooldown("AvatarState")) return;
 					if (player.getHealth() - event.getDamage() <= 0) {
+						if (AvatarState.cooldowns.containsKey(player.getName())) {
+							if (AvatarState.cooldowns.get(player.getName()) + ProjectKorra.plugin.getConfig().getLong("Abilities.AvatarState.Cooldown") >= System.currentTimeMillis()) {
+								return;
+							} else {
+								AvatarState.cooldowns.remove(player.getName());
+							}
+						} 
 						event.setCancelled(true);
 						new AvatarState(player);
 					}

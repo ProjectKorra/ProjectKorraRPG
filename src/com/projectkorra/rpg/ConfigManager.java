@@ -42,6 +42,11 @@ public class ConfigManager {
 		config.addDefault("ElementAssign.Percentages.Fire", 0.205);
 		config.addDefault("ElementAssign.Percentages.Earth", 0.18);
 		
+		config.addDefault("CustomItems.MechaSuitArmor.Enabled", true);
+		config.addDefault("CustomItems.MechaSuitArmor.CanBeWorn", false);
+		
+		config.addDefault("CustomItems.MechaSuit.Enabled", true);
+		
 		config.addDefault("Storage.engine", "sqlite");
 
 		config.addDefault("Storage.MySQL.host", "localhost");

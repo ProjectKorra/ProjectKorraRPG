@@ -28,6 +28,12 @@ ElementAssign:
     Water: 0.205
     Earth: 0.205
     Chi: 0.18
+CustomItems:
+  MechaSuitArmor:
+    Enabled: true
+    CanBeWorn: false
+  MechaSuit:
+    Enabled: true
 Storage:
   engine: sqlite
   MySQL:

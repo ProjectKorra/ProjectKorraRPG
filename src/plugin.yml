@@ -2,3 +2,4 @@ name: ProjectKorraRPG
 author: ProjectKorra
 version: 1.0.0
 main: com.projectkorra.rpg.ProjectKorraRPG
+depend: [ProjectKorra]

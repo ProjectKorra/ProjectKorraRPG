@@ -1,15 +1,20 @@
 package com.projectkorra.rpg;
 
-import org.bukkit.Bukkit;
+import java.util.concurrent.ConcurrentHashMap;
+
+import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.IronGolem;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.inventory.PrepareItemCraftEvent;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.CraftingInventory;
@@ -19,9 +24,11 @@ import com.projectkorra.ProjectKorra.BendingPlayer;
 import com.projectkorra.ProjectKorra.Methods;
 import com.projectkorra.ProjectKorra.ProjectKorra;
 import com.projectkorra.ProjectKorra.Ability.AvatarState;
-import com.projectkorra.rpg.api.MechaAPI;
 
 public class RPGListener implements Listener{
+	
+	public static ConcurrentHashMap<String, IronGolem> riding = new ConcurrentHashMap<String, IronGolem>();
+	public static ConcurrentHashMap<IronGolem, Location> unmounted = new ConcurrentHashMap<IronGolem, Location>();
 	
 	@EventHandler
 	public void onAvatarDamaged(EntityDamageEvent event) {
@@ -73,11 +80,74 @@ public class RPGListener implements Listener{
 			if (is.getItemMeta().getDisplayName().equals(Methods.getChiColor() + "Mecha Suit")) {
 				LivingEntity entity = (LivingEntity) p.getWorld().spawnEntity(block.getLocation().add(0, 1, 0), EntityType.IRON_GOLEM);
 				entity.setCustomName(Methods.getChiColor() + "Mecha Suit");
+				entity.setHealth(entity.getHealth() / 2);
+				unmounted.put((IronGolem)entity, entity.getLocation());
 				p.getInventory().remove(is);
 				p.updateInventory();
 			}
 		}
 	}
+	
+	@EventHandler
+	public void onPlayerGetInSuit(PlayerInteractEntityEvent event) {
+		Player player = event.getPlayer();
+		
+		if(event.getRightClicked() instanceof IronGolem) {
+			IronGolem suit = (IronGolem) event.getRightClicked();
+			
+			if(suit.getCustomName().equalsIgnoreCase(Methods.getChiColor() + "Mecha Suit")) {
+				
+				if(riding.contains(suit)) {
+					for(String key : riding.keySet()) {
+						if(riding.get(key) == suit) {
+							riding.remove(key);
+							unmounted.put(suit, suit.getLocation());
+							return;
+						}
+					}
+				}
+				
+				player.teleport(suit.getLocation());
+				riding.put(player.getUniqueId().toString(), suit);
+				unmounted.remove(suit);
+			}
+		}
+	}
+	
+	@EventHandler
+	public void riderDamaged(EntityDamageEvent event) {
+		if(event.getEntity() instanceof Player) {
+			Player player = (Player) event.getEntity();
+			
+			for(String key : riding.keySet()) {
+				if(key.equalsIgnoreCase(player.getUniqueId().toString())) {
+					riding.get(key).damage(event.getDamage());
+					event.setCancelled(true);
+				}
+			}
+		}
+	}
+	
+	@EventHandler
+	public void suitDie(EntityDeathEvent event) {
+		if(event.getEntity() instanceof IronGolem) {
+			IronGolem suit = (IronGolem) event.getEntity();
+			
+			if(riding.contains(suit)) {
+				for(String key : riding.keySet()) {
+					if(riding.get(key) == suit) {
+						riding.remove(key);
+					}
+				}
+				event.getDrops().clear();
+			}
+			if(unmounted.containsKey(suit)) {
+				unmounted.remove(suit);
+				event.getDrops().clear();
+			}
+		}
+	}
+	
 	@EventHandler
 	public void mechaCrafting(PrepareItemCraftEvent event) {
 		CraftingInventory ci = event.getInventory();

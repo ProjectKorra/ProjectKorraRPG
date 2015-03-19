@@ -1,6 +1,5 @@
 package com.projectkorra.rpg;
 
-import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
@@ -17,9 +16,7 @@ import org.bukkit.inventory.ItemStack;
 
 import com.projectkorra.ProjectKorra.BendingPlayer;
 import com.projectkorra.ProjectKorra.Methods;
-import com.projectkorra.ProjectKorra.ProjectKorra;
 import com.projectkorra.ProjectKorra.Ability.AvatarState;
-import com.projectkorra.rpg.api.MechaAPI;
 
 public class RPGListener implements Listener{
 	
@@ -34,13 +31,7 @@ public class RPGListener implements Listener{
 					BendingPlayer bP = Methods.getBendingPlayer(player.getName());
 					
 					if (player.getHealth() - event.getDamage() <= 0) {
-						if (AvatarState.cooldowns.containsKey(player.getName())) {
-							if (AvatarState.cooldowns.get(player.getName()) + ProjectKorra.plugin.getConfig().getLong("Abilities.AvatarState.Cooldown") >= System.currentTimeMillis()) {
-								return;
-							} else {
-								AvatarState.cooldowns.remove(player.getName());
-							}
-						} 
+						if (bP.isOnCooldown("AvatarState")) return;
 						event.setCancelled(true);
 						new AvatarState(player);
 					}
@@ -63,6 +54,7 @@ public class RPGListener implements Listener{
 		}
 	}
 	
+	@SuppressWarnings("deprecation")
 	@EventHandler
 	public void onPlayerInteract(PlayerInteractEvent event) {
 		Player p = event.getPlayer();

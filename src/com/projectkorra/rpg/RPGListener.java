@@ -1,25 +1,17 @@
 package com.projectkorra.rpg;
 
 import org.bukkit.Bukkit;
-import org.bukkit.block.Block;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.inventory.PrepareItemCraftEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.inventory.CraftingInventory;
-import org.bukkit.inventory.ItemStack;
 
 import com.projectkorra.ProjectKorra.BendingPlayer;
 import com.projectkorra.ProjectKorra.Methods;
 import com.projectkorra.ProjectKorra.ProjectKorra;
 import com.projectkorra.ProjectKorra.Ability.AvatarState;
-import com.projectkorra.rpg.api.MechaAPI;
 
 public class RPGListener implements Listener{
 	
@@ -59,41 +51,6 @@ public class RPGListener implements Listener{
 			
 			if((bp.getElements().isEmpty()) && (!bp.isPermaRemoved())) {
 				RPGMethods.randomAssign(bp);
-			}
-		}
-	}
-	
-	@EventHandler
-	public void onPlayerInteract(PlayerInteractEvent event) {
-		Player p = event.getPlayer();
-		Block block = event.getClickedBlock();
-		
-		ItemStack is = p.getItemInHand();
-		if (is != null && is.hasItemMeta() && block != null) {
-			if (is.getItemMeta().getDisplayName().equals(Methods.getChiColor() + "Mecha Suit")) {
-				LivingEntity entity = (LivingEntity) p.getWorld().spawnEntity(block.getLocation().add(0, 1, 0), EntityType.IRON_GOLEM);
-				entity.setCustomName(Methods.getChiColor() + "Mecha Suit");
-				p.getInventory().remove(is);
-				p.updateInventory();
-			}
-		}
-	}
-	@EventHandler
-	public void mechaCrafting(PrepareItemCraftEvent event) {
-		CraftingInventory ci = event.getInventory();
-		if (ci.getResult().hasItemMeta() && ci.getResult().getItemMeta().getDisplayName().equals(Methods.getChiColor() + "Mecha Suit")) {
-			boolean found1 = false, found2 = false, found3 = false, found4 = false;
-			for (ItemStack item: ci.getMatrix()) {
-				if (item != null && item.hasItemMeta()) {
-					if (item.getItemMeta().getDisplayName().equals(Methods.getChiColor() + "Mecha Helmet")) found1 = true;
-					else if (item.getItemMeta().getDisplayName().equals(Methods.getChiColor() + "Mecha Chestplate")) found2 = true;
-					else if (item.getItemMeta().getDisplayName().equals(Methods.getChiColor() + "Mecha Leggings")) found3 = true;
-					else if (item.getItemMeta().getDisplayName().equals(Methods.getChiColor() + "Mecha Boots")) found4 = true;
-				}
-			}
-			
-			if (!found1 || !found2 || !found3 || !found4) {
-				ci.setResult(null);
 			}
 		}
 	}

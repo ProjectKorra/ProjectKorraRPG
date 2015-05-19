@@ -11,7 +11,12 @@ import org.bukkit.entity.Player;
 
 import com.projectkorra.ProjectKorra.BendingPlayer;
 import com.projectkorra.ProjectKorra.Element;
-import com.projectkorra.ProjectKorra.Methods;
+import com.projectkorra.ProjectKorra.GeneralMethods;
+import com.projectkorra.ProjectKorra.airbending.AirMethods;
+import com.projectkorra.ProjectKorra.chiblocking.ChiMethods;
+import com.projectkorra.ProjectKorra.earthbending.EarthMethods;
+import com.projectkorra.ProjectKorra.firebending.FireMethods;
+import com.projectkorra.ProjectKorra.waterbending.WaterMethods;
 
 public class RPGMethods {
 
@@ -117,14 +122,14 @@ public class RPGMethods {
 
 	private static void assignElement(BendingPlayer player, Element e, Boolean chiblocker) {
 		player.setElement(e);
-		Methods.saveElements(player);
+		GeneralMethods.saveElements(player);
 		if(!chiblocker) {
-			if(e.toString().equalsIgnoreCase("Earth")) Bukkit.getPlayer(player.getUUID()).sendMessage(ChatColor.RED + "You have been born as an " + Methods.getEarthColor() + e.toString() + "bender!");
-			if(e.toString().equalsIgnoreCase("Fire")) Bukkit.getPlayer(player.getUUID()).sendMessage(ChatColor.RED + "You have been born as a " + Methods.getFireColor() + e.toString() + "bender!");
-			if(e.toString().equalsIgnoreCase("Water")) Bukkit.getPlayer(player.getUUID()).sendMessage(ChatColor.RED + "You have been born as a " + Methods.getWaterColor() + e.toString() + "bender!");
-			if(e.toString().equalsIgnoreCase("Air")) Bukkit.getPlayer(player.getUUID()).sendMessage(ChatColor.RED + "You have been born as an " + Methods.getAirColor() + e.toString() + "bender!");
+			if(e.toString().equalsIgnoreCase("Earth")) Bukkit.getPlayer(player.getUUID()).sendMessage(ChatColor.RED + "You have been born as an " + EarthMethods.getEarthColor() + e.toString() + "bender!");
+			if(e.toString().equalsIgnoreCase("Fire")) Bukkit.getPlayer(player.getUUID()).sendMessage(ChatColor.RED + "You have been born as a " + FireMethods.getFireColor() + e.toString() + "bender!");
+			if(e.toString().equalsIgnoreCase("Water")) Bukkit.getPlayer(player.getUUID()).sendMessage(ChatColor.RED + "You have been born as a " + WaterMethods.getWaterColor() + e.toString() + "bender!");
+			if(e.toString().equalsIgnoreCase("Air")) Bukkit.getPlayer(player.getUUID()).sendMessage(ChatColor.RED + "You have been born as an " + AirMethods.getAirColor() + e.toString() + "bender!");
 		}else{
-			Bukkit.getPlayer(player.getUUID()).sendMessage(ChatColor.RED + "You have been raised as a " + Methods.getChiColor() + e.toString() + "blocker!");
+			Bukkit.getPlayer(player.getUUID()).sendMessage(ChatColor.RED + "You have been raised as a " + ChiMethods.getChiColor() + e.toString() + "blocker!");
 		}
 	}
 
@@ -132,7 +137,7 @@ public class RPGMethods {
 		plugin.getConfig().set("Avatar.Current", uuid.toString());
 		plugin.saveConfig();
 		Player player = Bukkit.getPlayer(uuid);
-		BendingPlayer bPlayer = Methods.getBendingPlayer(player.getName());
+		BendingPlayer bPlayer = GeneralMethods.getBendingPlayer(player.getName());
 		String element = "none";
 		if (bPlayer.getElements().contains(Element.Air)) element = "air";
 		if (bPlayer.getElements().contains(Element.Water)) element = "water";

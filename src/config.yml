@@ -1,27 +1,30 @@
 WorldEvents:
+  FullMoon:
+    Enabled: true
+    Factor: 3.0
+    Element: Water
+    Message: A full moon is rising, empowering waterbending like never before.
   SolarEclipse:
     Enabled: true
     Frequency: 20
-    Factor: 0.0
     Element: Fire
-    Time: Day
+    Message: A lunar eclipse is out! Waterbenders are temporarily powerless.
   LunarEclipse:
     Enabled: true
     Frequency: 40
-    Factor: 0.0
     Element: Water
-    Time: Night
+    Message: A solar eclipse is out! Firebenders are temporarily powerless.
   SozinsComet:
     Enabled: true
     Frequency: 100
     Factor: 5.0
     Element: Fire
-    Time: Day
+    Message: Sozin's Comet is passing overhead! Firebending is now at its most powerful.
 Abilities:
   AvatarStateOnFinalBlow: true
 ElementAssign:
   Enabled: false
-  Default: Earth
+  Default: None
   Percentages:
     Air: 0.205
     Fire: 0.205

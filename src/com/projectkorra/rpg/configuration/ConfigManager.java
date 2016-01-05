@@ -33,6 +33,7 @@ public class ConfigManager {
 
 		
 		config.addDefault("WorldEvents.SozinsComet.Enabled", true);
+		config.addDefault("WorldEvents.SozinsComet.Duration", 24000);
 		config.addDefault("WorldEvents.SozinsComet.Frequency", 100);
 		config.addDefault("WorldEvents.SozinsComet.Factor", 5.0);
 		config.addDefault("WorldEvents.SozinsComet.Element", "Fire");

@@ -1,7 +1,17 @@
 package com.projectkorra.rpg;
 
-import java.util.concurrent.ConcurrentHashMap;
+import com.projectkorra.projectkorra.BendingPlayer;
+import com.projectkorra.projectkorra.Element;
+import com.projectkorra.projectkorra.GeneralMethods;
+import com.projectkorra.projectkorra.ability.AvatarState;
+import com.projectkorra.projectkorra.earthbending.EarthMethods;
+import com.projectkorra.rpg.event.EventManager;
+import com.projectkorra.rpg.event.FullMoonEvent;
+import com.projectkorra.rpg.event.LunarEclipseEvent;
+import com.projectkorra.rpg.event.SolarEclipseEvent;
+import com.projectkorra.rpg.event.SozinsCometEvent;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.block.BlockFace;
@@ -13,22 +23,7 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.player.PlayerJoinEvent;
 
-import com.projectkorra.projectkorra.BendingPlayer;
-import com.projectkorra.projectkorra.Element;
-import com.projectkorra.projectkorra.GeneralMethods;
-import com.projectkorra.projectkorra.ability.AvatarState;
-import com.projectkorra.projectkorra.earthbending.EarthMethods;
-import com.projectkorra.projectkorra.firebending.FireMethods;
-import com.projectkorra.projectkorra.waterbending.WaterMethods;
-import com.projectkorra.rpg.event.WorldEvent;
-import com.projectkorra.rpg.event.WorldEvent.FullMoonEvent;
-import com.projectkorra.rpg.event.WorldEvent.LunarEclipseEvent;
-import com.projectkorra.rpg.event.WorldEvent.SolarEclipseEvent;
-import com.projectkorra.rpg.event.WorldEvent.SozinsCometEvent;
-
 public class RPGListener implements Listener{
-	
-	private ConcurrentHashMap<World, WorldEvent> events = new ConcurrentHashMap<World, WorldEvent>();
 	
 	@EventHandler
 	public void onAvatarDamaged(EntityDamageEvent event) {
@@ -66,57 +61,59 @@ public class RPGListener implements Listener{
 		}
 	}
 	
-	@EventHandler(priority = EventPriority.HIGHEST)
+	@EventHandler(priority = EventPriority.MONITOR)
 	public void onFullMoon(FullMoonEvent event) {
 		if (event.isCancelled()) return;
 		World world = event.getWorld();
-		if (!events.isEmpty() && (events.get(world).equals(WorldEvent.LunarEclipse) || events.get(world).equals(WorldEvent.FullMoon))) {
-			event.setCancelled(true);
-			return;
-		}
-		for (Player player : world.getPlayers()) {
-			player.sendMessage(ChatColor.DARK_AQUA + event.getMessage());
+		EventManager.marker.put(world, "FullMoon");
+		for (Player player : Bukkit.getOnlinePlayers()) {
+			if (GeneralMethods.isBender(player.getName(), Element.Water)) {
+				if (player.hasPermission("bending.message.nightmessage")) {
+					player.sendMessage(ChatColor.DARK_AQUA + event.getMessage());
+				}
+			}
 		}
 	}
 
-	@EventHandler(priority = EventPriority.HIGHEST)
+	@EventHandler(priority = EventPriority.MONITOR)
 	public void onLunarEclipse(LunarEclipseEvent event) {
 		if (event.isCancelled()) return;
 		World world = event.getWorld();
-		if (!events.isEmpty() && events.get(world).equals(WorldEvent.LunarEclipse)) {
-			event.setCancelled(true);
-			return;
-		}
-		events.put(world, event.getWorldEvent());
-		for (Player player : world.getPlayers()) {
-			player.sendMessage(WaterMethods.getWaterColor() + event.getMessage());
+		EventManager.marker.put(world, "LunarEclipse");
+		for (Player player : Bukkit.getOnlinePlayers()) {
+			if (GeneralMethods.isBender(player.getName(), Element.Water)) {
+				if (player.hasPermission("bending.message.nightmessage")) {
+					player.sendMessage(ChatColor.AQUA + event.getMessage());
+				}
+			}
 		}
 	}
 	
-	@EventHandler(priority = EventPriority.HIGHEST)
+	@EventHandler(priority = EventPriority.MONITOR)
 	public void onSolarEclipse(SolarEclipseEvent event) {
 		if (event.isCancelled()) return;
 		World world = event.getWorld();
-		if (!events.isEmpty() && (events.get(world).equals(WorldEvent.SozinsComet) || events.get(world).equals(WorldEvent.SolarEclipse))) {
-			event.setCancelled(true);
-			return;
-		}
-		for (Player player : world.getPlayers()) {
-			player.sendMessage(FireMethods.getFireColor() + event.getMessage());
+		EventManager.marker.put(world, "SolarEclipse");
+		for (Player player : Bukkit.getOnlinePlayers()) {
+			if (GeneralMethods.isBender(player.getName(), Element.Fire)) {
+				if (player.hasPermission("bending.message.daymessage")) {
+					player.sendMessage(ChatColor.RED + event.getMessage());
+				}
+			}
 		}
 	}
 	
-	@EventHandler(priority = EventPriority.HIGHEST)
+	@EventHandler(priority = EventPriority.MONITOR)
 	public void onSozinsComet(SozinsCometEvent event) {
+		if (event.isCancelled()) return;
 		World world = event.getWorld();
-		WorldEvent we = event.getWorldEvent();
-		if (!events.isEmpty() && events.get(world).equals(WorldEvent.SozinsComet)) {
-			event.setCancelled(true);
-			return;
-		}
-		events.put(world, we);
-		for (Player player : world.getPlayers()) {
-			player.sendMessage(ChatColor.DARK_RED + event.getMessage());
+		EventManager.marker.put(world, "SozinsComet");
+		for (Player player : Bukkit.getOnlinePlayers()) {
+			if (GeneralMethods.isBender(player.getName(), Element.Fire)) {
+				if (player.hasPermission("bending.message.daymessage")) {
+					player.sendMessage(ChatColor.DARK_RED + event.getMessage());
+				}
+			}
 		}
 	}
 }

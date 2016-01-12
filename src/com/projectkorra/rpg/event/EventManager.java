@@ -34,11 +34,33 @@ public class EventManager implements Runnable{
 			}
 			
 			if (!marker.get(world).equals("")) {
+				if (FireMethods.isDay(world)) {
+					if (marker.get(world).equalsIgnoreCase("LunarEclipse")) {
+						marker.replace(world, "");
+					} else if (marker.get(world).equalsIgnoreCase("FullMoon")) {
+						marker.replace(world, "");
+					}
+				} else {
+					if (marker.get(world).equalsIgnoreCase("SolarEclipse")) {
+						marker.replace(world, "");
+					}
+				}
+				if (marker.get(world).equalsIgnoreCase("SozinsComet")) {
+					handleSozinsComet(world);
+				}
+			}
+		}
+		for (World world : Bukkit.getServer().getWorlds()) {
+			if (ConfigManager.defaultConfig.get().getStringList("Properties.DisabledWorlds").contains(world.getName())) {
 				continue;
 			}
 			
-			if (RPGMethods.isHappening(world, "SozinsComet")) {
-				handleSozinsComet(world);
+			if (!marker.containsKey(world)) {
+				marker.put(world, "");
+			}
+			
+			if (!marker.get(world).equals("")) {
+				continue;
 			}
 			
 			if (FireMethods.isDay(world)) {
@@ -51,10 +73,7 @@ public class EventManager implements Runnable{
 				if (RPGMethods.isSolarEclipse(world) && !RPGMethods.isHappening(world, "SolarEclipse")) {
 					ProjectKorra.plugin.getServer().getPluginManager().callEvent(new SolarEclipseEvent(world));
 					continue;
-				} else {
-					marker.put(world, "");
-					continue;
-				}
+				} 
 			} else {
 				if (RPGMethods.isLunarEclipse(world) && !RPGMethods.isHappening(world, "LunarEclipse")) {
 					ProjectKorra.plugin.getServer().getPluginManager().callEvent(new LunarEclipseEvent(world));
@@ -63,9 +82,6 @@ public class EventManager implements Runnable{
 				
 				if (RPGMethods.isFullMoon(world) && !RPGMethods.isHappening(world, "FullMoon")) {
 					ProjectKorra.plugin.getServer().getPluginManager().callEvent(new FullMoonEvent(world));
-					continue;
-				} else {
-					marker.put(world, "");
 					continue;
 				}
 			}

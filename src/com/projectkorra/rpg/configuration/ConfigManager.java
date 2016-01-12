@@ -31,7 +31,6 @@ public class ConfigManager {
 		config.addDefault("WorldEvents.SolarEclipse.Element", "Fire");
 		config.addDefault("WorldEvents.SolarEclipse.Message", "A solar eclipse is out! Firebenders are temporarily powerless.");
 
-		
 		config.addDefault("WorldEvents.SozinsComet.Enabled", true);
 		config.addDefault("WorldEvents.SozinsComet.Duration", 24000);
 		config.addDefault("WorldEvents.SozinsComet.Frequency", 100);

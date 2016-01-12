@@ -36,7 +36,7 @@ public class RPGMethods {
 	public static boolean isFullMoon(World world) {
 		if (!getEnabled("FullMoon")) return false;
 		long days = world.getFullTime() / 24000;
-		long phase = days % 8;
+		long phase = days % getFrequency("FullMoon");
 		if (phase == 0) {
 			return true;
 		}

@@ -21,7 +21,7 @@ import java.util.List;
 public class EventCommand extends PKCommand{
 
 	public EventCommand() {
-		super("worldevent", "/bending worldevent help|start|current [worldevent]", "Main command for anything dealing with RPG world events.", new String[] {"worldevent", "worlde", "event", "we"});
+		super("worldevent", "/bending worldevent help|start|current [worldevent]", "Main command for anything dealing with RPG world events.mk", new String[] {"worldevent", "worlde", "event", "we"});
 	}
 
 	@Override

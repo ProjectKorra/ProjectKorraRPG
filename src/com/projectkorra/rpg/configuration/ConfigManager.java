@@ -32,11 +32,11 @@ public class ConfigManager {
 		config.addDefault("WorldEvents.SolarEclipse.Message", "A solar eclipse is out! Firebenders are temporarily powerless.");
 
 		config.addDefault("WorldEvents.SozinsComet.Enabled", true);
-		config.addDefault("WorldEvents.SozinsComet.Duration", 24000);
 		config.addDefault("WorldEvents.SozinsComet.Frequency", 100);
 		config.addDefault("WorldEvents.SozinsComet.Factor", 5.0);
 		config.addDefault("WorldEvents.SozinsComet.Element", "Fire");
 		config.addDefault("WorldEvents.SozinsComet.Message", "Sozin's Comet is passing overhead! Firebending is now at its most powerful.");
+		config.addDefault("WorldEvents.SozinsComet.EndMessage", "Sozin's Comet has passed.");
 		
 		config.addDefault("Abilities.AvatarStateOnFinalBlow", true);
 		

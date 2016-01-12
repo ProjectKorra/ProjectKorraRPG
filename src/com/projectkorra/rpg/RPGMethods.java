@@ -52,8 +52,19 @@ public class RPGMethods {
 	public static boolean isHappening(World world, String worldevent) {
 		if (EventManager.marker.get(world) == null) return false;
 		if (EventManager.marker.get(world) == "") return false;
-		if (EventManager.marker.get(world) == worldevent) return true;
+		if (EventManager.marker.get(world).equalsIgnoreCase(worldevent)) return true;
 		return false;
+	}
+	
+	/**
+	 * Checks if an event is happening in the provided world
+	 * @param world
+	 * @return
+	 */
+	public static boolean isEventHappening(World world) {
+		if (EventManager.marker.get(world) == null) return false;
+		if (EventManager.marker.get(world) == "") return false;
+		return true;
 	}
 	
 	/**

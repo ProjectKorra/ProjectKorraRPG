@@ -16,10 +16,9 @@ import org.bukkit.entity.Player;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class EventManager implements Runnable{
-	
-	private static long duration = ProjectKorraRPG.plugin.getConfig().getLong("WorldEvents.SozinsComet.Duration");
-	private long DURATION;
-	
+
+	private static String message = ProjectKorraRPG.plugin.getConfig().getString("WorldEvents.SozinsComet.EndMessage");
+
 	public static ConcurrentHashMap<World, String> marker = new ConcurrentHashMap<>();
 
 	@Override
@@ -28,16 +27,20 @@ public class EventManager implements Runnable{
 			if (ConfigManager.defaultConfig.get().getStringList("Properties.DisabledWorlds").contains(world.getName())) {
 				continue;
 			}
-			
+
 			if (!marker.containsKey(world)) {
 				marker.put(world, "");
 			}
-			
+
 			if (!marker.get(world).equals("")) {
+				if (marker.get(world).equalsIgnoreCase("SozinsComet")) {
+					handleSozinsComet(world);
+				}
 				if (FireMethods.isDay(world)) {
 					if (marker.get(world).equalsIgnoreCase("LunarEclipse")) {
 						marker.replace(world, "");
-					} else if (marker.get(world).equalsIgnoreCase("FullMoon")) {
+					}
+					if (marker.get(world).equalsIgnoreCase("FullMoon")) {
 						marker.replace(world, "");
 					}
 				} else {
@@ -45,55 +48,36 @@ public class EventManager implements Runnable{
 						marker.replace(world, "");
 					}
 				}
-				if (marker.get(world).equalsIgnoreCase("SozinsComet")) {
-					handleSozinsComet(world);
-				}
 			}
-		}
-		for (World world : Bukkit.getServer().getWorlds()) {
-			if (ConfigManager.defaultConfig.get().getStringList("Properties.DisabledWorlds").contains(world.getName())) {
-				continue;
-			}
-			
-			if (!marker.containsKey(world)) {
-				marker.put(world, "");
-			}
-			
-			if (!marker.get(world).equals("")) {
-				continue;
-			}
-			
-			if (FireMethods.isDay(world)) {
-				if (RPGMethods.isSozinsComet(world) && !RPGMethods.isHappening(world, "SozinsComet")) {
-					DURATION = System.currentTimeMillis() + duration;
-					ProjectKorra.plugin.getServer().getPluginManager().callEvent(new SozinsCometEvent(world));
-					continue;
-				}
-				
-				if (RPGMethods.isSolarEclipse(world) && !RPGMethods.isHappening(world, "SolarEclipse")) {
-					ProjectKorra.plugin.getServer().getPluginManager().callEvent(new SolarEclipseEvent(world));
-					continue;
-				} 
-			} else {
-				if (RPGMethods.isLunarEclipse(world) && !RPGMethods.isHappening(world, "LunarEclipse")) {
-					ProjectKorra.plugin.getServer().getPluginManager().callEvent(new LunarEclipseEvent(world));
-					continue;
-				}
-				
-				if (RPGMethods.isFullMoon(world) && !RPGMethods.isHappening(world, "FullMoon")) {
-					ProjectKorra.plugin.getServer().getPluginManager().callEvent(new FullMoonEvent(world));
-					continue;
+
+			if (!RPGMethods.isEventHappening(world)) {
+				if (FireMethods.isDay(world)) {
+					if (RPGMethods.isSozinsComet(world) && !RPGMethods.isHappening(world, "SozinsComet")) {
+						ProjectKorra.plugin.getServer().getPluginManager().callEvent(new SozinsCometEvent(world));
+						continue;
+					} else if (RPGMethods.isSolarEclipse(world) && !RPGMethods.isHappening(world, "SolarEclipse")) {
+						ProjectKorra.plugin.getServer().getPluginManager().callEvent(new SolarEclipseEvent(world));
+						continue;
+					} 
+				} else {
+					if (RPGMethods.isLunarEclipse(world) && !RPGMethods.isHappening(world, "LunarEclipse")) {
+						ProjectKorra.plugin.getServer().getPluginManager().callEvent(new LunarEclipseEvent(world));
+						continue;
+					} else if (RPGMethods.isFullMoon(world) && !RPGMethods.isHappening(world, "FullMoon")) {
+						ProjectKorra.plugin.getServer().getPluginManager().callEvent(new FullMoonEvent(world));
+						continue;
+					}
 				}
 			}
 		}
 	}
-	
+
 	public void handleSozinsComet(World world) {
-		if (System.currentTimeMillis() >= DURATION) {
+		if (!FireMethods.isDay(world)) {
 			marker.put(world, "");
 			for (Player player : Bukkit.getOnlinePlayers()) {
 				if (GeneralMethods.isBender(player.getName(), Element.Fire)) {
-					player.sendMessage(ChatColor.DARK_RED + "Sozin's Comet is over!");
+					player.sendMessage(ChatColor.DARK_RED + message);
 				}
 			}
 		}

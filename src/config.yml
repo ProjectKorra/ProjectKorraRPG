@@ -20,6 +20,7 @@ WorldEvents:
     Factor: 5.0
     Element: Fire
     Message: Sozin's Comet is passing overhead! Firebending is now at its most powerful.
+    EndMessage: Sozin's Comet has passed.
 Abilities:
   AvatarStateOnFinalBlow: true
 ElementAssign:

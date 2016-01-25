@@ -65,6 +65,9 @@ public class RPGListener implements Listener{
 	public void onFullMoon(FullMoonEvent event) {
 		if (event.isCancelled()) return;
 		World world = event.getWorld();
+		if (world.getEnvironment().equals(World.Environment.NETHER) || world.getEnvironment().equals(World.Environment.THE_END)) {
+			return;
+		}
 		EventManager.marker.put(world, "FullMoon");
 		for (Player player : Bukkit.getOnlinePlayers()) {
 			if (player.getWorld().equals(world)) {
@@ -81,6 +84,9 @@ public class RPGListener implements Listener{
 	public void onLunarEclipse(LunarEclipseEvent event) {
 		if (event.isCancelled()) return;
 		World world = event.getWorld();
+		if (world.getEnvironment().equals(World.Environment.NETHER) || world.getEnvironment().equals(World.Environment.THE_END)) {
+			return;
+		}
 		EventManager.marker.put(world, "LunarEclipse");
 		for (Player player : Bukkit.getOnlinePlayers()) {
 			if (player.getWorld().equals(world)) {
@@ -97,6 +103,9 @@ public class RPGListener implements Listener{
 	public void onSolarEclipse(SolarEclipseEvent event) {
 		if (event.isCancelled()) return;
 		World world = event.getWorld();
+		if (world.getEnvironment().equals(World.Environment.NETHER) || world.getEnvironment().equals(World.Environment.THE_END)) {
+			return;
+		}
 		EventManager.marker.put(world, "SolarEclipse");
 		for (Player player : Bukkit.getOnlinePlayers()) {
 			if (player.getWorld().equals(world)) {
@@ -114,6 +123,9 @@ public class RPGListener implements Listener{
 		if (event.isCancelled()) return;
 		World world = event.getWorld();
 		EventManager.marker.put(world, "SozinsComet");
+		if (world.getEnvironment().equals(World.Environment.NETHER) || world.getEnvironment().equals(World.Environment.THE_END)) {
+			return;
+		}
 		for (Player player : Bukkit.getOnlinePlayers()) {
 			if (player.getWorld().equals(world)) {
 				if (GeneralMethods.isBender(player.getName(), Element.Fire)) {

@@ -3,11 +3,6 @@ package com.projectkorra.rpg;
 import com.projectkorra.projectkorra.BendingPlayer;
 import com.projectkorra.projectkorra.Element;
 import com.projectkorra.projectkorra.GeneralMethods;
-import com.projectkorra.projectkorra.airbending.AirMethods;
-import com.projectkorra.projectkorra.chiblocking.ChiMethods;
-import com.projectkorra.projectkorra.earthbending.EarthMethods;
-import com.projectkorra.projectkorra.firebending.FireMethods;
-import com.projectkorra.projectkorra.waterbending.WaterMethods;
 import com.projectkorra.rpg.event.EventManager;
 import com.projectkorra.rpg.storage.DBConnection;
 
@@ -157,46 +152,46 @@ public class RPGMethods {
 
 		if(ProjectKorraRPG.plugin.getConfig().getBoolean("ElementAssign.Enabled")) {
 			if (rand < earthchance ) {
-				assignElement(player, Element.Earth, false);
+				assignElement(player, Element.EARTH, false);
 				return;
 			}
 
 			else if (rand < waterchance + earthchance && rand > earthchance) {
-				assignElement(player, Element.Water, false);
+				assignElement(player, Element.WATER, false);
 				return;
 			}
 
 			else if (rand < airchance + waterchance + earthchance && rand > waterchance + earthchance) {
-				assignElement(player, Element.Air, false);
+				assignElement(player, Element.AIR, false);
 				return;
 			}
 
 			else if (rand < firechance + airchance + waterchance + earthchance && rand > airchance + waterchance + earthchance) {
-				assignElement(player, Element.Fire, false);
+				assignElement(player, Element.FIRE, false);
 				return;
 			}
 
 			else if (rand < chichance + firechance + airchance + waterchance + earthchance && rand > firechance + airchance + waterchance + earthchance) {
-				assignElement(player, Element.Chi, true);
+				assignElement(player, Element.CHI, true);
 				return;
 			}
 		} else {
 			String defaultElement = ProjectKorraRPG.plugin.getConfig().getString("ElementAssign.Default");
-			Element e = Element.Earth;
+			Element e = Element.EARTH;
 			
 			if(defaultElement.equalsIgnoreCase("None")) {
 				return;
 			}
 
 			if(defaultElement.equalsIgnoreCase("Chi")) {
-				assignElement(player, Element.Chi, true);
+				assignElement(player, Element.CHI, true);
 				return;
 			}
 
-			if(defaultElement.equalsIgnoreCase("Water")) e = Element.Water;
-			if(defaultElement.equalsIgnoreCase("Earth")) e = Element.Earth;
-			if(defaultElement.equalsIgnoreCase("Fire")) e = Element.Fire;
-			if(defaultElement.equalsIgnoreCase("Air")) e = Element.Air;
+			if(defaultElement.equalsIgnoreCase("Water")) e = Element.WATER;
+			if(defaultElement.equalsIgnoreCase("Earth")) e = Element.EARTH;
+			if(defaultElement.equalsIgnoreCase("Fire")) e = Element.FIRE;
+			if(defaultElement.equalsIgnoreCase("Air")) e = Element.AIR;
 
 			assignElement(player, e, false);
 			return;
@@ -213,12 +208,12 @@ public class RPGMethods {
 		player.setElement(e);
 		GeneralMethods.saveElements(player);
 		if(!chiblocker) {
-			if(e.toString().equalsIgnoreCase("Earth")) Bukkit.getPlayer(player.getUUID()).sendMessage(ChatColor.WHITE + "You have been born as an " + EarthMethods.getEarthColor() + e.toString() + "bender!");
-			if(e.toString().equalsIgnoreCase("Fire")) Bukkit.getPlayer(player.getUUID()).sendMessage(ChatColor.WHITE + "You have been born as a " + FireMethods.getFireColor() + e.toString() + "bender!");
-			if(e.toString().equalsIgnoreCase("Water")) Bukkit.getPlayer(player.getUUID()).sendMessage(ChatColor.WHITE + "You have been born as a " + WaterMethods.getWaterColor() + e.toString() + "bender!");
-			if(e.toString().equalsIgnoreCase("Air")) Bukkit.getPlayer(player.getUUID()).sendMessage(ChatColor.WHITE + "You have been born as an " + AirMethods.getAirColor() + e.toString() + "bender!");
+			if(e.toString().equalsIgnoreCase("Earth")) Bukkit.getPlayer(player.getUUID()).sendMessage(ChatColor.WHITE + "You have been born as an " + ChatColor.GREEN + e.toString() + "bender!");
+			if(e.toString().equalsIgnoreCase("Fire")) Bukkit.getPlayer(player.getUUID()).sendMessage(ChatColor.WHITE + "You have been born as a " + ChatColor.RED + e.toString() + "bender!");
+			if(e.toString().equalsIgnoreCase("Water")) Bukkit.getPlayer(player.getUUID()).sendMessage(ChatColor.WHITE + "You have been born as a " + ChatColor.AQUA + e.toString() + "bender!");
+			if(e.toString().equalsIgnoreCase("Air")) Bukkit.getPlayer(player.getUUID()).sendMessage(ChatColor.WHITE + "You have been born as an " + ChatColor.GRAY + e.toString() + "bender!");
 		}else{
-			Bukkit.getPlayer(player.getUUID()).sendMessage(ChatColor.WHITE + "You have been raised as a " + ChiMethods.getChiColor() + "Chiblocker!");
+			Bukkit.getPlayer(player.getUUID()).sendMessage(ChatColor.WHITE + "You have been raised as a " + ChatColor.GOLD + "Chiblocker!");
 		}
 	}
 	
@@ -230,21 +225,21 @@ public class RPGMethods {
 		plugin.getConfig().set("Avatar.Current", uuid.toString());
 		plugin.saveConfig();
 		Player player = Bukkit.getPlayer(uuid);
-		BendingPlayer bPlayer = GeneralMethods.getBendingPlayer(player.getName());
+		BendingPlayer bPlayer = BendingPlayer.getBendingPlayer(player.getName());
 		String element = "none";
-		if (bPlayer.getElements().contains(Element.Air)) element = "air";
-		if (bPlayer.getElements().contains(Element.Water)) element = "water";
-		if (bPlayer.getElements().contains(Element.Earth)) element = "earth";
-		if (bPlayer.getElements().contains(Element.Fire)) element = "fire";
-		if (bPlayer.getElements().contains(Element.Chi)) element = "chi";
+		if (bPlayer.getElements().contains(Element.AIR)) element = "air";
+		if (bPlayer.getElements().contains(Element.WATER)) element = "water";
+		if (bPlayer.getElements().contains(Element.EARTH)) element = "earth";
+		if (bPlayer.getElements().contains(Element.FIRE)) element = "fire";
+		if (bPlayer.getElements().contains(Element.CHI)) element = "chi";
 
 		/*
 		 * Gives them the elements
 		 */
-		if (!bPlayer.getElements().contains(Element.Air)) bPlayer.addElement(Element.Air);
-		if (!bPlayer.getElements().contains(Element.Water)) bPlayer.addElement(Element.Water);
-		if (!bPlayer.getElements().contains(Element.Earth)) bPlayer.addElement(Element.Earth);
-		if (!bPlayer.getElements().contains(Element.Fire)) bPlayer.addElement(Element.Fire);
+		if (!bPlayer.getElements().contains(Element.AIR)) bPlayer.addElement(Element.AIR);
+		if (!bPlayer.getElements().contains(Element.WATER)) bPlayer.addElement(Element.WATER);
+		if (!bPlayer.getElements().contains(Element.EARTH)) bPlayer.addElement(Element.EARTH);
+		if (!bPlayer.getElements().contains(Element.FIRE)) bPlayer.addElement(Element.FIRE);
 
 		DBConnection.sql.modifyQuery("INSERT INTO pk_avatars (uuid, player, element) VALUES ('" + uuid.toString() + "', '" + player.getName() + "', '" + element + "')");
 	}

@@ -1,15 +1,14 @@
 package com.projectkorra.rpg.commands;
 
-import java.util.List;
+import com.projectkorra.projectkorra.command.PKCommand;
+import com.projectkorra.rpg.RPGMethods;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import com.projectkorra.projectkorra.GeneralMethods;
-import com.projectkorra.projectkorra.command.PKCommand;
-import com.projectkorra.rpg.RPGMethods;
+import java.util.List;
 
 public class AvatarCommand extends PKCommand{
 
@@ -32,7 +31,7 @@ public class AvatarCommand extends PKCommand{
 			return;
 		} else {
 			RPGMethods.setAvatar(target.getUniqueId());
-			Bukkit.broadcastMessage(ChatColor.WHITE + target.getName() + GeneralMethods.getAvatarColor() + " has been declared avatar!");
+			Bukkit.broadcastMessage(ChatColor.WHITE + target.getName() + ChatColor.DARK_PURPLE + " has been declared avatar!");
 		}
 	}
 

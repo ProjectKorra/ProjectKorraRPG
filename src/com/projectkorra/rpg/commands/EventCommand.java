@@ -1,16 +1,14 @@
 package com.projectkorra.rpg.commands;
 
-import com.projectkorra.rpg.event.LunarEclipseEvent;
-import com.projectkorra.rpg.event.SolarEclipseEvent;
-import com.projectkorra.rpg.event.SozinsCometEvent;
-
 import com.projectkorra.projectkorra.ProjectKorra;
+import com.projectkorra.projectkorra.ability.WaterAbility;
 import com.projectkorra.projectkorra.command.PKCommand;
-import com.projectkorra.projectkorra.firebending.FireMethods;
-import com.projectkorra.projectkorra.waterbending.WaterMethods;
 import com.projectkorra.rpg.RPGMethods;
 import com.projectkorra.rpg.event.EventManager;
 import com.projectkorra.rpg.event.FullMoonEvent;
+import com.projectkorra.rpg.event.LunarEclipseEvent;
+import com.projectkorra.rpg.event.SolarEclipseEvent;
+import com.projectkorra.rpg.event.SozinsCometEvent;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -57,7 +55,7 @@ public class EventCommand extends PKCommand{
 				Player player = (Player)sender;
 				String name = args.get(1);
 				if (name.equalsIgnoreCase("FullMoon")) {
-					if (!WaterMethods.isNight(player.getWorld())) {
+					if (!WaterAbility.isNight(player.getWorld())) {
 						player.sendMessage(ChatColor.DARK_AQUA + "There cannot be a full moon during the day!");
 						return;
 					} else if (RPGMethods.isHappening(player.getWorld(), "LunarEclipse")) {
@@ -70,24 +68,24 @@ public class EventCommand extends PKCommand{
 						ProjectKorra.plugin.getServer().getPluginManager().callEvent(new FullMoonEvent(player.getWorld()));
 					}
 				} else if (name.equalsIgnoreCase("LunarEclipse")) {
-					if (!WaterMethods.isNight(player.getWorld())) {
-						player.sendMessage(WaterMethods.getWaterColor() + "It is not night time, a lunar eclipse cannot happen during the day!");
+					if (!WaterAbility.isNight(player.getWorld())) {
+						player.sendMessage(ChatColor.AQUA + "It is not night time, a lunar eclipse cannot happen during the day!");
 						return;
 					} else if (RPGMethods.isHappening(player.getWorld(), "LunarEclipse")) {
-						player.sendMessage(WaterMethods.getWaterColor() + "There is already a lunar eclipse in progress!");
+						player.sendMessage(ChatColor.AQUA + "There is already a lunar eclipse in progress!");
 						return;
 					} else {
 						ProjectKorra.plugin.getServer().getPluginManager().callEvent(new LunarEclipseEvent(player.getWorld()));
 					}
 				} else if (name.equalsIgnoreCase("SolarEclipse")) {
-					if (WaterMethods.isNight(player.getWorld())) {
-						player.sendMessage(FireMethods.getFireColor() + "It is not day time, a solar eclipse cannot happen during the day!");
+					if (WaterAbility.isNight(player.getWorld())) {
+						player.sendMessage(ChatColor.RED + "It is not day time, a solar eclipse cannot happen during the day!");
 						return;
 					} else if (RPGMethods.isHappening(player.getWorld(), "SozinsComet")) {
-						player.sendMessage(FireMethods.getFireColor() + "Starting a solar eclipse will have no effect with Sozin's comet in range!");
+						player.sendMessage(ChatColor.RED + "Starting a solar eclipse will have no effect with Sozin's comet in range!");
 						return;
 					} else if (RPGMethods.isHappening(player.getWorld(), "SolarEclipse")) {
-						player.sendMessage(FireMethods.getFireColor() + "There is already a solar eclipse in progress!");
+						player.sendMessage(ChatColor.RED + "There is already a solar eclipse in progress!");
 						return;
 					} else {
 						ProjectKorra.plugin.getServer().getPluginManager().callEvent(new SolarEclipseEvent(player.getWorld()));

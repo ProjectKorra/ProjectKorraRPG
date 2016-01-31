@@ -1,10 +1,10 @@
 package com.projectkorra.rpg.event;
 
+import com.projectkorra.projectkorra.BendingPlayer;
 import com.projectkorra.projectkorra.Element;
-import com.projectkorra.projectkorra.GeneralMethods;
 import com.projectkorra.projectkorra.ProjectKorra;
+import com.projectkorra.projectkorra.ability.FireAbility;
 import com.projectkorra.projectkorra.configuration.ConfigManager;
-import com.projectkorra.projectkorra.firebending.FireMethods;
 import com.projectkorra.rpg.ProjectKorraRPG;
 import com.projectkorra.rpg.RPGMethods;
 
@@ -36,7 +36,7 @@ public class EventManager implements Runnable{
 				if (marker.get(world).equalsIgnoreCase("SozinsComet")) {
 					handleSozinsComet(world);
 				}
-				if (FireMethods.isDay(world)) {
+				if (FireAbility.isDay(world)) {
 					if (marker.get(world).equalsIgnoreCase("LunarEclipse")) {
 						marker.replace(world, "");
 					}
@@ -51,7 +51,7 @@ public class EventManager implements Runnable{
 			}
 
 			if (!RPGMethods.isEventHappening(world)) {
-				if (FireMethods.isDay(world)) {
+				if (FireAbility.isDay(world)) {
 					if (RPGMethods.isSozinsComet(world) && !RPGMethods.isHappening(world, "SozinsComet")) {
 						ProjectKorra.plugin.getServer().getPluginManager().callEvent(new SozinsCometEvent(world));
 						continue;
@@ -73,10 +73,10 @@ public class EventManager implements Runnable{
 	}
 
 	public void handleSozinsComet(World world) {
-		if (!FireMethods.isDay(world)) {
+		if (!FireAbility.isDay(world)) {
 			marker.put(world, "");
 			for (Player player : Bukkit.getOnlinePlayers()) {
-				if (GeneralMethods.isBender(player.getName(), Element.Fire) && player.getWorld().equals(world)) {
+				if (BendingPlayer.getBendingPlayer(player).hasElement(Element.FIRE) && player.getWorld().equals(world)) {
 					player.sendMessage(ChatColor.DARK_RED + message);
 				}
 			}

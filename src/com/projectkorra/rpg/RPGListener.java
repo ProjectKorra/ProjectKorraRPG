@@ -2,9 +2,8 @@ package com.projectkorra.rpg;
 
 import com.projectkorra.projectkorra.BendingPlayer;
 import com.projectkorra.projectkorra.Element;
-import com.projectkorra.projectkorra.GeneralMethods;
-import com.projectkorra.projectkorra.ability.AvatarState;
-import com.projectkorra.projectkorra.earthbending.EarthMethods;
+import com.projectkorra.projectkorra.ability.EarthAbility;
+import com.projectkorra.projectkorra.avatar.AvatarState;
 import com.projectkorra.rpg.event.EventManager;
 import com.projectkorra.rpg.event.FullMoonEvent;
 import com.projectkorra.rpg.event.LunarEclipseEvent;
@@ -32,16 +31,16 @@ public class RPGListener implements Listener{
 		if(ProjectKorraRPG.plugin.getConfig().getBoolean("Abilities.AvatarStateOnFinalBlow")) {
 			if (event.getEntity() instanceof Player) {
 				Player player = (Player) event.getEntity();
-				if (GeneralMethods.getBendingPlayer(player.getName()) != null && (RPGMethods.isCurrentAvatar(player.getUniqueId()) || RPGMethods.hasBeenAvatar(player.getUniqueId()))) {
-					BendingPlayer bP = GeneralMethods.getBendingPlayer(player.getName());
-					if (event.getCause() == DamageCause.FALL && bP.hasElement(Element.Air)) return;
-					if (event.getCause() == DamageCause.FALL && bP.hasElement(Element.Earth) && EarthMethods.isEarthbendable(player, player.getLocation().getBlock().getRelative(BlockFace.DOWN)))
-						if (player.getHealth() - event.getDamage() <= 0) {
-							if (!bP.isOnCooldown("AvatarState")) {
-								event.setCancelled(true);
-								new AvatarState(player);
-							} 
-						}
+				if (BendingPlayer.getBendingPlayer(player.getName()) != null && (RPGMethods.isCurrentAvatar(player.getUniqueId()) || RPGMethods.hasBeenAvatar(player.getUniqueId()))) {
+					BendingPlayer bP = BendingPlayer.getBendingPlayer(player.getName());
+					if (event.getCause() == DamageCause.FALL && bP.hasElement(Element.AIR)) return;
+					if (event.getCause() == DamageCause.FALL && bP.hasElement(Element.EARTH) && EarthAbility.isEarthbendable(player, player.getLocation().getBlock().getRelative(BlockFace.DOWN)))
+					if (player.getHealth() - event.getDamage() <= 0) {
+						if (!bP.isOnCooldown("AvatarState")) {
+							event.setCancelled(true);
+							new AvatarState(player);
+						} 
+					}
 				}
 			}
 		}
@@ -51,10 +50,10 @@ public class RPGListener implements Listener{
 	public void randomElementAssign(PlayerJoinEvent event) {
 
 		if(!ProjectKorraRPG.plugin.getConfig().getBoolean("ElementAssign.Enabled")) return;
-
-		if(GeneralMethods.getBendingPlayer(event.getPlayer().getName()) != null) {
-			BendingPlayer bp = GeneralMethods.getBendingPlayer(event.getPlayer().getName());
-
+		
+		if(BendingPlayer.getBendingPlayer(event.getPlayer().getName()) != null) {
+			BendingPlayer bp = BendingPlayer.getBendingPlayer(event.getPlayer().getName());
+			
 			if((bp.getElements().isEmpty()) && (!bp.isPermaRemoved())) {
 				RPGMethods.randomAssign(bp);
 			}
@@ -70,11 +69,9 @@ public class RPGListener implements Listener{
 		}
 		EventManager.marker.put(world, "FullMoon");
 		for (Player player : Bukkit.getOnlinePlayers()) {
-			if (player.getWorld().equals(world)) {
-				if (GeneralMethods.isBender(player.getName(), Element.Water)) {
-					if (player.hasPermission("bending.message.nightmessage")) {
-						player.sendMessage(ChatColor.DARK_AQUA + event.getMessage());
-					}
+			if (BendingPlayer.getBendingPlayer(player).hasElement(Element.WATER)) {
+				if (player.hasPermission("bending.message.nightmessage")) {
+					player.sendMessage(ChatColor.DARK_AQUA + event.getMessage());
 				}
 			}
 		}
@@ -89,11 +86,9 @@ public class RPGListener implements Listener{
 		}
 		EventManager.marker.put(world, "LunarEclipse");
 		for (Player player : Bukkit.getOnlinePlayers()) {
-			if (player.getWorld().equals(world)) {
-				if (GeneralMethods.isBender(player.getName(), Element.Water)) {
-					if (player.hasPermission("bending.message.nightmessage")) {
-						player.sendMessage(ChatColor.AQUA + event.getMessage());
-					}
+			if (BendingPlayer.getBendingPlayer(player).hasElement(Element.WATER)) {
+				if (player.hasPermission("bending.message.nightmessage")) {
+					player.sendMessage(ChatColor.AQUA + event.getMessage());
 				}
 			}
 		}
@@ -108,11 +103,9 @@ public class RPGListener implements Listener{
 		}
 		EventManager.marker.put(world, "SolarEclipse");
 		for (Player player : Bukkit.getOnlinePlayers()) {
-			if (player.getWorld().equals(world)) {
-				if (GeneralMethods.isBender(player.getName(), Element.Fire)) {
-					if (player.hasPermission("bending.message.daymessage")) {
-						player.sendMessage(ChatColor.RED + event.getMessage());
-					}
+			if (BendingPlayer.getBendingPlayer(player).hasElement(Element.FIRE)) {
+				if (player.hasPermission("bending.message.daymessage")) {
+					player.sendMessage(ChatColor.RED + event.getMessage());
 				}
 			}
 		}
@@ -128,7 +121,7 @@ public class RPGListener implements Listener{
 		}
 		for (Player player : Bukkit.getOnlinePlayers()) {
 			if (player.getWorld().equals(world)) {
-				if (GeneralMethods.isBender(player.getName(), Element.Fire)) {
+				if (BendingPlayer.getBendingPlayer(player).hasElement(Element.FIRE)) {
 					if (player.hasPermission("bending.message.daymessage")) {
 						player.sendMessage(ChatColor.DARK_RED + event.getMessage());
 					}

@@ -2,8 +2,8 @@
 <classpath>
 	<classpathentry excluding="src/" kind="src" path=""/>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="lib" path="C:/Users/Benford/Downloads/Test server/spigot-BT38_1.8.7_06.3.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="C:/Users/Benford/Downloads/ProjectKorra.jar"/>
+	<classpathentry kind="lib" path="E:/Dev/Testing Servers/ProjectKorra Refactor Server/spigot.jar"/>
+	<classpathentry kind="lib" path="E:/Dev/Testing Servers/ProjectKorra Refactor Server/plugins/ProjectKorra.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

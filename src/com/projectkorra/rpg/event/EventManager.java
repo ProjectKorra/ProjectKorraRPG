@@ -76,7 +76,7 @@ public class EventManager implements Runnable{
 		if (!FireAbility.isDay(world)) {
 			marker.put(world, "");
 			for (Player player : Bukkit.getOnlinePlayers()) {
-				if (BendingPlayer.getBendingPlayer(player).hasElement(Element.FIRE)) {
+				if (BendingPlayer.getBendingPlayer(player).hasElement(Element.FIRE) && player.getWorld().equals(world)) {
 					player.sendMessage(ChatColor.DARK_RED + message);
 				}
 			}

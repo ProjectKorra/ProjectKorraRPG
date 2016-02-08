@@ -1,5 +1,6 @@
 package com.projectkorra.rpg.commands;
 
+import com.projectkorra.projectkorra.Element;
 import com.projectkorra.projectkorra.ProjectKorra;
 import com.projectkorra.projectkorra.ability.WaterAbility;
 import com.projectkorra.projectkorra.command.PKCommand;
@@ -11,6 +12,7 @@ import com.projectkorra.rpg.event.SolarEclipseEvent;
 import com.projectkorra.rpg.event.SozinsCometEvent;
 
 import org.bukkit.ChatColor;
+import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -19,7 +21,7 @@ import java.util.List;
 public class EventCommand extends PKCommand{
 
 	public EventCommand() {
-		super("worldevent", "/bending worldevent help|start|current [worldevent]", "Main command for anything dealing with RPG world events.mk", new String[] {"worldevent", "worlde", "event", "we"});
+		super("worldevent", "/bending worldevent help|start|current [worldevent]", "Main command for anything dealing with RPG world events.", new String[] {"worldevent", "worlde", "event", "we"});
 	}
 
 	@Override
@@ -32,17 +34,17 @@ public class EventCommand extends PKCommand{
 			} else if (args.get(0).equalsIgnoreCase("help")) {
 				sender.sendMessage(ChatColor.YELLOW + getDescription());
 				sender.sendMessage(ChatColor.YELLOW + "WorldEvents:");
-				sender.sendMessage(ChatColor.DARK_AQUA + "FullMoon");
-				sender.sendMessage(ChatColor.AQUA + "LunarEclipse");
-				sender.sendMessage(ChatColor.RED + "SolarEclipse");
-				sender.sendMessage(ChatColor.DARK_RED + "SozinsComet");
+				sender.sendMessage(Element.ICE.getColor() + "FullMoon");
+				sender.sendMessage(Element.WATER.getColor() + "LunarEclipse");
+				sender.sendMessage(Element.FIRE.getColor() + "SolarEclipse");
+				sender.sendMessage(Element.COMBUSTION.getColor() + "SozinsComet");
 			} else if (args.get(0).equalsIgnoreCase("current")) {
 				if (!isPlayer(sender)) return;
 				Player player = (Player)sender;
-				if (EventManager.marker.get(player.getWorld()) == "") {
+				if (!EventManager.getMarker().containsKey(player.getWorld()) || EventManager.getMarker().get(player.getWorld()) == "") {
 					sender.sendMessage(ChatColor.RED + "There are no current world events happening in this world.");
 				} else {
-					sender.sendMessage(ChatColor.YELLOW + "Current event:" + EventManager.marker.get(player.getWorld()));
+					sender.sendMessage(ChatColor.YELLOW + "Current event: " + EventManager.getMarker().get(player.getWorld()));
 				}
 			}
 		} else if (args.size() == 2) {
@@ -53,39 +55,43 @@ public class EventCommand extends PKCommand{
 					return;
 				}
 				Player player = (Player)sender;
+				if (player.getWorld().getEnvironment().equals(World.Environment.NETHER) || player.getWorld().getEnvironment().equals(World.Environment.THE_END)) {
+					player.sendMessage(ChatColor.RED + "Cannot start an Event in this world type!");
+					return;
+				}
 				String name = args.get(1);
 				if (name.equalsIgnoreCase("FullMoon")) {
 					if (!WaterAbility.isNight(player.getWorld())) {
-						player.sendMessage(ChatColor.DARK_AQUA + "There cannot be a full moon during the day!");
+						player.sendMessage(Element.ICE.getColor() + "There cannot be a full moon during the day!");
 						return;
 					} else if (RPGMethods.isHappening(player.getWorld(), "LunarEclipse")) {
-						player.sendMessage(ChatColor.DARK_AQUA + "The lunar eclipse is blocking your command!");
+						player.sendMessage(Element.ICE.getColor() + "The lunar eclipse is blocking your command!");
 						return;
 					} else if (RPGMethods.isHappening(player.getWorld(), "FullMoon")) {
-						player.sendMessage(ChatColor.DARK_AQUA + "There is already a full moon out!");
+						player.sendMessage(Element.ICE.getColor() + "There is already a full moon out!");
 						return;
 					} else {
 						ProjectKorra.plugin.getServer().getPluginManager().callEvent(new FullMoonEvent(player.getWorld()));
 					}
 				} else if (name.equalsIgnoreCase("LunarEclipse")) {
 					if (!WaterAbility.isNight(player.getWorld())) {
-						player.sendMessage(ChatColor.AQUA + "It is not night time, a lunar eclipse cannot happen during the day!");
+						player.sendMessage(Element.WATER.getColor() + "It is not night time, a lunar eclipse cannot happen during the day!");
 						return;
 					} else if (RPGMethods.isHappening(player.getWorld(), "LunarEclipse")) {
-						player.sendMessage(ChatColor.AQUA + "There is already a lunar eclipse in progress!");
+						player.sendMessage(Element.WATER.getColor() + "There is already a lunar eclipse in progress!");
 						return;
 					} else {
 						ProjectKorra.plugin.getServer().getPluginManager().callEvent(new LunarEclipseEvent(player.getWorld()));
 					}
 				} else if (name.equalsIgnoreCase("SolarEclipse")) {
 					if (WaterAbility.isNight(player.getWorld())) {
-						player.sendMessage(ChatColor.RED + "It is not day time, a solar eclipse cannot happen during the day!");
+						player.sendMessage(Element.FIRE.getColor() + "It is not day time, a solar eclipse cannot happen during the day!");
 						return;
 					} else if (RPGMethods.isHappening(player.getWorld(), "SozinsComet")) {
-						player.sendMessage(ChatColor.RED + "Starting a solar eclipse will have no effect with Sozin's comet in range!");
+						player.sendMessage(Element.FIRE.getColor() + "Starting a solar eclipse will have no effect with Sozin's comet in range!");
 						return;
 					} else if (RPGMethods.isHappening(player.getWorld(), "SolarEclipse")) {
-						player.sendMessage(ChatColor.RED + "There is already a solar eclipse in progress!");
+						player.sendMessage(Element.FIRE.getColor() + "There is already a solar eclipse in progress!");
 						return;
 					} else {
 						ProjectKorra.plugin.getServer().getPluginManager().callEvent(new SolarEclipseEvent(player.getWorld()));
@@ -94,7 +100,7 @@ public class EventCommand extends PKCommand{
 					if (!RPGMethods.isHappening(player.getWorld(), "SozinsComet")) {
 						ProjectKorra.plugin.getServer().getPluginManager().callEvent(new SozinsCometEvent(player.getWorld()));
 					} else {
-						player.sendMessage(ChatColor.DARK_RED + "You cannot have two comets in the sky at the same time!");
+						player.sendMessage(Element.COMBUSTION.getColor() + "You cannot have two comets in the sky at the same time!");
 					}
 				}
 			}

@@ -69,7 +69,8 @@ public class RPGListener implements Listener{
 		}
 		EventManager.marker.put(world, "FullMoon");
 		for (Player player : Bukkit.getOnlinePlayers()) {
-			if (BendingPlayer.getBendingPlayer(player).hasElement(Element.WATER)) {
+			BendingPlayer bPlayer = BendingPlayer.getBendingPlayer(player);
+			if (bPlayer != null && bPlayer.hasElement(Element.WATER)) {
 				if (player.hasPermission("bending.message.nightmessage")) {
 					player.sendMessage(ChatColor.DARK_AQUA + event.getMessage());
 				}
@@ -86,7 +87,8 @@ public class RPGListener implements Listener{
 		}
 		EventManager.marker.put(world, "LunarEclipse");
 		for (Player player : Bukkit.getOnlinePlayers()) {
-			if (BendingPlayer.getBendingPlayer(player).hasElement(Element.WATER)) {
+			BendingPlayer bPlayer = BendingPlayer.getBendingPlayer(player);
+			if (bPlayer != null && bPlayer.hasElement(Element.WATER)) {
 				if (player.hasPermission("bending.message.nightmessage")) {
 					player.sendMessage(ChatColor.AQUA + event.getMessage());
 				}
@@ -103,7 +105,8 @@ public class RPGListener implements Listener{
 		}
 		EventManager.marker.put(world, "SolarEclipse");
 		for (Player player : Bukkit.getOnlinePlayers()) {
-			if (BendingPlayer.getBendingPlayer(player).hasElement(Element.FIRE)) {
+			BendingPlayer bPlayer = BendingPlayer.getBendingPlayer(player);
+			if (bPlayer != null && bPlayer.hasElement(Element.FIRE)) {
 				if (player.hasPermission("bending.message.daymessage")) {
 					player.sendMessage(ChatColor.RED + event.getMessage());
 				}
@@ -121,7 +124,8 @@ public class RPGListener implements Listener{
 		}
 		for (Player player : Bukkit.getOnlinePlayers()) {
 			if (player.getWorld().equals(world)) {
-				if (BendingPlayer.getBendingPlayer(player).hasElement(Element.FIRE)) {
+				BendingPlayer bPlayer = BendingPlayer.getBendingPlayer(player);
+				if (bPlayer != null && bPlayer.hasElement(Element.FIRE)) {
 					if (player.hasPermission("bending.message.daymessage")) {
 						player.sendMessage(ChatColor.DARK_RED + event.getMessage());
 					}

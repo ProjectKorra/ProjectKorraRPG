@@ -9,7 +9,6 @@ import com.projectkorra.rpg.ProjectKorraRPG;
 import com.projectkorra.rpg.RPGMethods;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
@@ -77,9 +76,13 @@ public class EventManager implements Runnable{
 			marker.put(world, "");
 			for (Player player : Bukkit.getOnlinePlayers()) {
 				if (BendingPlayer.getBendingPlayer(player).hasElement(Element.FIRE) && player.getWorld().equals(world)) {
-					player.sendMessage(ChatColor.DARK_RED + message);
+					player.sendMessage(Element.COMBUSTION.getColor() + message);
 				}
 			}
 		}
+	}
+	
+	public static ConcurrentHashMap<World, String> getMarker() {
+		return marker;
 	}
 }

@@ -11,7 +11,6 @@ import com.projectkorra.rpg.event.SolarEclipseEvent;
 import com.projectkorra.rpg.event.SozinsCometEvent;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
@@ -35,12 +34,12 @@ public class RPGListener implements Listener{
 					BendingPlayer bP = BendingPlayer.getBendingPlayer(player.getName());
 					if (event.getCause() == DamageCause.FALL && bP.hasElement(Element.AIR)) return;
 					if (event.getCause() == DamageCause.FALL && bP.hasElement(Element.EARTH) && EarthAbility.isEarthbendable(player, player.getLocation().getBlock().getRelative(BlockFace.DOWN)))
-					if (player.getHealth() - event.getDamage() <= 0) {
-						if (!bP.isOnCooldown("AvatarState")) {
-							event.setCancelled(true);
-							new AvatarState(player);
-						} 
-					}
+						if (player.getHealth() - event.getDamage() <= 0) {
+							if (!bP.isOnCooldown("AvatarState")) {
+								event.setCancelled(true);
+								new AvatarState(player);
+							} 
+						}
 				}
 			}
 		}
@@ -50,10 +49,10 @@ public class RPGListener implements Listener{
 	public void randomElementAssign(PlayerJoinEvent event) {
 
 		if(!ProjectKorraRPG.plugin.getConfig().getBoolean("ElementAssign.Enabled")) return;
-		
+
 		if(BendingPlayer.getBendingPlayer(event.getPlayer().getName()) != null) {
 			BendingPlayer bp = BendingPlayer.getBendingPlayer(event.getPlayer().getName());
-			
+
 			if((bp.getElements().isEmpty()) && (!bp.isPermaRemoved())) {
 				RPGMethods.randomAssign(bp);
 			}
@@ -69,10 +68,11 @@ public class RPGListener implements Listener{
 		}
 		EventManager.marker.put(world, "FullMoon");
 		for (Player player : Bukkit.getOnlinePlayers()) {
+			if (player.getWorld() != world) continue;
 			BendingPlayer bPlayer = BendingPlayer.getBendingPlayer(player);
 			if (bPlayer != null && bPlayer.hasElement(Element.WATER)) {
 				if (player.hasPermission("bending.message.nightmessage")) {
-					player.sendMessage(ChatColor.DARK_AQUA + event.getMessage());
+					player.sendMessage(Element.ICE.getColor() + event.getMessage());
 				}
 			}
 		}
@@ -87,10 +87,11 @@ public class RPGListener implements Listener{
 		}
 		EventManager.marker.put(world, "LunarEclipse");
 		for (Player player : Bukkit.getOnlinePlayers()) {
+			if (player.getWorld() != world) continue;
 			BendingPlayer bPlayer = BendingPlayer.getBendingPlayer(player);
 			if (bPlayer != null && bPlayer.hasElement(Element.WATER)) {
 				if (player.hasPermission("bending.message.nightmessage")) {
-					player.sendMessage(ChatColor.AQUA + event.getMessage());
+					player.sendMessage(Element.WATER.getColor() + event.getMessage());
 				}
 			}
 		}
@@ -105,10 +106,11 @@ public class RPGListener implements Listener{
 		}
 		EventManager.marker.put(world, "SolarEclipse");
 		for (Player player : Bukkit.getOnlinePlayers()) {
+			if (player.getWorld() != world) continue;
 			BendingPlayer bPlayer = BendingPlayer.getBendingPlayer(player);
 			if (bPlayer != null && bPlayer.hasElement(Element.FIRE)) {
 				if (player.hasPermission("bending.message.daymessage")) {
-					player.sendMessage(ChatColor.RED + event.getMessage());
+					player.sendMessage(Element.FIRE.getColor() + event.getMessage());
 				}
 			}
 		}
@@ -123,12 +125,11 @@ public class RPGListener implements Listener{
 			return;
 		}
 		for (Player player : Bukkit.getOnlinePlayers()) {
-			if (player.getWorld().equals(world)) {
-				BendingPlayer bPlayer = BendingPlayer.getBendingPlayer(player);
-				if (bPlayer != null && bPlayer.hasElement(Element.FIRE)) {
-					if (player.hasPermission("bending.message.daymessage")) {
-						player.sendMessage(ChatColor.DARK_RED + event.getMessage());
-					}
+			if (player.getWorld() != world) continue;
+			BendingPlayer bPlayer = BendingPlayer.getBendingPlayer(player);
+			if (bPlayer != null && bPlayer.hasElement(Element.FIRE)) {
+				if (player.hasPermission("bending.message.daymessage")) {
+					player.sendMessage(Element.COMBUSTION.getColor() + event.getMessage());
 				}
 			}
 		}

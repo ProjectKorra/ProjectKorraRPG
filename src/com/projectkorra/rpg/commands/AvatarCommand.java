@@ -13,7 +13,7 @@ import java.util.List;
 public class AvatarCommand extends PKCommand{
 
 	public AvatarCommand() {
-		super("avatar", "/bending avatar [player]", "This command defines a player as the avatar and gives them all the elements and other perks.", new String[] {"avatar", "av", "a", "avy"});
+		super("avatar", "/bending avatar [player]", "This command defines a player as the avatar and gives them all the elements and other perks.", new String[] {"avatar", "av", "avy"});
 	}
 
 	@Override

@@ -2,26 +2,22 @@ package com.projectkorra.rpg;
 
 import com.projectkorra.projectkorra.BendingPlayer;
 import com.projectkorra.projectkorra.Element;
+import com.projectkorra.projectkorra.Element.SubElement;
 import com.projectkorra.projectkorra.GeneralMethods;
+import com.projectkorra.rpg.configuration.ConfigManager;
 import com.projectkorra.rpg.event.EventManager;
-import com.projectkorra.rpg.storage.DBConnection;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
 public class RPGMethods {
-
-	static ProjectKorraRPG plugin;
-
-	public RPGMethods(ProjectKorraRPG plugin) {
-		RPGMethods.plugin = plugin;
-	}
 	
 	/**
 	 * Returns false if the world event isn't enabled
@@ -113,7 +109,7 @@ public class RPGMethods {
 	 * @return boolean of if param we is enabled
 	 */
 	public static boolean getEnabled(String we) {
-		return ProjectKorraRPG.plugin.getConfig().getBoolean("WorldEvents." + we + ".Enabled");
+		return ConfigManager.rpgConfig.get().getBoolean("WorldEvents." + we + ".Enabled");
 	}
 
 	/**
@@ -124,7 +120,7 @@ public class RPGMethods {
 	public static int getFrequency(String we) {
 		if (we == "FullMoon")
 			return 8;
-		return ProjectKorraRPG.plugin.getConfig().getInt("WorldEvents." + we + ".Frequency");
+		return ConfigManager.rpgConfig.get().getInt("WorldEvents." + we + ".Frequency");
 	}
 
 	/**
@@ -135,7 +131,7 @@ public class RPGMethods {
 	public static double getFactor(String we) {
 		if (we == "SolarEclipse" || we == "LunarEclipse")
 			return 0;
-		return ProjectKorraRPG.plugin.getConfig().getDouble("WorldEvents." + we + ".Factor");
+		return ConfigManager.rpgConfig.get().getDouble("WorldEvents." + we + ".Factor");
 	}
 	
 	/**
@@ -144,13 +140,13 @@ public class RPGMethods {
 	 */
 	public static void randomAssign(BendingPlayer player) {
 		double rand = Math.random();
-		double earthchance = ProjectKorraRPG.plugin.getConfig().getDouble("ElementAssign.Percentages.Earth");
-		double firechance = ProjectKorraRPG.plugin.getConfig().getDouble("ElementAssign.Percentages.Fire");
-		double airchance = ProjectKorraRPG.plugin.getConfig().getDouble("ElementAssign.Percentages.Air");
-		double waterchance = ProjectKorraRPG.plugin.getConfig().getDouble("ElementAssign.Percentages.Water");
-		double chichance = ProjectKorraRPG.plugin.getConfig().getDouble("ElementAssign.Percentages.Chi");
+		double earthchance = ConfigManager.rpgConfig.get().getDouble("ElementAssign.Percentages.Earth");
+		double firechance = ConfigManager.rpgConfig.get().getDouble("ElementAssign.Percentages.Fire");
+		double airchance = ConfigManager.rpgConfig.get().getDouble("ElementAssign.Percentages.Air");
+		double waterchance = ConfigManager.rpgConfig.get().getDouble("ElementAssign.Percentages.Water");
+		double chichance = ConfigManager.rpgConfig.get().getDouble("ElementAssign.Percentages.Chi");
 
-		if(ProjectKorraRPG.plugin.getConfig().getBoolean("ElementAssign.Enabled")) {
+		if(ConfigManager.rpgConfig.get().getBoolean("ElementAssign.Enabled")) {
 			if (rand < earthchance ) {
 				assignElement(player, Element.EARTH, false);
 				return;
@@ -176,7 +172,7 @@ public class RPGMethods {
 				return;
 			}
 		} else {
-			String defaultElement = ProjectKorraRPG.plugin.getConfig().getString("ElementAssign.Default");
+			String defaultElement = ConfigManager.rpgConfig.get().getString("ElementAssign.Default");
 			Element e = Element.EARTH;
 			
 			if(defaultElement.equalsIgnoreCase("None")) {
@@ -222,40 +218,46 @@ public class RPGMethods {
 	 * @param uuid UUID of player being set as the avatar
 	 */
 	public static void setAvatar(UUID uuid) {
-		plugin.getConfig().set("Avatar.Current", uuid.toString());
-		plugin.saveConfig();
+		if (ConfigManager.avatarConfig.get().contains("Avatar.Current")) {
+			UUID curr = UUID.fromString(ConfigManager.avatarConfig.get().getString("Avatar.Current"));
+			revokeAvatar(curr);
+		}
+		ConfigManager.avatarConfig.get().set("Avatar.Current", uuid.toString());
 		Player player = Bukkit.getPlayer(uuid);
 		BendingPlayer bPlayer = BendingPlayer.getBendingPlayer(player.getName());
-		String element = "none";
-		if (bPlayer.getElements().contains(Element.AIR)) element = "air";
-		if (bPlayer.getElements().contains(Element.WATER)) element = "water";
-		if (bPlayer.getElements().contains(Element.EARTH)) element = "earth";
-		if (bPlayer.getElements().contains(Element.FIRE)) element = "fire";
-		if (bPlayer.getElements().contains(Element.CHI)) element = "chi";
-
+		StringBuilder sb = new StringBuilder();
+		int i = 0;
+		for (Element e : bPlayer.getElements()) {
+			if (e instanceof SubElement) continue;
+			
+			if (bPlayer.getElements().size() - 1 == i) {
+				sb.append(e.toString());
+			} else {
+				sb.append(e.toString() + ":");
+			}
+			i += 1;
+		}
+		ConfigManager.avatarConfig.get().set("Avatar.Past." + uuid.toString(), sb.toString());
 		/*
 		 * Gives them the elements
 		 */
-		if (!bPlayer.getElements().contains(Element.AIR)) bPlayer.addElement(Element.AIR);
-		if (!bPlayer.getElements().contains(Element.WATER)) bPlayer.addElement(Element.WATER);
-		if (!bPlayer.getElements().contains(Element.EARTH)) bPlayer.addElement(Element.EARTH);
-		if (!bPlayer.getElements().contains(Element.FIRE)) bPlayer.addElement(Element.FIRE);
-
-		DBConnection.sql.modifyQuery("INSERT INTO pk_avatars (uuid, player, element) VALUES ('" + uuid.toString() + "', '" + player.getName() + "', '" + element + "')");
+		bPlayer.getElements().clear();
+		bPlayer.getElements().addAll(Arrays.asList(Element.getAllElements()));
+		GeneralMethods.saveElements(bPlayer);
+		ConfigManager.avatarConfig.save();
 	}
 
 	/**
 	 * Checks if player with uuid is they current avatar. Returns null if there is no current avatar
 	 * @param uuid UUID of player being checked
-	 * @return if player with uuid is or is not the current avatar
+	 * @return if player with uuid is the current avatar
 	 */
 	public static boolean isCurrentAvatar(UUID uuid) {
-		String currAvatar = plugin.getConfig().getString("Avatar.Current");
+		String currAvatar = ConfigManager.avatarConfig.get().getString("Avatar.Current");
 		if (currAvatar == null) {
 			return false;
 		}
-		UUID uuid2 = UUID.fromString(currAvatar);
-		if (uuid.toString().equalsIgnoreCase(uuid2.toString())) {
+		if (uuid.toString().equalsIgnoreCase(currAvatar)) {
 			return true;
 		}
 		return false;
@@ -268,15 +270,24 @@ public class RPGMethods {
 	 */
 	public static boolean hasBeenAvatar(UUID uuid) {
 		if (isCurrentAvatar(uuid)) return true;
-		ResultSet rs2 = DBConnection.sql.readQuery("SELECT * FROM pk_avatars WHERE uuid = '" + uuid.toString() + "'");
-		try {
-			if (rs2.next()) {
-				return true;
-			}
-
-		} catch (SQLException ex) {
-			ex.printStackTrace();
-		}
+		if (ConfigManager.avatarConfig.get().contains("Avatar.Past." + uuid.toString())) return true;
 		return false;
+	}
+	
+	/**
+	 * Removes the rpg avatar permissions for the player with the matching uuid, if they are the current avatar
+	 * @param uuid UUID of player being checked
+	 */
+	public static void revokeAvatar(UUID uuid) {
+		if (!isCurrentAvatar(uuid)) return;
+		List<Element> elements = new ArrayList<>();
+		BendingPlayer bPlayer = BendingPlayer.getBendingPlayer(Bukkit.getPlayer(uuid));
+		if (bPlayer == null) return;
+		for (String s : ConfigManager.avatarConfig.get().getString("Avatar.Past." + uuid.toString()).split(":")) {
+			elements.add(Element.fromString(s));
+		}
+		bPlayer.getElements().clear();
+		bPlayer.getElements().addAll(elements);
+		GeneralMethods.saveElements(bPlayer);
 	}
 }

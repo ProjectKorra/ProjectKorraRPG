@@ -23,6 +23,10 @@ public class EventManager implements Runnable{
 	@Override
 	public void run() {
 		for (World world : Bukkit.getServer().getWorlds()) {
+			if (world.getEnvironment() == World.Environment.NETHER || world.getEnvironment() == World.Environment.THE_END) {
+				continue;
+			}
+			
 			if (ConfigManager.defaultConfig.get().getStringList("Properties.DisabledWorlds").contains(world.getName())) {
 				continue;
 			}
@@ -74,7 +78,7 @@ public class EventManager implements Runnable{
 	public void handleSozinsComet(World world) {
 		if (!FireAbility.isDay(world)) {
 			marker.put(world, "");
-			for (Player player : Bukkit.getOnlinePlayers()) {
+			for (Player player : world.getPlayers()) {
 				if (BendingPlayer.getBendingPlayer(player).hasElement(Element.FIRE) && player.getWorld().equals(world)) {
 					player.sendMessage(Element.COMBUSTION.getColor() + message);
 				}

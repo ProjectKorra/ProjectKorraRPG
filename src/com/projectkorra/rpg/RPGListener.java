@@ -10,7 +10,6 @@ import com.projectkorra.rpg.event.LunarEclipseEvent;
 import com.projectkorra.rpg.event.SolarEclipseEvent;
 import com.projectkorra.rpg.event.SozinsCometEvent;
 
-import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
@@ -33,28 +32,16 @@ public class RPGListener implements Listener{
 				if (BendingPlayer.getBendingPlayer(player.getName()) != null && (RPGMethods.isCurrentAvatar(player.getUniqueId()) || RPGMethods.hasBeenAvatar(player.getUniqueId()))) {
 					BendingPlayer bP = BendingPlayer.getBendingPlayer(player.getName());
 					if (event.getCause() == DamageCause.FALL && bP.hasElement(Element.AIR)) return;
-					if (event.getCause() == DamageCause.FALL && bP.hasElement(Element.EARTH) && EarthAbility.isEarthbendable(player, player.getLocation().getBlock().getRelative(BlockFace.DOWN)))
+					else if (event.getCause() == DamageCause.FALL && bP.hasElement(Element.EARTH) && EarthAbility.isEarthbendable(player, player.getLocation().getBlock().getRelative(BlockFace.DOWN))) return;
+					else if (event.getCause() == DamageCause.FALL) {
 						if (player.getHealth() - event.getDamage() <= 0) {
 							if (!bP.isOnCooldown("AvatarState")) {
 								event.setCancelled(true);
 								new AvatarState(player);
 							} 
 						}
+					}
 				}
-			}
-		}
-	}
-
-	@EventHandler(priority = EventPriority.HIGHEST)
-	public void randomElementAssign(PlayerJoinEvent event) {
-
-		if(!ProjectKorraRPG.plugin.getConfig().getBoolean("ElementAssign.Enabled")) return;
-
-		if(BendingPlayer.getBendingPlayer(event.getPlayer().getName()) != null) {
-			BendingPlayer bp = BendingPlayer.getBendingPlayer(event.getPlayer().getName());
-
-			if((bp.getElements().isEmpty()) && (!bp.isPermaRemoved())) {
-				RPGMethods.randomAssign(bp);
 			}
 		}
 	}
@@ -63,12 +50,8 @@ public class RPGListener implements Listener{
 	public void onFullMoon(FullMoonEvent event) {
 		if (event.isCancelled()) return;
 		World world = event.getWorld();
-		if (world.getEnvironment().equals(World.Environment.NETHER) || world.getEnvironment().equals(World.Environment.THE_END)) {
-			return;
-		}
 		EventManager.marker.put(world, "FullMoon");
-		for (Player player : Bukkit.getOnlinePlayers()) {
-			if (player.getWorld() != world) continue;
+		for (Player player : world.getPlayers()) {
 			BendingPlayer bPlayer = BendingPlayer.getBendingPlayer(player);
 			if (bPlayer != null && bPlayer.hasElement(Element.WATER)) {
 				if (player.hasPermission("bending.message.nightmessage")) {
@@ -82,12 +65,8 @@ public class RPGListener implements Listener{
 	public void onLunarEclipse(LunarEclipseEvent event) {
 		if (event.isCancelled()) return;
 		World world = event.getWorld();
-		if (world.getEnvironment().equals(World.Environment.NETHER) || world.getEnvironment().equals(World.Environment.THE_END)) {
-			return;
-		}
 		EventManager.marker.put(world, "LunarEclipse");
-		for (Player player : Bukkit.getOnlinePlayers()) {
-			if (player.getWorld() != world) continue;
+		for (Player player : world.getPlayers()) {
 			BendingPlayer bPlayer = BendingPlayer.getBendingPlayer(player);
 			if (bPlayer != null && bPlayer.hasElement(Element.WATER)) {
 				if (player.hasPermission("bending.message.nightmessage")) {
@@ -101,12 +80,8 @@ public class RPGListener implements Listener{
 	public void onSolarEclipse(SolarEclipseEvent event) {
 		if (event.isCancelled()) return;
 		World world = event.getWorld();
-		if (world.getEnvironment().equals(World.Environment.NETHER) || world.getEnvironment().equals(World.Environment.THE_END)) {
-			return;
-		}
 		EventManager.marker.put(world, "SolarEclipse");
-		for (Player player : Bukkit.getOnlinePlayers()) {
-			if (player.getWorld() != world) continue;
+		for (Player player : world.getPlayers()) {
 			BendingPlayer bPlayer = BendingPlayer.getBendingPlayer(player);
 			if (bPlayer != null && bPlayer.hasElement(Element.FIRE)) {
 				if (player.hasPermission("bending.message.daymessage")) {
@@ -121,16 +96,25 @@ public class RPGListener implements Listener{
 		if (event.isCancelled()) return;
 		World world = event.getWorld();
 		EventManager.marker.put(world, "SozinsComet");
-		if (world.getEnvironment().equals(World.Environment.NETHER) || world.getEnvironment().equals(World.Environment.THE_END)) {
-			return;
-		}
-		for (Player player : Bukkit.getOnlinePlayers()) {
-			if (player.getWorld() != world) continue;
+		for (Player player : world.getPlayers()) {
 			BendingPlayer bPlayer = BendingPlayer.getBendingPlayer(player);
 			if (bPlayer != null && bPlayer.hasElement(Element.FIRE)) {
 				if (player.hasPermission("bending.message.daymessage")) {
 					player.sendMessage(Element.COMBUSTION.getColor() + event.getMessage());
 				}
+			}
+		}
+	}
+	
+	@EventHandler(priority = EventPriority.HIGHEST)
+	public void randomElementAssign(PlayerJoinEvent event) {
+		if(!ProjectKorraRPG.plugin.getConfig().getBoolean("ElementAssign.Enabled")) return;
+
+		if(BendingPlayer.getBendingPlayer(event.getPlayer().getName()) != null) {
+			BendingPlayer bp = BendingPlayer.getBendingPlayer(event.getPlayer().getName());
+
+			if((bp.getElements().isEmpty()) && (!bp.isPermaRemoved())) {
+				RPGMethods.randomAssign(bp);
 			}
 		}
 	}

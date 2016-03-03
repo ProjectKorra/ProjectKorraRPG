@@ -27,12 +27,10 @@ public class AvatarCommand extends PKCommand{
 			sender.sendMessage(ChatColor.RED + "Player not found!");
 			return;
 		} else if (RPGMethods.hasBeenAvatar(target.getUniqueId())) {
-			sender.sendMessage(ChatColor.RED + "Player has already been avatar!");
+			sender.sendMessage(ChatColor.RED + "Player has already been the avatar!");
 			return;
-		} else {
-			RPGMethods.setAvatar(target.getUniqueId());
-			Bukkit.broadcastMessage(ChatColor.WHITE + target.getName() + ChatColor.DARK_PURPLE + " has been declared avatar!");
-		}
+		} 
+		RPGMethods.setAvatar(target.getUniqueId());
+		Bukkit.broadcastMessage(ChatColor.WHITE + target.getName() + ChatColor.DARK_PURPLE + " has been declared avatar!");
 	}
-
 }

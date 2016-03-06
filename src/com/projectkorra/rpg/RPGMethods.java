@@ -68,7 +68,7 @@ public class RPGMethods {
 		if (!getEnabled(comet)) return false;
 		int freq = getFrequency(comet);
 
-		long days = world.getFullTime() / 24000;
+		long days = (world.getFullTime() + 500) / 24000;
 		if (days%freq == 0) return true;
 		return false;
 	}
@@ -83,7 +83,7 @@ public class RPGMethods {
 		if (!getEnabled(eclipse)) return false;
 		int freq = getFrequency(eclipse);
 
-		long days = world.getFullTime() / 24000;
+		long days = (world.getFullTime() + 500) / 24000;
 		if (days%freq == 0) return true;
 		return false;
 	}
@@ -98,7 +98,7 @@ public class RPGMethods {
 		if (!getEnabled(eclipse)) return false;
 		int freq = getFrequency(eclipse);
 
-		long days = world.getFullTime() / 24000;
+		long days = (world.getFullTime() + 500) / 24000;
 		if (days%freq == 0) return true;
 		return false;
 	}

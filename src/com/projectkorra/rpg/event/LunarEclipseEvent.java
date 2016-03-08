@@ -1,6 +1,7 @@
 package com.projectkorra.rpg.event;
 
 import com.projectkorra.rpg.ProjectKorraRPG;
+import com.projectkorra.rpg.configuration.ConfigManager;
 
 import org.bukkit.World;
 import org.bukkit.event.Cancellable;
@@ -11,7 +12,7 @@ public class LunarEclipseEvent extends Event implements Cancellable{
 	
 	public static final HandlerList handlers = new HandlerList();
 	
-	public String message = ProjectKorraRPG.plugin.getConfig().getString("WorldEvents.LunarEclipse.Message");
+	public String message = ConfigManager.rpgConfig.get().getString("WorldEvents.LunarEclipse.Message");
 	public World world;
 	public boolean cancelled;
 	

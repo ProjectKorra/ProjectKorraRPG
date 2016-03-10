@@ -2,11 +2,9 @@ package com.projectkorra.rpg.event;
 
 import com.projectkorra.projectkorra.BendingPlayer;
 import com.projectkorra.projectkorra.Element;
-import com.projectkorra.projectkorra.ProjectKorra;
-import com.projectkorra.projectkorra.ability.FireAbility;
+import com.projectkorra.projectkorra.command.Commands;
 import com.projectkorra.projectkorra.configuration.ConfigManager;
 import com.projectkorra.rpg.ProjectKorraRPG;
-import com.projectkorra.rpg.RPGMethods;
 
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -14,11 +12,12 @@ import org.bukkit.entity.Player;
 
 import java.util.concurrent.ConcurrentHashMap;
 
-public class EventManager implements Runnable{
+public class EventManager implements Runnable {
 
-	private static String message = ProjectKorraRPG.plugin.getConfig().getString("WorldEvents.SozinsComet.EndMessage");
+	private static String message = com.projectkorra.rpg.configuration.ConfigManager.avatarConfig.get().getString("WorldEvents.SozinsComet.EndMessage");
 
 	public static ConcurrentHashMap<World, String> marker = new ConcurrentHashMap<>();
+	public static ConcurrentHashMap<World, Boolean> skipper = new ConcurrentHashMap<>();
 
 	@Override
 	public void run() {
@@ -26,8 +25,12 @@ public class EventManager implements Runnable{
 			if (world.getEnvironment() == World.Environment.NETHER || world.getEnvironment() == World.Environment.THE_END) {
 				continue;
 			}
-			
+
 			if (ConfigManager.defaultConfig.get().getStringList("Properties.DisabledWorlds").contains(world.getName())) {
+				continue;
+			}
+			
+			if (Commands.isToggledForAll) {
 				continue;
 			}
 
@@ -35,58 +38,30 @@ public class EventManager implements Runnable{
 				marker.put(world, "");
 			}
 
+			if (!skipper.containsKey(world)) {
+				skipper.put(world, false);
+			}
+			
 			if (!marker.get(world).equals("")) {
-				if (marker.get(world).equalsIgnoreCase("SozinsComet")) {
-					handleSozinsComet(world);
-				}
-				if (FireAbility.isDay(world)) {
-					if (marker.get(world).equalsIgnoreCase("LunarEclipse")) {
-						marker.replace(world, "");
-					}
-					if (marker.get(world).equalsIgnoreCase("FullMoon")) {
-						marker.replace(world, "");
-					}
-				} else {
-					if (marker.get(world).equalsIgnoreCase("SolarEclipse")) {
-						marker.replace(world, "");
-					}
-				}
+				continue;
 			}
 
-			if (!RPGMethods.isEventHappening(world)) {
-				if (FireAbility.isDay(world)) {
-					if (RPGMethods.isSozinsComet(world) && !RPGMethods.isHappening(world, "SozinsComet")) {
-						ProjectKorra.plugin.getServer().getPluginManager().callEvent(new SozinsCometEvent(world));
-						continue;
-					} else if (RPGMethods.isSolarEclipse(world) && !RPGMethods.isHappening(world, "SolarEclipse")) {
-						ProjectKorra.plugin.getServer().getPluginManager().callEvent(new SolarEclipseEvent(world));
-						continue;
-					} 
-				} else {
-					if (RPGMethods.isLunarEclipse(world) && !RPGMethods.isHappening(world, "LunarEclipse")) {
-						ProjectKorra.plugin.getServer().getPluginManager().callEvent(new LunarEclipseEvent(world));
-						continue;
-					} else if (RPGMethods.isFullMoon(world) && !RPGMethods.isHappening(world, "FullMoon")) {
-						ProjectKorra.plugin.getServer().getPluginManager().callEvent(new FullMoonEvent(world));
-						continue;
-					}
-				}
+			if (world.getTime() > 23500 && world.getTime() < 500) {
+				ProjectKorraRPG.plugin.getServer().getPluginManager().callEvent(new WorldSunRiseEvent(world));
+			} else if (world.getTime() > 11500 && world.getTime() < 12500) {
+				ProjectKorraRPG.plugin.getServer().getPluginManager().callEvent(new WorldSunSetEvent(world));
 			}
 		}
 	}
 
-	public void handleSozinsComet(World world) {
-		if (!FireAbility.isDay(world)) {
-			marker.put(world, "");
+	public static void endEvent(World world) {
+		if (marker.get(world).equals("SozinsComet")) {
 			for (Player player : world.getPlayers()) {
-				if (BendingPlayer.getBendingPlayer(player).hasElement(Element.FIRE) && player.getWorld().equals(world)) {
+				if (BendingPlayer.getBendingPlayer(player).hasElement(Element.FIRE)) {
 					player.sendMessage(Element.COMBUSTION.getColor() + message);
 				}
 			}
 		}
-	}
-	
-	public static ConcurrentHashMap<World, String> getMarker() {
-		return marker;
+		marker.put(world, "");
 	}
 }

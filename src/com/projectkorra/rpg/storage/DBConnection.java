@@ -15,52 +15,49 @@ public class DBConnection {
 	private static boolean isOpen;
 
 	public static void init() {
+		open();
+		if (!isOpen) return;
+		if (!sql.tableExists("pk_avatars")) {
+			ProjectKorraRPG.log.info("Creating pk_avatars table.");
+			String query = "CREATE TABLE `pk_avatars` ("
+					+ "`id` INTEGER PRIMARY KEY,"
+					+ "`uuid` TEXT(255),"
+					+ "`player` TEXT(255),"
+					+ "`element` TEXT(255));";
+			sql.modifyQuery(query);
+		}
+	}
+	
+	public static void close() {
+		isOpen = false;
+		sql.close();
+	}
+	
+	public static void open() {
 		engine = ProjectKorraRPG.plugin.getConfig().getString("Storage.engine");
 		host = ProjectKorraRPG.plugin.getConfig().getString("Storage.MySQL.host");
 		port = ProjectKorraRPG.plugin.getConfig().getInt("Storage.MySQL.port");
 		pass = ProjectKorraRPG.plugin.getConfig().getString("Storage.MySQL.pass");
 		db = ProjectKorraRPG.plugin.getConfig().getString("Storage.MySQL.db");
 		user = ProjectKorraRPG.plugin.getConfig().getString("Storage.MySQL.user");
+		if (isOpen) 
+			return;
 		if (engine.equalsIgnoreCase("mysql")) {
-			sql = new MySQL(ProjectKorraRPG.log, "[ProjectKorra] Establishing MySQL Connection... ", host, port, user, pass, db);
+			sql = new MySQL(ProjectKorraRPG.log, "Establishing MySQL Connection... ", host, port, user, pass, db);
 			if (((MySQL) sql).open() == null) {
-				ProjectKorraRPG.log.severe("Disabling due to database error");
+				ProjectKorraRPG.log.severe("Failed to open the database.");
 				return;
 			}
-
 			isOpen = true;
-			ProjectKorraRPG.log.info("[ProjectKorra] Database connection established.");
-
-			if (!sql.tableExists("pk_avatars")) {
-				ProjectKorraRPG.log.info("Creating pk_avatars table.");
-				String query = "CREATE TABLE `pk_avatars` ("
-						+ "`id` int(32) NOT NULL AUTO_INCREMENT,"
-						+ "`uuid` varchar(255),"
-						+ "`player` varchar(255),"
-						+ "`element` varchar(255),"
-						+ " PRIMARY KEY (id));";
-				sql.modifyQuery(query);
-			}
-			
+			ProjectKorraRPG.log.info("Database connection established.");
 		} else {
-			sql = new SQLite(ProjectKorraRPG.log, "[ProjectKorra] Establishing SQLite Connection... ", "projectkorra.db", ProjectKorraRPG.plugin.getDataFolder().getAbsolutePath());
+			sql = new SQLite(ProjectKorraRPG.log, "Establishing SQLite Connection... ", "projectkorra.db", ProjectKorraRPG.plugin.getDataFolder().getAbsolutePath());
 			if (((SQLite) sql).open() == null) {
 				ProjectKorraRPG.log.severe("Disabling due to database error");
 				return;
 			}
-
 			isOpen = true;
-			ProjectKorraRPG.log.info("[ProjectKorra] Database connection established.");
-
-			if (!sql.tableExists("pk_avatars")) {
-				ProjectKorraRPG.log.info("Creating pk_avatars table.");
-				String query = "CREATE TABLE `pk_avatars` ("
-						+ "`id` INTEGER PRIMARY KEY,"
-						+ "`uuid` TEXT(255),"
-						+ "`player` TEXT(255),"
-						+ "`element` TEXT(255));";
-				sql.modifyQuery(query);
-			}
+			ProjectKorraRPG.log.info("Database connection established.");
 		}
 	}
 	

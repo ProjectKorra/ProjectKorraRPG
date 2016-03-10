@@ -1,0 +1,61 @@
+package com.projectkorra.rpg.commands;
+
+import com.projectkorra.projectkorra.Element;
+
+import org.bukkit.ChatColor;
+import org.bukkit.command.CommandSender;
+
+import java.util.Arrays;
+import java.util.List;
+
+public class HelpCommand extends RPGCommand{
+	
+	private String[] fullmoon = {"fullmoon", "fm", "fmoon", "fullm"}; 
+	private String[] lunar = {"lunareclipse", "le", "leclipse", "lunare"}; 
+	private String[] solar = {"solareclipse", "se", "seclipse", "solare"}; 
+	private String[] sozins = {"sozinscomet", "sc", "sozins", "sozinsc", "scomet", "comet"}; 
+	private String[] avatar = {"avatar", "avy", "av"};
+	private String modifiers = ChatColor.BLUE + "Command Modifiers : [] - optional : <> - required : () - together";
+
+	public HelpCommand() {
+		super("help", "/bending rpg help [topic]", "Shows all helpful information for rpg", new String[] {"help", "h", "?"});
+	}
+
+	@Override
+	public void execute(CommandSender sender, List<String> args) {
+		if (!correctLength(sender, args.size(), 0, 1)) {
+			return;
+		}
+		
+		StringBuilder help = new StringBuilder(modifiers);
+		for (RPGCommand command : RPGCommand.instances.values()) {
+			help.append(ChatColor.YELLOW + "\n" + command.getProperUse() + " - " + command.getDescription());
+		}
+		
+		if (args.size() == 0) {
+			sender.sendMessage(help.toString());
+		} else if (args.size() == 1) {
+			if (Arrays.asList(fullmoon).contains(args.get(0).toLowerCase())) {
+				if (!hasPermission(sender, fullmoon[1]))
+					return;
+				sender.sendMessage(Element.ICE.getColor() + "Full Moon - This is a world event in which the moon is full, enhancing the power of waterbending by a large amount.");
+			} else if (Arrays.asList(lunar).contains(args.get(0).toLowerCase())) {
+				if (!hasPermission(sender, lunar[1]))
+					return;
+				sender.sendMessage(Element.WATER.getColor() + "Lunar Eclipse - This is a world event in which the moon is unable to be seen in the night sky, causing waterbending to lose all it's power.");				
+			} else if (Arrays.asList(solar).contains(args.get(0).toLowerCase())) {
+				if (!hasPermission(sender, solar[1]))
+					return;
+				sender.sendMessage(Element.FIRE.getColor() + "Solar Eclipse - This is a world event in which the sun is unable to be seen in the day sky, causing firebending to lose all it's power.");				
+			} else if (Arrays.asList(sozins).contains(args.get(0).toLowerCase())) {
+				if (!hasPermission(sender, sozins[1]))
+					return;
+				sender.sendMessage(Element.COMBUSTION.getColor() + "Sozins Comet - This is a world event in which a comet passes by the earth, enhancing firebending by a large amount.");				
+			} else if (Arrays.asList(avatar).contains(args.get(0).toLowerCase())) {
+				if (!hasPermission(sender, avatar[1]))
+					return;
+				sender.sendMessage(Element.AVATAR.getColor() + "Avatar - The avatar is the only bender who can wield all the elements. He or she is the bridge between the spirit and physical world, keeping balance in the physical world. The avatar is the most powerful bender, and the cycle for which element is to be the next avatar goes Fire, Air, Water, Earth, starting with the first firebending avatar, Wan");				
+			}
+		}
+	}
+}

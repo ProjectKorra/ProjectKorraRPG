@@ -1,6 +1,5 @@
 package com.projectkorra.rpg.commands;
 
-import com.projectkorra.projectkorra.command.PKCommand;
 import com.projectkorra.rpg.RPGMethods;
 
 import org.bukkit.Bukkit;
@@ -10,7 +9,7 @@ import org.bukkit.entity.Player;
 
 import java.util.List;
 
-public class AvatarCommand extends PKCommand{
+public class AvatarCommand extends RPGCommand{
 
 	public AvatarCommand() {
 		super("avatar", "/bending avatar [player]", "This command defines a player as the avatar and gives them all the elements and other perks.", new String[] {"avatar", "av", "avy"});

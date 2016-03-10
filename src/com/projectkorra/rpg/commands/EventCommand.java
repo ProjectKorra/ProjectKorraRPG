@@ -3,7 +3,6 @@ package com.projectkorra.rpg.commands;
 import com.projectkorra.projectkorra.Element;
 import com.projectkorra.projectkorra.ProjectKorra;
 import com.projectkorra.projectkorra.ability.WaterAbility;
-import com.projectkorra.projectkorra.command.PKCommand;
 import com.projectkorra.rpg.RPGMethods;
 import com.projectkorra.rpg.event.EventManager;
 import com.projectkorra.rpg.event.FullMoonEvent;
@@ -16,12 +15,19 @@ import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.Arrays;
 import java.util.List;
 
-public class EventCommand extends PKCommand{
+public class EventCommand extends RPGCommand {
+	
+	private String[] help = {"help", "h", "?"};
+	private String[] current = {"current", "curr", "c"};
+	private String[] end = {"end", "e", "cancel", "remove"};
+	private String[] skip = {"skip", "sk"};
+	private String[] start = {"start", "st", "strt", "begin"};
 
 	public EventCommand() {
-		super("worldevent", "/bending worldevent help|start|current [worldevent]", "Main command for anything dealing with RPG world events.", new String[] {"worldevent", "worlde", "event", "we"});
+		super("worldevent", "/bending worldevent <help/ current / end / skip / (start <worldevent>)>", "Main command for anything dealing with RPG world events.", new String[] { "worldevent", "worlde", "event", "we" });
 	}
 
 	@Override
@@ -31,30 +37,47 @@ public class EventCommand extends PKCommand{
 		} else if (args.size() == 1) {
 			if (!hasPermission(sender)) {
 				return;
-			} else if (args.get(0).equalsIgnoreCase("help")) {
+			} else if (Arrays.asList(help).contains(args.get(0).toLowerCase())) {
 				sender.sendMessage(ChatColor.YELLOW + getDescription());
 				sender.sendMessage(ChatColor.YELLOW + "WorldEvents:");
-				sender.sendMessage(Element.ICE.getColor() + "FullMoon");
-				sender.sendMessage(Element.WATER.getColor() + "LunarEclipse");
-				sender.sendMessage(Element.FIRE.getColor() + "SolarEclipse");
-				sender.sendMessage(Element.COMBUSTION.getColor() + "SozinsComet");
-			} else if (args.get(0).equalsIgnoreCase("current")) {
-				if (!isPlayer(sender)) return;
-				Player player = (Player)sender;
-				if (!EventManager.getMarker().containsKey(player.getWorld()) || EventManager.getMarker().get(player.getWorld()) == "") {
+				sender.sendMessage(Element.ICE.getColor() + "FullMoon - Makes Waterbending super enhanced");
+				sender.sendMessage(Element.WATER.getColor() + "LunarEclipse - Makes Waterbending useless");
+				sender.sendMessage(Element.FIRE.getColor() + "SolarEclipse - Makes Firebending useless");
+				sender.sendMessage(Element.COMBUSTION.getColor() + "SozinsComet - Makes Firebending super enhanced");
+			} else if (Arrays.asList(current).contains(args.get(0).toLowerCase())) {
+				if (!isPlayer(sender))
+					return;
+				Player player = (Player) sender;
+				if (!EventManager.marker.containsKey(player.getWorld()) || EventManager.marker.get(player.getWorld()) == "") {
 					sender.sendMessage(ChatColor.RED + "There are no current world events happening in this world.");
 				} else {
-					sender.sendMessage(ChatColor.YELLOW + "Current event: " + EventManager.getMarker().get(player.getWorld()));
+					sender.sendMessage(ChatColor.YELLOW + "Current event: " + EventManager.marker.get(player.getWorld()));
 				}
+			} else if (Arrays.asList(end).contains(args.get(0).toLowerCase())) {
+				if (!isPlayer(sender))
+					return;
+				Player player = (Player) sender;
+				if (!EventManager.marker.containsKey(player.getWorld()) || EventManager.marker.get(player.getWorld()) == "") {
+					sender.sendMessage(ChatColor.RED + "There is no event to end at the moment.");
+				} else {
+					EventManager.endEvent(player.getWorld());
+					sender.sendMessage(ChatColor.GREEN + "The event occupying this world has been ended.");
+				}
+			} else if (Arrays.asList(skip).contains(args.get(0).toLowerCase())) {
+				if (!isPlayer(sender))
+					return;
+				Player player = (Player) sender;
+				EventManager.skipper.put(player.getWorld(), true);
+				sender.sendMessage(ChatColor.GREEN + "The next worldevent will be skipped.");
 			}
 		} else if (args.size() == 2) {
 			if (!hasPermission(sender)) {
 				return;
-			} else if (args.get(0).equalsIgnoreCase("start")) {
+			} else if (Arrays.asList(start).contains(args.get(0).toLowerCase())) {
 				if (!isPlayer(sender)) {
 					return;
 				}
-				Player player = (Player)sender;
+				Player player = (Player) sender;
 				if (player.getWorld().getEnvironment().equals(World.Environment.NETHER) || player.getWorld().getEnvironment().equals(World.Environment.THE_END)) {
 					player.sendMessage(ChatColor.RED + "Cannot start an Event in this world type!");
 					return;

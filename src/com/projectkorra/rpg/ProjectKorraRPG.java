@@ -12,6 +12,7 @@ import com.projectkorra.rpg.util.MetricsLite;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.File;
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -35,7 +36,12 @@ public class ProjectKorraRPG extends JavaPlugin {
 		new EventCommand();
 		new HelpCommand();
 		
-		importDatabase();
+		if (this.getDataFolder() != null) {
+			if (new File(this.getDataFolder(), "projectkorra.db").exists()) {
+				importDatabase();
+			}
+		}
+		
 		
 		Bukkit.getServer().getPluginManager().registerEvents(new RPGListener(), this);
 		Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, new EventManager(), 0L, 1L);

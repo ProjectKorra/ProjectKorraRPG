@@ -1,5 +1,6 @@
 package com.projectkorra.rpg.storage;
 
+import com.projectkorra.projectkorra.ProjectKorra;
 import com.projectkorra.rpg.ProjectKorraRPG;
 
 public class DBConnection {
@@ -17,14 +18,19 @@ public class DBConnection {
 	public static void init() {
 		open();
 		if (!isOpen) return;
+		String createQuery = "CREATE TABLE pk_avatars (id INTEGER PRIMARY KEY, uuid %uuid%, player %player%, elements %elements%)";
+		if (host.equalsIgnoreCase("mysql")) {
+			createQuery = createQuery.replace("%uuid%", "varchar(255)");
+			createQuery = createQuery.replace("%player%", "varchar(255)");
+			createQuery = createQuery.replace("%elements%", "varchar(255)");
+		} else {
+			createQuery = createQuery.replace("%uuid%", "TEXT(255)");
+			createQuery = createQuery.replace("%player%", "TEXT(255)");
+			createQuery = createQuery.replace("%elements%", "TEXT(255)");
+		}
 		if (!sql.tableExists("pk_avatars")) {
 			ProjectKorraRPG.log.info("Creating pk_avatars table.");
-			String query = "CREATE TABLE `pk_avatars` ("
-					+ "`id` INTEGER PRIMARY KEY,"
-					+ "`uuid` TEXT(255),"
-					+ "`player` TEXT(255),"
-					+ "`element` TEXT(255));";
-			sql.modifyQuery(query);
+			sql.modifyQuery(createQuery);
 		}
 	}
 	
@@ -51,7 +57,7 @@ public class DBConnection {
 			isOpen = true;
 			ProjectKorraRPG.log.info("Database connection established.");
 		} else {
-			sql = new SQLite(ProjectKorraRPG.log, "Establishing SQLite Connection... ", "projectkorra.db", ProjectKorraRPG.plugin.getDataFolder().getAbsolutePath());
+			sql = new SQLite(ProjectKorraRPG.log, "Establishing SQLite Connection... ", "projectkorra_rpg.db", ProjectKorra.plugin.getDataFolder().getAbsolutePath());
 			if (((SQLite) sql).open() == null) {
 				ProjectKorraRPG.log.severe("Disabling due to database error");
 				return;

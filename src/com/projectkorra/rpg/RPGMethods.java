@@ -12,6 +12,8 @@ import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -301,7 +303,7 @@ public class RPGMethods {
 			}
 			i += 1;
 		}
-		ConfigManager.avatarConfig.get().set("Avatar.Past." + uuid.toString(), sb.toString());
+		DBConnection.sql.modifyQuery("INSERT INTO pk_avatars (uuid, player, elements) VALUES ('" + uuid.toString() + "', '" + player.getName() + "', '" + sb.toString() + "')");
 		/*
 		 * Gives them the elements
 		 */
@@ -339,9 +341,15 @@ public class RPGMethods {
 	public static boolean hasBeenAvatar(UUID uuid) {
 		if (isCurrentAvatar(uuid))
 			return true;
-		if (ConfigManager.avatarConfig.get().contains("Avatar.Past." + uuid.toString()))
-			return true;
-		return false;
+		ResultSet rs = DBConnection.sql.readQuery("SELECT uuid FROM pk_avatars WHERE uuid = '" + uuid.toString() + "'");
+		boolean valid = false;
+		try {
+			valid = rs.next();
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return false;
+		}
+		return valid;
 	}
 
 	/**
@@ -357,7 +365,16 @@ public class RPGMethods {
 		BendingPlayer bPlayer = BendingPlayer.getBendingPlayer(Bukkit.getPlayer(uuid));
 		if (bPlayer == null)
 			return;
-		for (String s : ConfigManager.avatarConfig.get().getString("Avatar.Past." + uuid.toString()).split(":")) {
+		String elements2 = "";
+		ResultSet rs = DBConnection.sql.readQuery("SELECT elements FROM pk_avatars WHERE uuid = '" + uuid.toString() + "'");
+		try {
+			rs.next();
+			elements2 = rs.getString(4);
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return;
+		}
+		for (String s : elements2.split(":")) {
 			elements.add(Element.fromString(s));
 		}
 		bPlayer.getElements().clear();

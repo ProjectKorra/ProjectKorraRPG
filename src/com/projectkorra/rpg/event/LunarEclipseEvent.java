@@ -1,6 +1,5 @@
 package com.projectkorra.rpg.event;
 
-import com.projectkorra.rpg.ProjectKorraRPG;
 import com.projectkorra.rpg.configuration.ConfigManager;
 
 import org.bukkit.World;

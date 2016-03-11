@@ -9,6 +9,8 @@ import com.projectkorra.rpg.event.FullMoonEvent;
 import com.projectkorra.rpg.event.LunarEclipseEvent;
 import com.projectkorra.rpg.event.SolarEclipseEvent;
 import com.projectkorra.rpg.event.SozinsCometEvent;
+import com.projectkorra.rpg.event.WorldSunRiseEvent;
+import com.projectkorra.rpg.event.WorldSunSetEvent;
 
 import org.bukkit.World;
 import org.bukkit.block.BlockFace;
@@ -48,12 +50,17 @@ public class RPGListener implements Listener{
 
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void onFullMoon(FullMoonEvent event) {
-		if (event.isCancelled()) return;
+		if (event.isCancelled())
+			return;
 		World world = event.getWorld();
+		if (EventManager.skipper.get(world)) {
+			EventManager.skipper.put(world, false);
+			return;
+		}
 		EventManager.marker.put(world, "FullMoon");
 		for (Player player : world.getPlayers()) {
 			BendingPlayer bPlayer = BendingPlayer.getBendingPlayer(player);
-			if (bPlayer != null && bPlayer.hasElement(Element.WATER) && bPlayer.isElementToggled(Element.WATER)) {
+			if (bPlayer != null && bPlayer.hasElement(Element.WATER)) {
 				if (player.hasPermission("bending.message.nightmessage")) {
 					player.sendMessage(Element.ICE.getColor() + event.getMessage());
 				}
@@ -63,12 +70,17 @@ public class RPGListener implements Listener{
 
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void onLunarEclipse(LunarEclipseEvent event) {
-		if (event.isCancelled()) return;
+		if (event.isCancelled())
+			return;
 		World world = event.getWorld();
+		if (EventManager.skipper.get(world)) {
+			EventManager.skipper.put(world, false);
+			return;
+		}
 		EventManager.marker.put(world, "LunarEclipse");
 		for (Player player : world.getPlayers()) {
 			BendingPlayer bPlayer = BendingPlayer.getBendingPlayer(player);
-			if (bPlayer != null && bPlayer.hasElement(Element.WATER) && bPlayer.isElementToggled(Element.WATER)) {
+			if (bPlayer != null && bPlayer.hasElement(Element.WATER)) {
 				if (player.hasPermission("bending.message.nightmessage")) {
 					player.sendMessage(Element.WATER.getColor() + event.getMessage());
 				}
@@ -78,12 +90,17 @@ public class RPGListener implements Listener{
 
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void onSolarEclipse(SolarEclipseEvent event) {
-		if (event.isCancelled()) return;
+		if (event.isCancelled())
+			return;
 		World world = event.getWorld();
+		if (EventManager.skipper.get(world)) {
+			EventManager.skipper.put(world, false);
+			return;
+		}
 		EventManager.marker.put(world, "SolarEclipse");
 		for (Player player : world.getPlayers()) {
 			BendingPlayer bPlayer = BendingPlayer.getBendingPlayer(player);
-			if (bPlayer != null && bPlayer.hasElement(Element.FIRE) && bPlayer.isElementToggled(Element.FIRE)) {
+			if (bPlayer != null && bPlayer.hasElement(Element.FIRE)) {
 				if (player.hasPermission("bending.message.daymessage")) {
 					player.sendMessage(Element.FIRE.getColor() + event.getMessage());
 				}
@@ -93,16 +110,47 @@ public class RPGListener implements Listener{
 
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void onSozinsComet(SozinsCometEvent event) {
-		if (event.isCancelled()) return;
+		if (event.isCancelled())
+			return;
 		World world = event.getWorld();
+		if (EventManager.skipper.get(world)) {
+			EventManager.skipper.put(world, false);
+			return;
+		}
 		EventManager.marker.put(world, "SozinsComet");
 		for (Player player : world.getPlayers()) {
 			BendingPlayer bPlayer = BendingPlayer.getBendingPlayer(player);
-			if (bPlayer != null && bPlayer.hasElement(Element.FIRE) && bPlayer.isElementToggled(Element.FIRE)) {
+			if (bPlayer != null && bPlayer.hasElement(Element.FIRE)) {
 				if (player.hasPermission("bending.message.daymessage")) {
 					player.sendMessage(Element.COMBUSTION.getColor() + event.getMessage());
 				}
 			}
+		}
+	}
+
+	@EventHandler
+	public void onSunRise(WorldSunRiseEvent event) {
+		if (RPGMethods.isHappening(event.getWorld(), "FullMoon") || RPGMethods.isHappening(event.getWorld(), "LunarEclipse")) {
+			EventManager.marker.put(event.getWorld(), "");
+		}
+
+		if (RPGMethods.isSozinsComet(event.getWorld())) {
+			ProjectKorraRPG.plugin.getServer().getPluginManager().callEvent(new SozinsCometEvent(event.getWorld()));
+		} else if (RPGMethods.isSolarEclipse(event.getWorld())) {
+			ProjectKorraRPG.plugin.getServer().getPluginManager().callEvent(new SolarEclipseEvent(event.getWorld()));
+		}
+	}
+
+	@EventHandler
+	public void onSunSet(WorldSunSetEvent event) {
+		if (RPGMethods.isHappening(event.getWorld(), "SolarEclipse") || RPGMethods.isHappening(event.getWorld(), "SozinsComet")) {
+			EventManager.marker.put(event.getWorld(), "");
+		}
+
+		if (RPGMethods.isLunarEclipse(event.getWorld())) {
+			ProjectKorraRPG.plugin.getServer().getPluginManager().callEvent(new LunarEclipseEvent(event.getWorld()));
+		} else if (RPGMethods.isFullMoon(event.getWorld())) {
+			ProjectKorraRPG.plugin.getServer().getPluginManager().callEvent(new FullMoonEvent(event.getWorld()));
 		}
 	}
 	

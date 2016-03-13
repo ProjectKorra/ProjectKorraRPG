@@ -6,6 +6,7 @@ import com.projectkorra.projectkorra.Element.SubElement;
 import com.projectkorra.projectkorra.GeneralMethods;
 import com.projectkorra.rpg.configuration.ConfigManager;
 import com.projectkorra.rpg.event.EventManager;
+import com.projectkorra.rpg.storage.DBConnection;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;

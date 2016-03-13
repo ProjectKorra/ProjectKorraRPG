@@ -1,6 +1,5 @@
 package com.projectkorra.rpg.storage;
 
-import com.projectkorra.projectkorra.ProjectKorra;
 import com.projectkorra.rpg.ProjectKorraRPG;
 
 public class DBConnection {
@@ -57,7 +56,7 @@ public class DBConnection {
 			isOpen = true;
 			ProjectKorraRPG.log.info("Database connection established.");
 		} else {
-			sql = new SQLite(ProjectKorraRPG.log, "Establishing SQLite Connection... ", "projectkorra_rpg.db", ProjectKorra.plugin.getDataFolder().getAbsolutePath());
+			sql = new SQLite(ProjectKorraRPG.log, "Establishing SQLite Connection... ", "projectkorra.db", ProjectKorraRPG.plugin.getDataFolder().getAbsolutePath());
 			if (((SQLite) sql).open() == null) {
 				ProjectKorraRPG.log.severe("Disabling due to database error");
 				return;

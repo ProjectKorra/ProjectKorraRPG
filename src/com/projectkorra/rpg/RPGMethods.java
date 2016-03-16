@@ -18,6 +18,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 import java.util.UUID;
 
 public class RPGMethods {
@@ -38,6 +39,21 @@ public class RPGMethods {
 		if (isSozinsComet(world))
 			return true;
 		return false;
+	}
+	
+	public static void cycleAvatar(BendingPlayer bPlayer) {
+		revokeAvatar(bPlayer.getUUID());
+		Bukkit.getServer().broadcastMessage("The avatar cycle has progressed!");
+		Player avatar = Bukkit.getPlayer(bPlayer.getUUID());
+		Random rand = new Random();
+		int i = rand.nextInt(avatar.getWorld().getPlayers().size());
+		for (Player player : avatar.getWorld().getPlayers()) {
+			if (player == avatar) continue;
+			if (avatar.getWorld().getPlayers().get(i) == player) {
+				setAvatar(player.getUniqueId());
+				break;
+			}
+		}
 	}
 
 	/**
@@ -250,6 +266,49 @@ public class RPGMethods {
 			assignElement(player, e, false);
 			return;
 		}
+	}
+	
+	public static void randomAssignSubElements(BendingPlayer bPlayer) {
+		if (bPlayer.hasElement(Element.CHI)) return;
+		
+		double rand = Math.random();
+		double chance = 0;
+		String[] subs = {"Blood", "Combustion", "Flight", "Healing", "Ice", "Lava", "Lightning", "Metal", "Plant", "Sand", "SpiritualProjection"};
+		StringBuilder sb = new StringBuilder("You have an affinity for ");
+		ArrayList<String> sublist = new ArrayList<>();
+		
+		for (String sub : subs) {
+			chance = ConfigManager.rpgConfig.get().getDouble("SubElementAssign.Percentages." + sub);
+			String name = sub;
+			if (sub.equals("SpiritualProjection"))
+				name = "Spiritual";
+			SubElement s = (SubElement) Element.getElement(name);
+			Element e = s.getParentElement();
+			
+			if (!bPlayer.hasElement(e)) continue;
+			if (sub.equals("Metal") && sublist.contains(SubElement.LAVA)) continue;
+			if (sub.equals("Lightning") && sublist.contains(SubElement.COMBUSTION)) continue;
+			
+			if (rand < chance) {
+				sublist.add(sub);
+				bPlayer.addSubElement(s);
+			}
+		}
+		int size = sublist.size();
+		for (String sub : sublist) {
+			String name = sub;
+			if (sub.equals("SpiritualProjection"))
+				name = "Spiritual";
+			
+			size -= 1;
+			if (size == 0) {
+				sb.append(ChatColor.WHITE + "and " + Element.getElement(name).getColor() + sub + ChatColor.WHITE + ".");
+			} else {
+				sb.append(Element.getElement(name).getColor() + sub + ChatColor.WHITE + ", ");
+			}
+		}
+		
+		Bukkit.getPlayer(bPlayer.getUUID()).sendMessage(sb.toString());
 	}
 
 	/**

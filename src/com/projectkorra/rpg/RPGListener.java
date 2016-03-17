@@ -4,6 +4,7 @@ import com.projectkorra.projectkorra.BendingPlayer;
 import com.projectkorra.projectkorra.Element;
 import com.projectkorra.projectkorra.ability.EarthAbility;
 import com.projectkorra.projectkorra.avatar.AvatarState;
+import com.projectkorra.rpg.configuration.ConfigManager;
 import com.projectkorra.rpg.event.EventManager;
 import com.projectkorra.rpg.event.FullMoonEvent;
 import com.projectkorra.rpg.event.LunarEclipseEvent;
@@ -28,11 +29,11 @@ public class RPGListener implements Listener{
 	public void onAvatarDamaged(EntityDamageEvent event) {
 		if(event.isCancelled()) return;
 
-		if(ProjectKorraRPG.plugin.getConfig().getBoolean("Abilities.AvatarStateOnFinalBlow")) {
+		if(ConfigManager.rpgConfig.get().getBoolean("Abilities.AvatarStateOnFinalBlow")) {
 			if (event.getEntity() instanceof Player) {
 				Player player = (Player) event.getEntity();
-				if (BendingPlayer.getBendingPlayer(player.getName()) != null && (RPGMethods.isCurrentAvatar(player.getUniqueId()) || RPGMethods.hasBeenAvatar(player.getUniqueId()))) {
-					BendingPlayer bP = BendingPlayer.getBendingPlayer(player.getName());
+				BendingPlayer bP = BendingPlayer.getBendingPlayer(player.getName());
+				if (bP != null && (RPGMethods.isCurrentAvatar(player.getUniqueId()) || RPGMethods.hasBeenAvatar(player.getUniqueId()))) {
 					if (event.getCause() == DamageCause.FALL && bP.hasElement(Element.AIR)) return;
 					else if (event.getCause() == DamageCause.FALL && bP.hasElement(Element.EARTH) && EarthAbility.isEarthbendable(player, player.getLocation().getBlock().getRelative(BlockFace.DOWN))) return;
 					else if (event.getCause() == DamageCause.FALL) {
@@ -47,6 +48,14 @@ public class RPGListener implements Listener{
 			}
 		}
 	}
+	
+	/*@EventHandler
+	public void onAvatarDeath(PlayerDeathEvent event) {
+		BendingPlayer bPlayer = BendingPlayer.getBendingPlayer(event.getEntity());
+		if (RPGMethods.isCurrentAvatar(bPlayer.getUUID())) {
+			RPGMethods.cycleAvatar(bPlayer);
+		}
+	}*/
 
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void onFullMoon(FullMoonEvent event) {
@@ -156,14 +165,18 @@ public class RPGListener implements Listener{
 	
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void randomElementAssign(PlayerJoinEvent event) {
-		if(!ProjectKorraRPG.plugin.getConfig().getBoolean("ElementAssign.Enabled")) return;
+		if (!ConfigManager.rpgConfig.get().getBoolean("ElementAssign.Enabled")) return;
 
-		if(BendingPlayer.getBendingPlayer(event.getPlayer().getName()) != null) {
+		if (BendingPlayer.getBendingPlayer(event.getPlayer().getName()) != null) {
 			BendingPlayer bp = BendingPlayer.getBendingPlayer(event.getPlayer().getName());
 
-			if((bp.getElements().isEmpty()) && (!bp.isPermaRemoved())) {
+			if ((bp.getElements().isEmpty()) && (!bp.isPermaRemoved())) {
 				RPGMethods.randomAssign(bp);
 			}
+			
+			/*if (bp.getSubElements().isEmpty() && !bp.isPermaRemoved()) {
+				RPGMethods.randomAssignSubElements(bp);
+			}*/
 		}
 	}
 }

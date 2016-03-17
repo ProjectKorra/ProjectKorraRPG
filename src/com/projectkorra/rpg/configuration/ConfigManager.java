@@ -47,13 +47,25 @@ public class ConfigManager {
 			
 			config.addDefault("Abilities.AvatarStateOnFinalBlow", true);
 			
-			config.addDefault("ElementAssign.Enabled", false);
+			config.addDefault("ElementAssign.Enabled", true);
 			config.addDefault("ElementAssign.Default", "None");
 			config.addDefault("ElementAssign.Percentages.Earth", 0.205);
 			config.addDefault("ElementAssign.Percentages.Water", 0.205);
 			config.addDefault("ElementAssign.Percentages.Air", 0.205);
 			config.addDefault("ElementAssign.Percentages.Fire", 0.205);
 			config.addDefault("ElementAssign.Percentages.Chi", 0.18);
+			
+			config.addDefault("SubElementAssign.Percentages.Blood", 0.01);
+			config.addDefault("SubElementAssign.Percentages.Combustion", 0.3);
+			config.addDefault("SubElementAssign.Percentages.Flight", 0.01);
+			config.addDefault("SubElementAssign.Percentages.Healing", 0.2);
+			config.addDefault("SubElementAssign.Percentages.Ice", 1);
+			config.addDefault("SubElementAssign.Percentages.Lava", 0.3);
+			config.addDefault("SubElementAssign.Percentages.Lightning", 0.5);
+			config.addDefault("SubElementAssign.Percentages.Metal", 0.7);
+			config.addDefault("SubElementAssign.Percentages.Plant", 0.7);
+			config.addDefault("SubElementAssign.Percentages.Sand", 1);
+			config.addDefault("SubElementAssign.Percentages.SpiritualProjection", 0.4);
 			
 			config.addDefault("Storage.engine", "sqlite");
 	

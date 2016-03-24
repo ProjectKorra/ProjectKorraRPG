@@ -13,9 +13,8 @@ public class HelpCommand extends RPGCommand{
 	private String[] fullmoon = {"fullmoon", "fm", "fmoon", "fullm"}; 
 	private String[] lunar = {"lunareclipse", "le", "leclipse", "lunare"}; 
 	private String[] solar = {"solareclipse", "se", "seclipse", "solare"}; 
-	private String[] sozins = {"sozinscomet", "sc", "sozins", "sozinsc", "scomet", "comet"}; 
-	private String[] avatar = {"avatar", "avy", "av"};
-	private String modifiers = ChatColor.BLUE + "Command Modifiers : [] - optional : <> - required : () - together";
+	private String[] sozins = {"sozinscomet", "sc", "sozins", "sozinsc", "scomet", "comet"};
+	private String modifiers = ChatColor.GOLD + "Commands: <required> [optional]";
 
 	public HelpCommand() {
 		super("help", "/bending rpg help [topic]", "Shows all helpful information for rpg", new String[] {"help", "h", "?"});
@@ -29,12 +28,26 @@ public class HelpCommand extends RPGCommand{
 		
 		StringBuilder help = new StringBuilder(modifiers);
 		for (RPGCommand command : RPGCommand.instances.values()) {
-			help.append(ChatColor.YELLOW + "\n" + command.getProperUse() + " - " + command.getDescription());
+			help.append(ChatColor.YELLOW + "\n" + command.getProperUse());
 		}
 		
 		if (args.size() == 0) {
 			sender.sendMessage(help.toString());
 		} else if (args.size() == 1) {
+			for (RPGCommand command : RPGCommand.instances.values()) {
+				if (command instanceof HelpCommand) continue;
+				if (Arrays.asList(command.getAliases()).contains(args.get(0).toLowerCase())) {
+					sender.sendMessage(ChatColor.GOLD + "Proper use: " + command.getProperUse());
+					sender.sendMessage(ChatColor.GRAY + command.getDescription());
+					if (command.getName().equalsIgnoreCase("avatar")) {
+						if (!hasPermission(sender, "avatar"))
+							return;
+						sender.sendMessage(Element.AVATAR.getColor() + "Avatar - The avatar is the only bender who can wield all four elements. He or she is the bridge between the spirit and physical world, keeping balance in the physical world. The avatar is the most powerful bender, and the cycle for which element is to be the next avatar goes Fire, Air, Water, Earth, starting with the first firebending avatar, Wan");				
+					}
+					return;
+				}
+				continue;
+			}
 			if (Arrays.asList(fullmoon).contains(args.get(0).toLowerCase())) {
 				if (!hasPermission(sender, fullmoon[1]))
 					return;
@@ -51,10 +64,6 @@ public class HelpCommand extends RPGCommand{
 				if (!hasPermission(sender, sozins[1]))
 					return;
 				sender.sendMessage(Element.COMBUSTION.getColor() + "Sozins Comet - This is a world event in which a comet passes by the earth, enhancing firebending by a large amount.");				
-			} else if (Arrays.asList(avatar).contains(args.get(0).toLowerCase())) {
-				if (!hasPermission(sender, avatar[1]))
-					return;
-				sender.sendMessage(Element.AVATAR.getColor() + "Avatar - The avatar is the only bender who can wield all the elements. He or she is the bridge between the spirit and physical world, keeping balance in the physical world. The avatar is the most powerful bender, and the cycle for which element is to be the next avatar goes Fire, Air, Water, Earth, starting with the first firebending avatar, Wan");				
 			}
 		}
 	}

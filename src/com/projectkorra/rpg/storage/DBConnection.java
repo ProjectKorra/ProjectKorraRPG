@@ -1,6 +1,7 @@
 package com.projectkorra.rpg.storage;
 
 import com.projectkorra.rpg.ProjectKorraRPG;
+import com.projectkorra.rpg.configuration.ConfigManager;
 
 public class DBConnection {
 
@@ -39,12 +40,12 @@ public class DBConnection {
 	}
 	
 	public static void open() {
-		engine = ProjectKorraRPG.plugin.getConfig().getString("Storage.engine");
-		host = ProjectKorraRPG.plugin.getConfig().getString("Storage.MySQL.host");
-		port = ProjectKorraRPG.plugin.getConfig().getInt("Storage.MySQL.port");
-		pass = ProjectKorraRPG.plugin.getConfig().getString("Storage.MySQL.pass");
-		db = ProjectKorraRPG.plugin.getConfig().getString("Storage.MySQL.db");
-		user = ProjectKorraRPG.plugin.getConfig().getString("Storage.MySQL.user");
+		engine = ConfigManager.rpgConfig.get().getString("Storage.engine");
+		host = ConfigManager.rpgConfig.get().getString("Storage.MySQL.host");
+		port = ConfigManager.rpgConfig.get().getInt("Storage.MySQL.port");
+		pass = ConfigManager.rpgConfig.get().getString("Storage.MySQL.pass");
+		db = ConfigManager.rpgConfig.get().getString("Storage.MySQL.db");
+		user = ConfigManager.rpgConfig.get().getString("Storage.MySQL.user");
 		if (isOpen) 
 			return;
 		if (engine.equalsIgnoreCase("mysql")) {

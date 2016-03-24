@@ -1,6 +1,7 @@
 package com.projectkorra.rpg.commands;
 
 import com.projectkorra.projectkorra.command.PKCommand;
+import com.projectkorra.projectkorra.command.SubCommand;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -8,7 +9,7 @@ import org.bukkit.entity.Player;
 
 import java.util.HashMap;
 
-public abstract class RPGCommand implements IRPGCommand{
+public abstract class RPGCommand implements SubCommand{
 	
 	public static HashMap<String, RPGCommand> instances = new HashMap<>();
 

@@ -12,13 +12,15 @@ import java.util.List;
 public class RPGCommandBase extends PKCommand {
 
 	public RPGCommandBase() {
-		super("RPG", "/bending RPG", "Base command for the RPG side plugin", new String[] {"rpg"});
+		super("rpg", "/bending rpg", "Base command for the RPG side plugin", new String[] {"rpg"});
 	}
 
 	@Override
 	public void execute(CommandSender sender, List<String> args) {
 		if (args.size() == 0) {
-			sender.sendMessage(ChatColor.RED + "/bending rpg help");
+			sender.sendMessage(ChatColor.RED + "/bending rpg avatar <Player> " + ChatColor.YELLOW + "Create an Avatar.");
+			sender.sendMessage(ChatColor.RED + "/bending rpg help <Command/Event> " + ChatColor.YELLOW + "Display help.");
+			sender.sendMessage(ChatColor.RED + "/bending rpg worldevent <Argument> [Event] " + ChatColor.YELLOW + "Manipulate events.");
 			return;
 		}
 		for (RPGCommand command : RPGCommand.instances.values()) {

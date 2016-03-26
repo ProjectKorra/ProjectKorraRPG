@@ -17,7 +17,7 @@ public class HelpCommand extends RPGCommand{
 	private String modifiers = ChatColor.GOLD + "Commands: <required> [optional]";
 
 	public HelpCommand() {
-		super("help", "/bending rpg help [topic]", "Shows all helpful information for rpg", new String[] {"help", "h", "?"});
+		super("help", "/bending rpg help <Command/Event>", "Shows all helpful information for rpg", new String[] {"help", "h", "?"});
 	}
 
 	@Override

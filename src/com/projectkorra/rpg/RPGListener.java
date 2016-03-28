@@ -172,6 +172,9 @@ public class RPGListener implements Listener{
 
 			if ((bp.getElements().isEmpty()) && (!bp.isPermaRemoved())) {
 				RPGMethods.randomAssign(bp);
+				if (ConfigManager.rpgConfig.get().getBoolean("SubElementAssign.Enabled")) {
+					RPGMethods.randomAssignSubElements(bp);
+				}
 			}
 			
 			/*if (bp.getSubElements().isEmpty() && !bp.isPermaRemoved()) {

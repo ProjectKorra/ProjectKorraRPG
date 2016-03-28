@@ -37,8 +37,8 @@ public class HelpCommand extends RPGCommand{
 			for (RPGCommand command : RPGCommand.instances.values()) {
 				if (command instanceof HelpCommand) continue;
 				if (Arrays.asList(command.getAliases()).contains(args.get(0).toLowerCase())) {
-					sender.sendMessage(ChatColor.GOLD + "Proper use: " + command.getProperUse());
-					sender.sendMessage(ChatColor.GRAY + command.getDescription());
+					sender.sendMessage(ChatColor.GOLD + "Proper use: " + ChatColor.DARK_AQUA + command.getProperUse());
+					sender.sendMessage(ChatColor.YELLOW + command.getDescription());
 					if (command.getName().equalsIgnoreCase("avatar")) {
 						if (!hasPermission(sender, "avatar"))
 							return;

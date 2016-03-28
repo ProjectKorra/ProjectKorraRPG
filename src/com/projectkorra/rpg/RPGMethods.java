@@ -295,17 +295,20 @@ public class RPGMethods {
 			}
 		}
 		int size = sublist.size();
-		for (String sub : sublist) {
-			String name = sub;
-			if (sub.equals("SpiritualProjection"))
-				name = "Spiritual";
-			
-			size -= 1;
-			if (size == 0) {
-				sb.append(ChatColor.WHITE + "and " + Element.getElement(name).getColor() + sub + ChatColor.WHITE + ".");
-			} else {
-				sb.append(Element.getElement(name).getColor() + sub + ChatColor.WHITE + ", ");
+		if (size > 1) {
+			for (String sub : sublist) {
+				String name = sub;
+				if (sub.equals("SpiritualProjection")) name = "Spiritual";
+
+				size -= 1;
+				if (size == 0) {
+					sb.append(ChatColor.WHITE + "and " + Element.getElement(name).getColor() + sub + ChatColor.WHITE + ".");
+				} else {
+					sb.append(Element.getElement(name).getColor() + sub + ChatColor.WHITE + ", ");
+				}
 			}
+		} else {
+			sb = new StringBuilder("You sadly don't have any extra affinity for your element.");
 		}
 		
 		Bukkit.getPlayer(bPlayer.getUUID()).sendMessage(sb.toString());
@@ -323,13 +326,13 @@ public class RPGMethods {
 		player.setElement(e);
 		GeneralMethods.saveElements(player);
 		if (!chiblocker) {
-			if (e.toString().equalsIgnoreCase("Earth"))
+			if (e.equals(Element.EARTH))
 				Bukkit.getPlayer(player.getUUID()).sendMessage(ChatColor.WHITE + "You have been born as an " + ChatColor.GREEN + e.toString() + "bender!");
-			if (e.toString().equalsIgnoreCase("Fire"))
+			if (e.equals(Element.FIRE))
 				Bukkit.getPlayer(player.getUUID()).sendMessage(ChatColor.WHITE + "You have been born as a " + ChatColor.RED + e.toString() + "bender!");
-			if (e.toString().equalsIgnoreCase("Water"))
+			if (e.equals(Element.WATER))
 				Bukkit.getPlayer(player.getUUID()).sendMessage(ChatColor.WHITE + "You have been born as a " + ChatColor.AQUA + e.toString() + "bender!");
-			if (e.toString().equalsIgnoreCase("Air"))
+			if (e.equals(Element.AIR))
 				Bukkit.getPlayer(player.getUUID()).sendMessage(ChatColor.WHITE + "You have been born as an " + ChatColor.GRAY + e.toString() + "bender!");
 		} else {
 			Bukkit.getPlayer(player.getUUID()).sendMessage(ChatColor.WHITE + "You have been raised as a " + ChatColor.GOLD + "Chiblocker!");

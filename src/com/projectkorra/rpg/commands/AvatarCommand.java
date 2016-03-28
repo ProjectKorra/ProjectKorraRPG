@@ -12,7 +12,7 @@ import java.util.List;
 public class AvatarCommand extends RPGCommand{
 
 	public AvatarCommand() {
-		super("avatar", "/bending rpg avatar [player]", "This command defines a player as the avatar and gives them all the elements and other perks.", new String[] {"avatar", "av", "avy"});
+		super("avatar", "/bending rpg avatar <Player>", "This command defines a player as the avatar and gives them all the elements and other perks.", new String[] {"avatar", "av", "avy"});
 	}
 
 	@Override

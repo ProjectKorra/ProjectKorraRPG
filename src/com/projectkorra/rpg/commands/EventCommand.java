@@ -27,7 +27,7 @@ public class EventCommand extends RPGCommand {
 	private String[] start = {"start", "st", "strt", "begin"};
 
 	public EventCommand() {
-		super("worldevent", "/bending rpg worldevent <current/end/help/skip/start> [worldevent]", "Main command for anything dealing with RPG world events.", new String[] { "worldevent", "worlde", "event", "we" });
+		super("worldevent", "/bending rpg worldevent <Current/End/Help/Skip/Start> [Event]", "Main command for anything dealing with RPG world events.", new String[] { "worldevent", "worlde", "event", "we" });
 	}
 
 	@Override

@@ -43,7 +43,6 @@ public class RPGMethods {
 	
 	public static void cycleAvatar(BendingPlayer bPlayer) {
 		revokeAvatar(bPlayer.getUUID());
-		Bukkit.getServer().broadcastMessage("The avatar cycle has progressed!");
 		Player avatar = Bukkit.getPlayer(bPlayer.getUUID());
 		Random rand = new Random();
 		int i = rand.nextInt(avatar.getWorld().getPlayers().size());
@@ -322,20 +321,20 @@ public class RPGMethods {
 	 * @param e Element being added to the player
 	 * @param chiblocker if the player is becoming a chiblocker
 	 */
-	private static void assignElement(BendingPlayer player, Element e, Boolean chiblocker) {
-		player.setElement(e);
-		GeneralMethods.saveElements(player);
+	private static void assignElement(BendingPlayer bPlayer, Element e, Boolean chiblocker) {
+		bPlayer.setElement(e);
+		GeneralMethods.saveElements(bPlayer);
 		if (!chiblocker) {
 			if (e.equals(Element.EARTH))
-				Bukkit.getPlayer(player.getUUID()).sendMessage(ChatColor.WHITE + "You have been born as an " + ChatColor.GREEN + e.toString() + "bender!");
+				Bukkit.getPlayer(bPlayer.getUUID()).sendMessage(ChatColor.WHITE + "You have been born as an " + ChatColor.GREEN + e.toString() + "bender!");
 			if (e.equals(Element.FIRE))
-				Bukkit.getPlayer(player.getUUID()).sendMessage(ChatColor.WHITE + "You have been born as a " + ChatColor.RED + e.toString() + "bender!");
+				Bukkit.getPlayer(bPlayer.getUUID()).sendMessage(ChatColor.WHITE + "You have been born as a " + ChatColor.RED + e.toString() + "bender!");
 			if (e.equals(Element.WATER))
-				Bukkit.getPlayer(player.getUUID()).sendMessage(ChatColor.WHITE + "You have been born as a " + ChatColor.AQUA + e.toString() + "bender!");
+				Bukkit.getPlayer(bPlayer.getUUID()).sendMessage(ChatColor.WHITE + "You have been born as a " + ChatColor.AQUA + e.toString() + "bender!");
 			if (e.equals(Element.AIR))
-				Bukkit.getPlayer(player.getUUID()).sendMessage(ChatColor.WHITE + "You have been born as an " + ChatColor.GRAY + e.toString() + "bender!");
+				Bukkit.getPlayer(bPlayer.getUUID()).sendMessage(ChatColor.WHITE + "You have been born as an " + ChatColor.GRAY + e.toString() + "bender!");
 		} else {
-			Bukkit.getPlayer(player.getUUID()).sendMessage(ChatColor.WHITE + "You have been raised as a " + ChatColor.GOLD + "Chiblocker!");
+			Bukkit.getPlayer(bPlayer.getUUID()).sendMessage(ChatColor.WHITE + "You have been raised as a " + ChatColor.GOLD + "Chiblocker!");
 		}
 	}
 

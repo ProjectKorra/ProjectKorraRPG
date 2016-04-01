@@ -4,6 +4,7 @@ import com.projectkorra.projectkorra.BendingPlayer;
 import com.projectkorra.projectkorra.Element;
 import com.projectkorra.projectkorra.ability.EarthAbility;
 import com.projectkorra.projectkorra.avatar.AvatarState;
+import com.projectkorra.projectkorra.event.BendingPlayerCreationEvent;
 import com.projectkorra.rpg.configuration.ConfigManager;
 import com.projectkorra.rpg.event.EventManager;
 import com.projectkorra.rpg.event.FullMoonEvent;
@@ -21,7 +22,6 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
-import org.bukkit.event.player.PlayerJoinEvent;
 
 public class RPGListener implements Listener{
 
@@ -56,6 +56,22 @@ public class RPGListener implements Listener{
 			RPGMethods.cycleAvatar(bPlayer);
 		}
 	}*/
+	
+	@EventHandler
+	public void onBendingPlayerCreationEvent(BendingPlayerCreationEvent event) {
+		if (!ConfigManager.rpgConfig.get().getBoolean("ElementAssign.Enabled")) return;
+
+		if (event.getBendingPlayer() != null) {
+			BendingPlayer bPlayer = event.getBendingPlayer();
+
+			if ((bPlayer.getElements().isEmpty()) && (!bPlayer.isPermaRemoved())) {
+				RPGMethods.randomAssign(bPlayer);
+				if (ConfigManager.rpgConfig.get().getBoolean("SubElementAssign.Enabled")) {
+					RPGMethods.randomAssignSubElements(bPlayer);
+				}
+			}
+		}
+	}
 
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void onFullMoon(FullMoonEvent event) {
@@ -160,26 +176,6 @@ public class RPGListener implements Listener{
 			ProjectKorraRPG.plugin.getServer().getPluginManager().callEvent(new LunarEclipseEvent(event.getWorld()));
 		} else if (RPGMethods.isFullMoon(event.getWorld())) {
 			ProjectKorraRPG.plugin.getServer().getPluginManager().callEvent(new FullMoonEvent(event.getWorld()));
-		}
-	}
-	
-	@EventHandler(priority = EventPriority.HIGHEST)
-	public void randomElementAssign(PlayerJoinEvent event) {
-		if (!ConfigManager.rpgConfig.get().getBoolean("ElementAssign.Enabled")) return;
-
-		if (BendingPlayer.getBendingPlayer(event.getPlayer().getName()) != null) {
-			BendingPlayer bp = BendingPlayer.getBendingPlayer(event.getPlayer().getName());
-
-			if ((bp.getElements().isEmpty()) && (!bp.isPermaRemoved())) {
-				RPGMethods.randomAssign(bp);
-				if (ConfigManager.rpgConfig.get().getBoolean("SubElementAssign.Enabled")) {
-					RPGMethods.randomAssignSubElements(bp);
-				}
-			}
-			
-			/*if (bp.getSubElements().isEmpty() && !bp.isPermaRemoved()) {
-				RPGMethods.randomAssignSubElements(bp);
-			}*/
 		}
 	}
 }

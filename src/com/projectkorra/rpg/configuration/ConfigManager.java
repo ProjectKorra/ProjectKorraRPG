@@ -1,6 +1,5 @@
 package com.projectkorra.rpg.configuration;
 
-import com.projectkorra.projectkorra.configuration.Config;
 import com.projectkorra.projectkorra.configuration.ConfigType;
 
 import org.bukkit.configuration.file.FileConfiguration;
@@ -55,6 +54,7 @@ public class ConfigManager {
 			config.addDefault("ElementAssign.Percentages.Fire", 0.205);
 			config.addDefault("ElementAssign.Percentages.Chi", 0.18);
 			
+			config.addDefault("SubElementAssign.Enabled", true);
 			config.addDefault("SubElementAssign.Percentages.Blood", 0.01);
 			config.addDefault("SubElementAssign.Percentages.Combustion", 0.3);
 			config.addDefault("SubElementAssign.Percentages.Flight", 0.01);

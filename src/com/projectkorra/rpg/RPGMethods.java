@@ -43,7 +43,6 @@ public class RPGMethods {
 	
 	public static void cycleAvatar(BendingPlayer bPlayer) {
 		revokeAvatar(bPlayer.getUUID());
-		Bukkit.getServer().broadcastMessage("The avatar cycle has progressed!");
 		Player avatar = Bukkit.getPlayer(bPlayer.getUUID());
 		Random rand = new Random();
 		int i = rand.nextInt(avatar.getWorld().getPlayers().size());
@@ -295,17 +294,20 @@ public class RPGMethods {
 			}
 		}
 		int size = sublist.size();
-		for (String sub : sublist) {
-			String name = sub;
-			if (sub.equals("SpiritualProjection"))
-				name = "Spiritual";
-			
-			size -= 1;
-			if (size == 0) {
-				sb.append(ChatColor.WHITE + "and " + Element.getElement(name).getColor() + sub + ChatColor.WHITE + ".");
-			} else {
-				sb.append(Element.getElement(name).getColor() + sub + ChatColor.WHITE + ", ");
+		if (size > 1) {
+			for (String sub : sublist) {
+				String name = sub;
+				if (sub.equals("SpiritualProjection")) name = "Spiritual";
+
+				size -= 1;
+				if (size == 0) {
+					sb.append(ChatColor.WHITE + "and " + Element.getElement(name).getColor() + sub + ChatColor.WHITE + ".");
+				} else {
+					sb.append(Element.getElement(name).getColor() + sub + ChatColor.WHITE + ", ");
+				}
 			}
+		} else {
+			sb = new StringBuilder("You sadly don't have any extra affinity for your element.");
 		}
 		
 		Bukkit.getPlayer(bPlayer.getUUID()).sendMessage(sb.toString());
@@ -319,20 +321,20 @@ public class RPGMethods {
 	 * @param e Element being added to the player
 	 * @param chiblocker if the player is becoming a chiblocker
 	 */
-	private static void assignElement(BendingPlayer player, Element e, Boolean chiblocker) {
-		player.setElement(e);
-		GeneralMethods.saveElements(player);
+	private static void assignElement(BendingPlayer bPlayer, Element e, Boolean chiblocker) {
+		bPlayer.setElement(e);
+		GeneralMethods.saveElements(bPlayer);
 		if (!chiblocker) {
-			if (e.toString().equalsIgnoreCase("Earth"))
-				Bukkit.getPlayer(player.getUUID()).sendMessage(ChatColor.WHITE + "You have been born as an " + ChatColor.GREEN + e.toString() + "bender!");
-			if (e.toString().equalsIgnoreCase("Fire"))
-				Bukkit.getPlayer(player.getUUID()).sendMessage(ChatColor.WHITE + "You have been born as a " + ChatColor.RED + e.toString() + "bender!");
-			if (e.toString().equalsIgnoreCase("Water"))
-				Bukkit.getPlayer(player.getUUID()).sendMessage(ChatColor.WHITE + "You have been born as a " + ChatColor.AQUA + e.toString() + "bender!");
-			if (e.toString().equalsIgnoreCase("Air"))
-				Bukkit.getPlayer(player.getUUID()).sendMessage(ChatColor.WHITE + "You have been born as an " + ChatColor.GRAY + e.toString() + "bender!");
+			if (e.equals(Element.EARTH))
+				Bukkit.getPlayer(bPlayer.getUUID()).sendMessage(ChatColor.WHITE + "You have been born as an " + ChatColor.GREEN + e.toString() + "bender!");
+			if (e.equals(Element.FIRE))
+				Bukkit.getPlayer(bPlayer.getUUID()).sendMessage(ChatColor.WHITE + "You have been born as a " + ChatColor.RED + e.toString() + "bender!");
+			if (e.equals(Element.WATER))
+				Bukkit.getPlayer(bPlayer.getUUID()).sendMessage(ChatColor.WHITE + "You have been born as a " + ChatColor.AQUA + e.toString() + "bender!");
+			if (e.equals(Element.AIR))
+				Bukkit.getPlayer(bPlayer.getUUID()).sendMessage(ChatColor.WHITE + "You have been born as an " + ChatColor.GRAY + e.toString() + "bender!");
 		} else {
-			Bukkit.getPlayer(player.getUUID()).sendMessage(ChatColor.WHITE + "You have been raised as a " + ChatColor.GOLD + "Chiblocker!");
+			Bukkit.getPlayer(bPlayer.getUUID()).sendMessage(ChatColor.WHITE + "You have been raised as a " + ChatColor.GOLD + "Chiblocker!");
 		}
 	}
 

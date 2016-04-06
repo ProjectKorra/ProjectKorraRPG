@@ -1,6 +1,5 @@
 package com.projectkorra.rpg.configuration;
 
-import com.projectkorra.projectkorra.configuration.Config;
 import com.projectkorra.projectkorra.configuration.ConfigType;
 
 import org.bukkit.configuration.file.FileConfiguration;

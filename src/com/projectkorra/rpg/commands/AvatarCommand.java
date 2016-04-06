@@ -1,12 +1,16 @@
 package com.projectkorra.rpg.commands;
 
 import com.projectkorra.rpg.RPGMethods;
+import com.projectkorra.rpg.storage.DBConnection;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class AvatarCommand extends RPGCommand{
@@ -21,6 +25,24 @@ public class AvatarCommand extends RPGCommand{
 			return;
 		if (!hasPermission(sender))
 			return;
+		if (args.get(0).equalsIgnoreCase("list")) {
+			ResultSet rs = DBConnection.sql.readQuery("SELECT player FROM pk_avatars");
+			List<String> avatars = new ArrayList<>();
+			try {
+				while (rs.next()) {
+					if (avatars.contains(rs.getString(1))) continue;
+					avatars.add(rs.getString(1));
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+				return;
+			}
+			sender.sendMessage("Avatar Past Lives:");
+			for (String s : avatars) {
+				sender.sendMessage(s);
+			}
+			return;
+		}
 		Player target = Bukkit.getPlayer(args.get(0));
 		if (target == null) {
 			sender.sendMessage(ChatColor.RED + "Player not found!");

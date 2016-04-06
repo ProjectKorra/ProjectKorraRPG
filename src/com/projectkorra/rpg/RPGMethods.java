@@ -217,27 +217,27 @@ public class RPGMethods {
 
 		if (ConfigManager.rpgConfig.get().getBoolean("ElementAssign.Enabled")) {
 			if (rand < earthchance) {
-				assignElement(player, Element.EARTH, false);
+				assignElement(player, Element.EARTH);
 				return;
 			}
 
 			else if (rand < waterchance + earthchance && rand > earthchance) {
-				assignElement(player, Element.WATER, false);
+				assignElement(player, Element.WATER);
 				return;
 			}
 
 			else if (rand < airchance + waterchance + earthchance && rand > waterchance + earthchance) {
-				assignElement(player, Element.AIR, false);
+				assignElement(player, Element.AIR);
 				return;
 			}
 
 			else if (rand < firechance + airchance + waterchance + earthchance && rand > airchance + waterchance + earthchance) {
-				assignElement(player, Element.FIRE, false);
+				assignElement(player, Element.FIRE);
 				return;
 			}
 
 			else if (rand < chichance + firechance + airchance + waterchance + earthchance && rand > firechance + airchance + waterchance + earthchance) {
-				assignElement(player, Element.CHI, true);
+				assignElement(player, Element.CHI);
 				return;
 			}
 		} else {
@@ -248,21 +248,18 @@ public class RPGMethods {
 				return;
 			}
 
-			if (defaultElement.equalsIgnoreCase("Chi")) {
-				assignElement(player, Element.CHI, true);
-				return;
-			}
-
-			if (defaultElement.equalsIgnoreCase("Water"))
+			if (defaultElement.equalsIgnoreCase("Chi"))
+				e = Element.CHI;
+			else if (defaultElement.equalsIgnoreCase("Water"))
 				e = Element.WATER;
-			if (defaultElement.equalsIgnoreCase("Earth"))
+			else if (defaultElement.equalsIgnoreCase("Earth"))
 				e = Element.EARTH;
-			if (defaultElement.equalsIgnoreCase("Fire"))
+			else if (defaultElement.equalsIgnoreCase("Fire"))
 				e = Element.FIRE;
-			if (defaultElement.equalsIgnoreCase("Air"))
+			else if (defaultElement.equalsIgnoreCase("Air"))
 				e = Element.AIR;
 
-			assignElement(player, e, false);
+			assignElement(player, e);
 			return;
 		}
 	}
@@ -321,21 +318,10 @@ public class RPGMethods {
 	 * @param e Element being added to the player
 	 * @param chiblocker if the player is becoming a chiblocker
 	 */
-	private static void assignElement(BendingPlayer bPlayer, Element e, Boolean chiblocker) {
+	private static void assignElement(BendingPlayer bPlayer, Element e) {
 		bPlayer.setElement(e);
 		GeneralMethods.saveElements(bPlayer);
-		if (!chiblocker) {
-			if (e.equals(Element.EARTH))
-				Bukkit.getPlayer(bPlayer.getUUID()).sendMessage(ChatColor.WHITE + "You have been born as an " + ChatColor.GREEN + e.toString() + "bender!");
-			if (e.equals(Element.FIRE))
-				Bukkit.getPlayer(bPlayer.getUUID()).sendMessage(ChatColor.WHITE + "You have been born as a " + ChatColor.RED + e.toString() + "bender!");
-			if (e.equals(Element.WATER))
-				Bukkit.getPlayer(bPlayer.getUUID()).sendMessage(ChatColor.WHITE + "You have been born as a " + ChatColor.AQUA + e.toString() + "bender!");
-			if (e.equals(Element.AIR))
-				Bukkit.getPlayer(bPlayer.getUUID()).sendMessage(ChatColor.WHITE + "You have been born as an " + ChatColor.GRAY + e.toString() + "bender!");
-		} else {
-			Bukkit.getPlayer(bPlayer.getUUID()).sendMessage(ChatColor.WHITE + "You have been raised as a " + ChatColor.GOLD + "Chiblocker!");
-		}
+		Bukkit.getPlayer(bPlayer.getUUID()).sendMessage(ChatColor.WHITE + "You have been born as an " + e.getColor() + e.getName() + e.getType().getBender() + "!");
 	}
 
 	/**
@@ -430,8 +416,9 @@ public class RPGMethods {
 		String elements2 = "";
 		ResultSet rs = DBConnection.sql.readQuery("SELECT elements FROM pk_avatars WHERE uuid = '" + uuid.toString() + "'");
 		try {
-			rs.next();
-			elements2 = rs.getString(4);
+			if (rs.next()) {
+				elements2 = rs.getString(1);
+			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return;
@@ -442,5 +429,6 @@ public class RPGMethods {
 		bPlayer.getElements().clear();
 		bPlayer.getElements().addAll(elements);
 		GeneralMethods.saveElements(bPlayer);
+		ConfigManager.avatarConfig.get().set("Avatar.Current", "");
 	}
 }

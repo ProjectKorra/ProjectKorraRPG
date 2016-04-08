@@ -15,6 +15,7 @@ import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -128,6 +129,20 @@ public class EventCommand extends RPGCommand {
 				}
 			}
 		}
+	}
+	
+	@Override
+	protected List<String> getTabCompletion(CommandSender sender, List<String> args) {
+		if (args.size() >= 2) return new ArrayList<String>();
+		List<String> l = new ArrayList<String>();
+		if (args.size() == 0) {
+			l = Arrays.asList(new String[] {"current", "end", "help", "skip", "start"});
+		} else {
+			if (Arrays.asList(start).contains(args.get(0).toLowerCase())) {
+				l = Arrays.asList(new String[] {"FullMoon", "LunarEclipse", "SolarEclipse", "SozinsComet"});
+			}
+		}
+		return l;
 	}
 
 }

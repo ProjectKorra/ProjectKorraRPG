@@ -5,6 +5,7 @@ import com.projectkorra.projectkorra.Element;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -66,5 +67,17 @@ public class HelpCommand extends RPGCommand{
 				sender.sendMessage(Element.COMBUSTION.getColor() + "Sozins Comet - This is a world event in which a comet passes by the earth, enhancing firebending by a large amount.");				
 			}
 		}
+	}
+	
+	@Override
+	protected List<String> getTabCompletion(CommandSender sender, List<String> args) {
+		if (args.size() >= 1) return new ArrayList<String>();
+		List<String> l = Arrays.asList(new String[] {"FullMoon", "LunarEclipse", "SolarEclipse", "SozinsComet"});
+		for (RPGCommand cmd : RPGCommand.instances.values()) {
+			if (!cmd.getName().equals("help")) {
+				l.add(cmd.getName());
+			}
+		}
+		return l;
 	}
 }

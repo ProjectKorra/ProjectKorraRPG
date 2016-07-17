@@ -270,7 +270,7 @@ public class RPGMethods {
 		double rand = Math.random();
 		double chance = 0;
 		String[] subs = {"Blood", "Combustion", "Flight", "Healing", "Ice", "Lava", "Lightning", "Metal", "Plant", "Sand", "SpiritualProjection"};
-		StringBuilder sb = new StringBuilder("You have an affinity for ");
+		StringBuilder sb = new StringBuilder(ChatColor.YELLOW + "You have an affinity for ");
 		ArrayList<String> sublist = new ArrayList<>();
 		
 		for (String sub : subs) {
@@ -288,6 +288,7 @@ public class RPGMethods {
 			if (rand < chance) {
 				sublist.add(sub);
 				bPlayer.addSubElement(s);
+				GeneralMethods.saveSubElements(bPlayer);
 			}
 		}
 		int size = sublist.size();
@@ -298,13 +299,13 @@ public class RPGMethods {
 
 				size -= 1;
 				if (size == 0) {
-					sb.append(ChatColor.WHITE + "and " + Element.getElement(name).getColor() + sub + ChatColor.WHITE + ".");
+					sb.append(ChatColor.YELLOW + "and " + Element.getElement(name).getColor() + sub + ChatColor.YELLOW + ".");
 				} else {
-					sb.append(Element.getElement(name).getColor() + sub + ChatColor.WHITE + ", ");
+					sb.append(Element.getElement(name).getColor() + sub + ChatColor.YELLOW + ", ");
 				}
 			}
 		} else {
-			sb = new StringBuilder("You sadly don't have any extra affinity for your element.");
+			sb = new StringBuilder(ChatColor.RED + "You sadly don't have any extra affinity for your element.");
 		}
 		
 		Bukkit.getPlayer(bPlayer.getUUID()).sendMessage(sb.toString());
@@ -321,7 +322,7 @@ public class RPGMethods {
 	private static void assignElement(BendingPlayer bPlayer, Element e) {
 		bPlayer.setElement(e);
 		GeneralMethods.saveElements(bPlayer);
-		Bukkit.getPlayer(bPlayer.getUUID()).sendMessage(ChatColor.WHITE + "You have been born as an " + e.getColor() + e.getName() + e.getType().getBender() + "!");
+		Bukkit.getPlayer(bPlayer.getUUID()).sendMessage(ChatColor.YELLOW + "You have been born as an " + e.getColor() + e.getName() + e.getType().getBender() + ChatColor.YELLOW +  "!");
 	}
 
 	/**

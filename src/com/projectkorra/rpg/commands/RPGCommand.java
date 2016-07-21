@@ -7,7 +7,9 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public abstract class RPGCommand implements SubCommand{
 	
@@ -118,5 +120,11 @@ public abstract class RPGCommand implements SubCommand{
 			sender.sendMessage(ChatColor.RED + "You must be a player to use that command.");
 			return false;
 		}
+	}
+	
+	/**Gets a list of valid arguments that can be used in tabbing.*/
+	protected List<String> getTabCompletion(CommandSender sender, List<String> args)
+	{
+		return new ArrayList<String>();
 	}
 }

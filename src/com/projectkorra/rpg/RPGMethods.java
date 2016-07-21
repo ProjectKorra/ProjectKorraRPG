@@ -42,17 +42,17 @@ public class RPGMethods {
 	}
 	
 	public static void cycleAvatar(BendingPlayer bPlayer) {
+		if (Bukkit.getOnlinePlayers().size() <= 1) return; //Don't bother with 1 person on...
 		revokeAvatar(bPlayer.getUUID());
 		Player avatar = Bukkit.getPlayer(bPlayer.getUUID());
 		Random rand = new Random();
 		int i = rand.nextInt(avatar.getWorld().getPlayers().size());
-		for (Player player : avatar.getWorld().getPlayers()) {
-			if (player == avatar) continue;
-			if (avatar.getWorld().getPlayers().get(i) == player) {
-				setAvatar(player.getUniqueId());
-				break;
-			}
+		Player p = (Player) Bukkit.getOnlinePlayers().toArray()[i];
+		while (p == avatar) {	
+			i = rand.nextInt(avatar.getWorld().getPlayers().size());
+			p = (Player) Bukkit.getOnlinePlayers().toArray()[i];
 		}
+		setAvatar(p.getUniqueId());
 	}
 
 	/**

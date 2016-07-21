@@ -54,4 +54,14 @@ public class AvatarCommand extends RPGCommand{
 		RPGMethods.setAvatar(target.getUniqueId());
 		Bukkit.broadcastMessage(ChatColor.WHITE + target.getName() + ChatColor.DARK_PURPLE + " has been declared avatar!");
 	}
+	
+	@Override
+	protected List<String> getTabCompletion(CommandSender sender, List<String> args) {
+		if (args.size() >= 1) return new ArrayList<String>();
+		List<String> players = new ArrayList<String>();
+		for (Player p : Bukkit.getOnlinePlayers()) {
+			players.add(p.getName());
+		}
+		return players;
+	}
 }

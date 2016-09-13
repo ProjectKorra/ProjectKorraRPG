@@ -266,14 +266,14 @@ public class RPGMethods {
 	
 	public static void randomAssignSubElements(BendingPlayer bPlayer) {
 		if (bPlayer.hasElement(Element.CHI)) return;
-		
-		double rand = Math.random();
+                
 		double chance = 0;
 		String[] subs = {"Blood", "Combustion", "Flight", "Healing", "Ice", "Lava", "Lightning", "Metal", "Plant", "Sand", "SpiritualProjection"};
 		StringBuilder sb = new StringBuilder(ChatColor.YELLOW + "You have an affinity for ");
 		ArrayList<String> sublist = new ArrayList<>();
 		
 		for (String sub : subs) {
+                        double rand = Math.random();
 			chance = ConfigManager.rpgConfig.get().getDouble("SubElementAssign.Percentages." + sub);
 			String name = sub;
 			if (sub.equals("SpiritualProjection"))

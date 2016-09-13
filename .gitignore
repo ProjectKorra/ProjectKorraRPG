@@ -27,7 +27,8 @@ bin/
 .LSOverride
 
 # Icon must end with two \r
-Icon
+Icon
+
 
 # Thumbnails
 ._*
@@ -46,3 +47,11 @@ Temporary Items
 .classpath
 *.classpath
 *.classpath
+/ProjectKorra/nbproject/private/
+/ProjectKorraRPG/nbproject/private/
+/nbproject/private/
+/build/
+/dist/
+/nbproject/
+*.mf
+build.xml

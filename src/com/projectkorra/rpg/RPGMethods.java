@@ -284,7 +284,6 @@ public class RPGMethods {
 			if (!bPlayer.hasElement(e)) continue;
 			if (sub.equals("Metal") && sublist.contains(SubElement.LAVA)) continue;
 			if (sub.equals("Lightning") && sublist.contains(SubElement.COMBUSTION)) continue;
-			
 			if (rand < chance) {
 				sublist.add(sub);
 				bPlayer.addSubElement(s);
@@ -292,16 +291,16 @@ public class RPGMethods {
 			}
 		}
 		int size = sublist.size();
-		if (size > 1) {
+		if (size >= 1) {
 			for (String sub : sublist) {
 				String name = sub;
 				if (sub.equals("SpiritualProjection")) name = "Spiritual";
 
 				size -= 1;
 				if (size == 0) {
-					sb.append(ChatColor.YELLOW + "and " + Element.getElement(name).getColor() + sub + ChatColor.YELLOW + ".");
+					sb.append(Element.getElement(name).getColor() + sub + ChatColor.YELLOW + ".");
 				} else {
-					sb.append(Element.getElement(name).getColor() + sub + ChatColor.YELLOW + ", ");
+					sb.append(Element.getElement(name).getColor() + sub + ChatColor.YELLOW + ", and ");
 				}
 			}
 		} else {

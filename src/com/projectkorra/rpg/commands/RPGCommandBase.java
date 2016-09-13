@@ -1,7 +1,5 @@
 package com.projectkorra.rpg.commands;
 
-import net.md_5.bungee.api.ChatColor;
-
 import com.projectkorra.projectkorra.command.PKCommand;
 
 import org.bukkit.command.CommandSender;
@@ -10,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import org.bukkit.ChatColor;
 
 public class RPGCommandBase extends PKCommand {
 

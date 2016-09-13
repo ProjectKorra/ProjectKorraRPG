@@ -18,6 +18,8 @@ public class EventManager implements Runnable {
 
 	public static ConcurrentHashMap<World, String> marker = new ConcurrentHashMap<>();
 	public static ConcurrentHashMap<World, Boolean> skipper = new ConcurrentHashMap<>();
+        
+        public static Time time;
 
 	@Override
 	public void run() {
@@ -41,14 +43,22 @@ public class EventManager implements Runnable {
 			if (!skipper.containsKey(world)) {
 				skipper.put(world, false);
 			}
-			
-			if (!marker.get(world).equals("")) {
-				continue;
-			}
 
-			if (world.getTime() > 23500 && world.getTime() < 500) {
-				ProjectKorraRPG.plugin.getServer().getPluginManager().callEvent(new WorldSunRiseEvent(world));
+			if (world.getTime() > 23500 || world.getTime() < 500) {
+                                if (time != null){
+                                    if (time == Time.DAY){
+                                        continue;
+                                    }
+                                }
+                                time = Time.DAY;
+                                ProjectKorraRPG.plugin.getServer().getPluginManager().callEvent(new WorldSunRiseEvent(world));
 			} else if (world.getTime() > 11500 && world.getTime() < 12500) {
+                                if (time != null){
+                                    if (time == Time.NIGHT){
+                                        continue;
+                                    }
+                                }
+                                time = Time.NIGHT;
 				ProjectKorraRPG.plugin.getServer().getPluginManager().callEvent(new WorldSunSetEvent(world));
 			}
 		}
@@ -64,4 +74,10 @@ public class EventManager implements Runnable {
 		}
 		marker.put(world, "");
 	}
+        
+        enum Time {
+            
+            DAY,
+            NIGHT;       
+        }
 }

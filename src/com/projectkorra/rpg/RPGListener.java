@@ -13,6 +13,7 @@ import com.projectkorra.rpg.event.SolarEclipseEvent;
 import com.projectkorra.rpg.event.SozinsCometEvent;
 import com.projectkorra.rpg.event.WorldSunRiseEvent;
 import com.projectkorra.rpg.event.WorldSunSetEvent;
+import org.bukkit.Bukkit;
 
 import org.bukkit.World;
 import org.bukkit.block.BlockFace;
@@ -85,7 +86,7 @@ public class RPGListener implements Listener{
 		EventManager.marker.put(world, "FullMoon");
 		for (Player player : world.getPlayers()) {
 			BendingPlayer bPlayer = BendingPlayer.getBendingPlayer(player);
-			if (bPlayer != null && bPlayer.hasElement(Element.WATER)) {
+			if (bPlayer != null) {
 				if (player.hasPermission("bending.message.nightmessage")) {
 					player.sendMessage(Element.ICE.getColor() + event.getMessage());
 				}
@@ -105,7 +106,7 @@ public class RPGListener implements Listener{
 		EventManager.marker.put(world, "LunarEclipse");
 		for (Player player : world.getPlayers()) {
 			BendingPlayer bPlayer = BendingPlayer.getBendingPlayer(player);
-			if (bPlayer != null && bPlayer.hasElement(Element.WATER)) {
+			if (bPlayer != null) {
 				if (player.hasPermission("bending.message.nightmessage")) {
 					player.sendMessage(Element.WATER.getColor() + event.getMessage());
 				}
@@ -125,7 +126,7 @@ public class RPGListener implements Listener{
 		EventManager.marker.put(world, "SolarEclipse");
 		for (Player player : world.getPlayers()) {
 			BendingPlayer bPlayer = BendingPlayer.getBendingPlayer(player);
-			if (bPlayer != null && bPlayer.hasElement(Element.FIRE)) {
+			if (bPlayer != null) {
 				if (player.hasPermission("bending.message.daymessage")) {
 					player.sendMessage(Element.FIRE.getColor() + event.getMessage());
 				}
@@ -145,7 +146,7 @@ public class RPGListener implements Listener{
 		EventManager.marker.put(world, "SozinsComet");
 		for (Player player : world.getPlayers()) {
 			BendingPlayer bPlayer = BendingPlayer.getBendingPlayer(player);
-			if (bPlayer != null && bPlayer.hasElement(Element.FIRE)) {
+			if (bPlayer != null) {
 				if (player.hasPermission("bending.message.daymessage")) {
 					player.sendMessage(Element.COMBUSTION.getColor() + event.getMessage());
 				}

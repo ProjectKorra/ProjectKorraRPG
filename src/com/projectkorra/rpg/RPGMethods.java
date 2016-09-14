@@ -358,9 +358,9 @@ public class RPGMethods {
 				continue;
 
 			if (bPlayer.getElements().size() - 1 == i) {
-				sb.append(e.toString());
+				sb.append(e.getName());
 			} else {
-				sb.append(e.toString() + ":");
+				sb.append(e.getName() + ":");
 			}
 			i += 1;
 		}
@@ -441,7 +441,9 @@ public class RPGMethods {
 			e.printStackTrace();
 			return;
 		}
+                Bukkit.broadcastMessage(elements2);
 		for (String s : elements2.split(":")) {
+                    Bukkit.broadcastMessage(s);
 			elements.add(Element.fromString(s));
 		}
                 

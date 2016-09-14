@@ -17,8 +17,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 import java.util.UUID;
 
 public class RPGMethods {
@@ -343,6 +345,8 @@ public class RPGMethods {
 		for (Element e : bPlayer.getElements()) {
 			if (e instanceof SubElement)
 				continue;
+                        if (e.equals(Element.CHI))
+                                continue;
 
 			if (bPlayer.getElements().size() - 1 == i) {
 				sb.append(e.toString());
@@ -356,7 +360,11 @@ public class RPGMethods {
 		 * Gives them the elements
 		 */
 		bPlayer.getElements().clear();
-		bPlayer.getElements().addAll(Arrays.asList(Element.getAllElements()));
+                Set<Element> shouldBeAdded = new HashSet<>(Arrays.asList(Element.getAllElements()));
+                if (shouldBeAdded.contains(Element.CHI)){
+                        shouldBeAdded.remove(Element.CHI);
+                }
+		bPlayer.getElements().addAll(shouldBeAdded);
 		GeneralMethods.saveElements(bPlayer);
 		ConfigManager.avatarConfig.save();
 	}

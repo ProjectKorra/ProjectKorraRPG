@@ -2,6 +2,7 @@ package com.projectkorra.rpg;
 
 import com.projectkorra.projectkorra.BendingPlayer;
 import com.projectkorra.projectkorra.Element;
+import com.projectkorra.projectkorra.ability.CoreAbility;
 import com.projectkorra.projectkorra.ability.EarthAbility;
 import com.projectkorra.projectkorra.avatar.AvatarState;
 import com.projectkorra.projectkorra.event.BendingPlayerCreationEvent;
@@ -25,24 +26,35 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
 public class RPGListener implements Listener{
+    
+        private boolean finalState = false;
+    
+        public RPGListener(){
+            finalState = ConfigManager.rpgConfig.get().getBoolean("Abilities.AvatarStateOnFinalBlow");
+        }
 
 	@EventHandler
 	public void onAvatarDamaged(EntityDamageEvent event) {
 		if(event.isCancelled()) return;
 
-		if(ConfigManager.rpgConfig.get().getBoolean("Abilities.AvatarStateOnFinalBlow")) {
+		if(finalState) {
 			if (event.getEntity() instanceof Player) {
 				Player player = (Player) event.getEntity();
 				BendingPlayer bP = BendingPlayer.getBendingPlayer(player.getName());
-				if (bP != null && (RPGMethods.isCurrentAvatar(player.getUniqueId()) || RPGMethods.hasBeenAvatar(player.getUniqueId()))) {
+				if (bP != null && (RPGMethods.isCurrentAvatar(player.getUniqueId()))) {
 					if (event.getCause() == DamageCause.FALL && bP.hasElement(Element.AIR)) return;
 					else if (event.getCause() == DamageCause.FALL && bP.hasElement(Element.EARTH) && EarthAbility.isEarthbendable(player, player.getLocation().getBlock().getRelative(BlockFace.DOWN))) return;
-					else if (event.getCause() == DamageCause.FALL) {
+					else {
 						if (player.getHealth() - event.getDamage() <= 0) {
-							if (!bP.isOnCooldown("AvatarState")) {
-								event.setCancelled(true);
-								new AvatarState(player);
-							} 
+                                                        if (bP.canBend(CoreAbility.getAbility("AvatarState"))){
+                                                                if (!bP.isOnCooldown("AvatarState")) {
+                                                                        player.setHealth(2);
+                                                                        event.setCancelled(true);
+                                                                        new AvatarState(player);
+                                                                        return;
+                                                                } 
+                                                        }
+                                                        RPGMethods.cycleAvatar(bP);
 						}
 					}
 				}

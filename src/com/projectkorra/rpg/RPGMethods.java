@@ -344,7 +344,7 @@ public class RPGMethods {
 	 * @param uuid UUID of player being set as the avatar
 	 */
 	public static void setAvatar(UUID uuid) {
-		if (ConfigManager.avatarConfig.get().contains("Avatar.Current")) {
+		if (!isAvatarChoosen()) {
 			UUID curr = UUID.fromString(ConfigManager.avatarConfig.get().getString("Avatar.Current"));
 			revokeAvatar(curr);
 		}
@@ -435,7 +435,7 @@ public class RPGMethods {
 		ResultSet rs = DBConnection.sql.readQuery("SELECT elements FROM pk_avatars WHERE uuid = '" + uuid.toString() + "'");
 		try {
 			if (rs.next()) {
-				elements2 = rs.getString(1);
+				elements2 = rs.getString("elements");
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -444,6 +444,7 @@ public class RPGMethods {
 		for (String s : elements2.split(":")) {
 			elements.add(Element.fromString(s));
 		}
+                
 		bPlayer.getElements().clear();
 		bPlayer.getElements().addAll(elements);
 		GeneralMethods.saveElements(bPlayer);

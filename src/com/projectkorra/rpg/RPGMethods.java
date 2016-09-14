@@ -364,7 +364,7 @@ public class RPGMethods {
 			}
 			i += 1;
 		}
-                DBConnection.sql.modifyQuery("DELETE * FROM pk_avatars WHERE uuid = '" + uuid.toString() + "'");
+                DBConnection.sql.modifyQuery("DELETE FROM pk_avatars WHERE uuid = '" + uuid.toString() + "'");
 		DBConnection.sql.modifyQuery("INSERT INTO pk_avatars (uuid, player, elements) VALUES ('" + uuid.toString() + "', '" + player.getName() + "', '" + sb.toString() + "')");
 		/*
 		 * Gives them the elements

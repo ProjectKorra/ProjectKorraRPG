@@ -325,6 +325,17 @@ public class RPGMethods {
 		GeneralMethods.saveElements(bPlayer);
 		Bukkit.getPlayer(bPlayer.getUUID()).sendMessage(ChatColor.YELLOW + "You have been born as an " + e.getColor() + e.getName() + e.getType().getBender() + ChatColor.YELLOW +  "!");
 	}
+        
+        /**
+	 * Returns if there is an avatar, if he/she has already been choosen or not.
+	 */
+	public static boolean isAvatarChoosen() {
+		if (ConfigManager.avatarConfig.get().contains("Avatar.Current")) {
+			if (!"".equals(ConfigManager.avatarConfig.get().getString("Avatar.Current")) || (ConfigManager.avatarConfig.get().getString("Avatar.Current")) != null)
+                                return true;
+		}
+                return false;
+	}
 
 	/**
 	 * Sets a player to the avatar giving them all the elements (excluding

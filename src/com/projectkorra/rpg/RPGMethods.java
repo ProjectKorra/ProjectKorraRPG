@@ -356,8 +356,6 @@ public class RPGMethods {
 		for (Element e : bPlayer.getElements()) {
 			if (e instanceof SubElement)
 				continue;
-                        if (e.equals(Element.CHI))
-                                continue;
 
 			if (bPlayer.getElements().size() - 1 == i) {
 				sb.append(e.toString());
@@ -366,6 +364,7 @@ public class RPGMethods {
 			}
 			i += 1;
 		}
+                DBConnection.sql.modifyQuery("DELETE * FROM pk_avatars WHERE uuid = '" + uuid.toString() + "'");
 		DBConnection.sql.modifyQuery("INSERT INTO pk_avatars (uuid, player, elements) VALUES ('" + uuid.toString() + "', '" + player.getName() + "', '" + sb.toString() + "')");
 		/*
 		 * Gives them the elements

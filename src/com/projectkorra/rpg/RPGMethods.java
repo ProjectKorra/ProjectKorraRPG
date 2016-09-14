@@ -441,9 +441,7 @@ public class RPGMethods {
 			e.printStackTrace();
 			return;
 		}
-                Bukkit.broadcastMessage(elements2);
 		for (String s : elements2.split(":")) {
-                    Bukkit.broadcastMessage(s);
 			elements.add(Element.fromString(s));
 		}
                 

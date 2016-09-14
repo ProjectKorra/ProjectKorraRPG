@@ -44,14 +44,14 @@ public class RPGMethods {
 	}
 	
 	public static void cycleAvatar(BendingPlayer bPlayer) {
-		if (Bukkit.getOnlinePlayers().size() <= 1) return; //Don't bother with 1 person on...
+		if (Bukkit.getOnlinePlayers().size() <= 1) return; //Don't bother with 0 person on...
 		revokeAvatar(bPlayer.getUUID());
 		Player avatar = Bukkit.getPlayer(bPlayer.getUUID());
 		Random rand = new Random();
-		int i = rand.nextInt(avatar.getWorld().getPlayers().size());
+		int i = rand.nextInt(Bukkit.getOnlinePlayers().size());
 		Player p = (Player) Bukkit.getOnlinePlayers().toArray()[i];
 		while (p == avatar) {	
-			i = rand.nextInt(avatar.getWorld().getPlayers().size());
+			i = rand.nextInt(Bukkit.getOnlinePlayers().size());
 			p = (Player) Bukkit.getOnlinePlayers().toArray()[i];
 		}
 		setAvatar(p.getUniqueId());
@@ -449,5 +449,6 @@ public class RPGMethods {
 		bPlayer.getElements().addAll(elements);
 		GeneralMethods.saveElements(bPlayer);
 		ConfigManager.avatarConfig.get().set("Avatar.Current", "");
+                ConfigManager.avatarConfig.save();
 	}
 }

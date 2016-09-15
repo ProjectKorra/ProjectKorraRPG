@@ -44,7 +44,7 @@ public class RPGMethods {
 	}
 	
 	public static void cycleAvatar(BendingPlayer bPlayer) {
-		if (Bukkit.getOnlinePlayers().size() <= 1) return; //Don't bother with 0 person on...
+		if (Bukkit.getOnlinePlayers().size() <= 1) return; //Don't bother with 1 person or less on...
 		revokeAvatar(bPlayer.getUUID());
 		Player avatar = Bukkit.getPlayer(bPlayer.getUUID());
 		Random rand = new Random();

@@ -425,6 +425,8 @@ public class RPGMethods {
 	 * @param uuid UUID of player being checked
 	 */
 	public static void revokeAvatar(UUID uuid) {
+                if (uuid == null)
+                        return;
 		if (!isCurrentAvatar(uuid))
 			return;
 		List<Element> elements = new ArrayList<>();
@@ -432,6 +434,10 @@ public class RPGMethods {
 		if (bPlayer == null)
 			return;
 		String elements2 = "";
+                if (DBConnection.sql == null)
+                        return;
+                if (DBConnection.sql.getConnection() == null)
+                        return;
 		ResultSet rs = DBConnection.sql.readQuery("SELECT elements FROM pk_avatars WHERE uuid = '" + uuid.toString() + "'");
 		try {
 			if (rs.next()) {

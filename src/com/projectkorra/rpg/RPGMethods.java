@@ -17,8 +17,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 import java.util.UUID;
 
 public class RPGMethods {
@@ -42,14 +44,14 @@ public class RPGMethods {
 	}
 	
 	public static void cycleAvatar(BendingPlayer bPlayer) {
-		if (Bukkit.getOnlinePlayers().size() <= 1) return; //Don't bother with 1 person on...
+		if (Bukkit.getOnlinePlayers().size() <= 1) return; //Don't bother with 1 person or less on...
 		revokeAvatar(bPlayer.getUUID());
 		Player avatar = Bukkit.getPlayer(bPlayer.getUUID());
 		Random rand = new Random();
-		int i = rand.nextInt(avatar.getWorld().getPlayers().size());
+		int i = rand.nextInt(Bukkit.getOnlinePlayers().size());
 		Player p = (Player) Bukkit.getOnlinePlayers().toArray()[i];
 		while (p == avatar) {	
-			i = rand.nextInt(avatar.getWorld().getPlayers().size());
+			i = rand.nextInt(Bukkit.getOnlinePlayers().size());
 			p = (Player) Bukkit.getOnlinePlayers().toArray()[i];
 		}
 		setAvatar(p.getUniqueId());
@@ -323,6 +325,17 @@ public class RPGMethods {
 		GeneralMethods.saveElements(bPlayer);
 		Bukkit.getPlayer(bPlayer.getUUID()).sendMessage(ChatColor.YELLOW + "You have been born as an " + e.getColor() + e.getName() + e.getType().getBender() + ChatColor.YELLOW +  "!");
 	}
+        
+        /**
+	 * Returns if there is an avatar, if he/she has already been choosen or not.
+	 */
+	public static boolean isAvatarChoosen() {
+		if (ConfigManager.avatarConfig.get().contains("Avatar.Current")) {
+			if (!"".equals(ConfigManager.avatarConfig.get().getString("Avatar.Current")) || (ConfigManager.avatarConfig.get().getString("Avatar.Current")) != null)
+                                return true;
+		}
+                return false;
+	}
 
 	/**
 	 * Sets a player to the avatar giving them all the elements (excluding
@@ -331,7 +344,7 @@ public class RPGMethods {
 	 * @param uuid UUID of player being set as the avatar
 	 */
 	public static void setAvatar(UUID uuid) {
-		if (ConfigManager.avatarConfig.get().contains("Avatar.Current")) {
+		if (!isAvatarChoosen()) {
 			UUID curr = UUID.fromString(ConfigManager.avatarConfig.get().getString("Avatar.Current"));
 			revokeAvatar(curr);
 		}
@@ -345,18 +358,23 @@ public class RPGMethods {
 				continue;
 
 			if (bPlayer.getElements().size() - 1 == i) {
-				sb.append(e.toString());
+				sb.append(e.getName());
 			} else {
-				sb.append(e.toString() + ":");
+				sb.append(e.getName() + ":");
 			}
 			i += 1;
 		}
+                DBConnection.sql.modifyQuery("DELETE FROM pk_avatars WHERE uuid = '" + uuid.toString() + "'");
 		DBConnection.sql.modifyQuery("INSERT INTO pk_avatars (uuid, player, elements) VALUES ('" + uuid.toString() + "', '" + player.getName() + "', '" + sb.toString() + "')");
 		/*
 		 * Gives them the elements
 		 */
 		bPlayer.getElements().clear();
-		bPlayer.getElements().addAll(Arrays.asList(Element.getAllElements()));
+                Set<Element> shouldBeAdded = new HashSet<>(Arrays.asList(Element.getAllElements()));
+                if (shouldBeAdded.contains(Element.CHI)){
+                        shouldBeAdded.remove(Element.CHI);
+                }
+		bPlayer.getElements().addAll(shouldBeAdded);
 		GeneralMethods.saveElements(bPlayer);
 		ConfigManager.avatarConfig.save();
 	}
@@ -407,6 +425,8 @@ public class RPGMethods {
 	 * @param uuid UUID of player being checked
 	 */
 	public static void revokeAvatar(UUID uuid) {
+                if (uuid == null)
+                        return;
 		if (!isCurrentAvatar(uuid))
 			return;
 		List<Element> elements = new ArrayList<>();
@@ -414,10 +434,14 @@ public class RPGMethods {
 		if (bPlayer == null)
 			return;
 		String elements2 = "";
+                if (DBConnection.sql == null)
+                        return;
+                if (DBConnection.sql.getConnection() == null)
+                        return;
 		ResultSet rs = DBConnection.sql.readQuery("SELECT elements FROM pk_avatars WHERE uuid = '" + uuid.toString() + "'");
 		try {
 			if (rs.next()) {
-				elements2 = rs.getString(1);
+				elements2 = rs.getString("elements");
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -426,9 +450,11 @@ public class RPGMethods {
 		for (String s : elements2.split(":")) {
 			elements.add(Element.fromString(s));
 		}
+                
 		bPlayer.getElements().clear();
 		bPlayer.getElements().addAll(elements);
 		GeneralMethods.saveElements(bPlayer);
 		ConfigManager.avatarConfig.get().set("Avatar.Current", "");
+                ConfigManager.avatarConfig.save();
 	}
 }

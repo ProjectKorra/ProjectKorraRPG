@@ -14,70 +14,72 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class EventManager implements Runnable {
 
-	private static String message = com.projectkorra.rpg.configuration.ConfigManager.avatarConfig.get().getString("WorldEvents.SozinsComet.EndMessage");
+	private static String message = com.projectkorra.rpg.configuration.ConfigManager.avatarConfig.get()
+			.getString("WorldEvents.SozinsComet.EndMessage");
 
-	public static ConcurrentHashMap<World, String> marker = new ConcurrentHashMap<>();
-	public static ConcurrentHashMap<World, Boolean> skipper = new ConcurrentHashMap<>();
-        
-        public static Time time;
+	public static ConcurrentHashMap<World, String> events = new ConcurrentHashMap<>();
+	public static ConcurrentHashMap<World, Boolean> SkippedEvents = new ConcurrentHashMap<>();
+
+	public static Time time;
 
 	@Override
 	public void run() {
 		for (World world : Bukkit.getServer().getWorlds()) {
-			if (world.getEnvironment() == World.Environment.NETHER || world.getEnvironment() == World.Environment.THE_END) {
+			if (world.getEnvironment() == World.Environment.NETHER
+					|| world.getEnvironment() == World.Environment.THE_END) {
 				continue;
 			}
 
-			if (ConfigManager.defaultConfig.get().getStringList("Properties.DisabledWorlds").contains(world.getName())) {
+			if (ConfigManager.defaultConfig.get().getStringList("Properties.DisabledWorlds")
+					.contains(world.getName())) {
 				continue;
 			}
-			
+
 			if (Commands.isToggledForAll) {
 				continue;
 			}
 
-			if (!marker.containsKey(world)) {
-				marker.put(world, "");
+			if (!events.containsKey(world)) {
+				events.put(world, "");
 			}
 
-			if (!skipper.containsKey(world)) {
-				skipper.put(world, false);
+			if (!SkippedEvents.containsKey(world)) {
+				SkippedEvents.put(world, false);
 			}
 
 			if (world.getTime() > 23500 || world.getTime() < 500) {
-                                if (time != null){
-                                    if (time == Time.DAY){
-                                        continue;
-                                    }
-                                }
-                                time = Time.DAY;
-                                ProjectKorraRPG.plugin.getServer().getPluginManager().callEvent(new WorldSunRiseEvent(world));
+				if (time != null) {
+					if (time == Time.DAY) {
+						continue;
+					}
+				}
+				time = Time.DAY;
+				ProjectKorraRPG.plugin.getServer().getPluginManager().callEvent(new WorldSunRiseEvent(world));
 			} else if (world.getTime() > 11500 && world.getTime() < 12500) {
-                                if (time != null){
-                                    if (time == Time.NIGHT){
-                                        continue;
-                                    }
-                                }
-                                time = Time.NIGHT;
+				if (time != null) {
+					if (time == Time.NIGHT) {
+						continue;
+					}
+				}
+				time = Time.NIGHT;
 				ProjectKorraRPG.plugin.getServer().getPluginManager().callEvent(new WorldSunSetEvent(world));
 			}
 		}
 	}
 
 	public static void endEvent(World world) {
-		if (marker.get(world).equals("SozinsComet")) {
+		if (events.get(world).equals("SozinsComet")) {
 			for (Player player : world.getPlayers()) {
 				if (BendingPlayer.getBendingPlayer(player).hasElement(Element.FIRE)) {
 					player.sendMessage(Element.COMBUSTION.getColor() + message);
 				}
 			}
 		}
-		marker.put(world, "");
+		events.put(world, "");
 	}
-        
-        enum Time {
-            
-            DAY,
-            NIGHT;       
-        }
+
+	enum Time {
+
+		DAY, NIGHT;
+	}
 }

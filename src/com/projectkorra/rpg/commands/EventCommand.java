@@ -49,16 +49,16 @@ public class EventCommand extends RPGCommand {
 				if (!isPlayer(sender))
 					return;
 				Player player = (Player) sender;
-				if (!EventManager.marker.containsKey(player.getWorld()) || EventManager.marker.get(player.getWorld()) == "") {
+				if (!EventManager.events.containsKey(player.getWorld()) || EventManager.events.get(player.getWorld()) == "") {
 					sender.sendMessage(ChatColor.RED + "There are no current world events happening in this world.");
 				} else {
-					sender.sendMessage(ChatColor.YELLOW + "Current event: " + EventManager.marker.get(player.getWorld()));
+					sender.sendMessage(ChatColor.YELLOW + "Current event: " + EventManager.events.get(player.getWorld()));
 				}
 			} else if (Arrays.asList(end).contains(args.get(0).toLowerCase())) {
 				if (!isPlayer(sender))
 					return;
 				Player player = (Player) sender;
-				if (!EventManager.marker.containsKey(player.getWorld()) || EventManager.marker.get(player.getWorld()) == "") {
+				if (!EventManager.events.containsKey(player.getWorld()) || EventManager.events.get(player.getWorld()) == "") {
 					sender.sendMessage(ChatColor.RED + "There is no event to end at the moment.");
 				} else {
 					EventManager.endEvent(player.getWorld());
@@ -68,7 +68,7 @@ public class EventCommand extends RPGCommand {
 				if (!isPlayer(sender))
 					return;
 				Player player = (Player) sender;
-				EventManager.skipper.put(player.getWorld(), true);
+				EventManager.SkippedEvents.put(player.getWorld(), true);
 				sender.sendMessage(ChatColor.GREEN + "The next worldevent will be skipped.");
 			}
 		} else if (args.size() == 2) {

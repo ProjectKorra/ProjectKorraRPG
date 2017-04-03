@@ -64,9 +64,9 @@ public class RPGMethods {
 	 * @return true if being skipped
 	 */
 	public static boolean isBeingSkipped(World world) {
-		if (EventManager.skipper == null)
+		if (EventManager.SkippedEvents == null)
 			return false;
-		return EventManager.skipper.get(world);
+		return EventManager.SkippedEvents.get(world);
 	}
 
 	/**
@@ -93,11 +93,11 @@ public class RPGMethods {
 	 * @return if param worldevent is happening in param world
 	 */
 	public static boolean isHappening(World world, String worldevent) {
-		if (EventManager.marker.get(world) == null)
+		if (EventManager.events.get(world) == null)
 			return false;
-		if (EventManager.marker.get(world) == "")
+		if (EventManager.events.get(world) == "")
 			return false;
-		if (EventManager.marker.get(world).equalsIgnoreCase(worldevent))
+		if (EventManager.events.get(world).equalsIgnoreCase(worldevent))
 			return true;
 		return false;
 	}
@@ -109,9 +109,9 @@ public class RPGMethods {
 	 * @return whether there is an event happening or not
 	 */
 	public static boolean isEventHappening(World world) {
-		if (EventManager.marker.get(world) == null)
+		if (EventManager.events.get(world) == null)
 			return false;
-		if (EventManager.marker.get(world) == "")
+		if (EventManager.events.get(world) == "")
 			return false;
 		return true;
 	}

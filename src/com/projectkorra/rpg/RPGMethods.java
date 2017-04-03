@@ -356,6 +356,8 @@ public class RPGMethods {
 		for (Element e : bPlayer.getElements()) {
 			if (e instanceof SubElement)
 				continue;
+                        if (e.equals(Element.CHI))
+                                continue;
 
 			if (bPlayer.getElements().size() - 1 == i) {
 				sb.append(e.getName());

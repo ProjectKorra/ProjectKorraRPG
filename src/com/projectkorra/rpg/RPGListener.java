@@ -46,7 +46,7 @@ public class RPGListener implements Listener{
 					else if (event.getCause() == DamageCause.FALL && bP.hasElement(Element.EARTH) && EarthAbility.isEarthbendable(player, player.getLocation().getBlock().getRelative(BlockFace.DOWN))) return;
 					else {
 						if (player.getHealth() - event.getDamage() <= 0) {
-                                                        if (bP.canBend(CoreAbility.getAbility("AvatarState"))){
+                                                        if (bP.canBendIgnoreBindsCooldowns(CoreAbility.getAbility("AvatarState"))){
                                                                 if (!bP.isOnCooldown("AvatarState")) {
                                                                         player.setHealth(2);
                                                                         event.setCancelled(true);

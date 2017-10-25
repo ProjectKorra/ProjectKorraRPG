@@ -5,10 +5,12 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.logging.Logger;
+
 public class SQLite extends Database {
 	private String location;
 	private String database;
 	private File SQLfile;
+
 	public SQLite(Logger log, String prefix, String database, String location) {
 		super(log, prefix, "[SQLite] ");
 		this.database = database;
@@ -19,6 +21,7 @@ public class SQLite extends Database {
 		}
 		this.SQLfile = new File(folder.getAbsolutePath() + File.separator + this.database);
 	}
+
 	@Override
 	public Connection open() {
 		try {
@@ -26,10 +29,12 @@ public class SQLite extends Database {
 			this.connection = DriverManager.getConnection("jdbc:sqlite:" + this.SQLfile.getAbsolutePath());
 			this.printInfo("Connection established!");
 			return this.connection;
-		} catch(ClassNotFoundException e) {
+		}
+		catch (ClassNotFoundException e) {
 			this.printErr("JDBC driver not found!", true);
 			return null;
-		} catch(SQLException e) {
+		}
+		catch (SQLException e) {
 			this.printErr("SQL exception during connection.", true);
 			return null;
 		}

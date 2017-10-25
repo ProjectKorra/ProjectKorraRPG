@@ -20,12 +20,12 @@ import java.util.Arrays;
 import java.util.List;
 
 public class EventCommand extends RPGCommand {
-	
-	private String[] help = {"help", "h", "?"};
-	private String[] current = {"current", "curr", "c"};
-	private String[] end = {"end", "e", "cancel", "remove"};
-	private String[] skip = {"skip", "sk"};
-	private String[] start = {"start", "st", "strt", "begin"};
+
+	private String[] help = { "help", "h", "?" };
+	private String[] current = { "current", "curr", "c" };
+	private String[] end = { "end", "e", "cancel", "remove" };
+	private String[] skip = { "skip", "sk" };
+	private String[] start = { "start", "st", "strt", "begin" };
 
 	public EventCommand() {
 		super("worldevent", "/bending rpg worldevent <Current/End/Help/Skip/Start> [Event]", "Main command for anything dealing with RPG world events.", new String[] { "worldevent", "worlde", "event", "we" });
@@ -130,16 +130,17 @@ public class EventCommand extends RPGCommand {
 			}
 		}
 	}
-	
+
 	@Override
 	protected List<String> getTabCompletion(CommandSender sender, List<String> args) {
-		if (args.size() >= 2) return new ArrayList<String>();
+		if (args.size() >= 2)
+			return new ArrayList<String>();
 		List<String> l = new ArrayList<String>();
 		if (args.size() == 0) {
-			l = Arrays.asList(new String[] {"current", "end", "help", "skip", "start"});
+			l = Arrays.asList(new String[] { "current", "end", "help", "skip", "start" });
 		} else {
 			if (Arrays.asList(start).contains(args.get(0).toLowerCase())) {
-				l = Arrays.asList(new String[] {"FullMoon", "LunarEclipse", "SolarEclipse", "SozinsComet"});
+				l = Arrays.asList(new String[] { "FullMoon", "LunarEclipse", "SolarEclipse", "SozinsComet" });
 			}
 		}
 		return l;

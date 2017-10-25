@@ -13,10 +13,10 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AvatarCommand extends RPGCommand{
+public class AvatarCommand extends RPGCommand {
 
 	public AvatarCommand() {
-		super("avatar", "/bending rpg avatar <Player>", "This command defines a player as the avatar and gives them all the elements and other perks.", new String[] {"avatar", "av", "avy"});
+		super("avatar", "/bending rpg avatar <Player>", "This command defines a player as the avatar and gives them all the elements and other perks.", new String[] { "avatar", "av", "avy" });
 	}
 
 	@Override
@@ -30,10 +30,12 @@ public class AvatarCommand extends RPGCommand{
 			List<String> avatars = new ArrayList<>();
 			try {
 				while (rs.next()) {
-					if (avatars.contains(rs.getString(1))) continue;
+					if (avatars.contains(rs.getString(1)))
+						continue;
 					avatars.add(rs.getString(1));
 				}
-			} catch (SQLException e) {
+			}
+			catch (SQLException e) {
 				e.printStackTrace();
 				return;
 			}
@@ -50,14 +52,15 @@ public class AvatarCommand extends RPGCommand{
 		} else if (RPGMethods.hasBeenAvatar(target.getUniqueId())) {
 			sender.sendMessage(ChatColor.RED + "Player has already been the avatar!");
 			return;
-		} 
+		}
 		RPGMethods.setAvatar(target.getUniqueId());
 		Bukkit.broadcastMessage(ChatColor.WHITE + target.getName() + ChatColor.DARK_PURPLE + " has been declared avatar!");
 	}
-	
+
 	@Override
 	protected List<String> getTabCompletion(CommandSender sender, List<String> args) {
-		if (args.size() >= 1) return new ArrayList<String>();
+		if (args.size() >= 1)
+			return new ArrayList<String>();
 		List<String> players = new ArrayList<String>();
 		for (Player p : Bukkit.getOnlinePlayers()) {
 			players.add(p.getName());

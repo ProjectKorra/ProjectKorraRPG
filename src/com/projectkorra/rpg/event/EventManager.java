@@ -18,8 +18,8 @@ public class EventManager implements Runnable {
 
 	public static ConcurrentHashMap<World, String> marker = new ConcurrentHashMap<>();
 	public static ConcurrentHashMap<World, Boolean> skipper = new ConcurrentHashMap<>();
-        
-        public static Time time;
+
+	public static Time time;
 
 	@Override
 	public void run() {
@@ -31,7 +31,7 @@ public class EventManager implements Runnable {
 			if (ConfigManager.defaultConfig.get().getStringList("Properties.DisabledWorlds").contains(world.getName())) {
 				continue;
 			}
-			
+
 			if (Commands.isToggledForAll) {
 				continue;
 			}
@@ -45,20 +45,20 @@ public class EventManager implements Runnable {
 			}
 
 			if (world.getTime() > 23500 || world.getTime() < 500) {
-                                if (time != null){
-                                    if (time == Time.DAY){
-                                        continue;
-                                    }
-                                }
-                                time = Time.DAY;
-                                ProjectKorraRPG.plugin.getServer().getPluginManager().callEvent(new WorldSunRiseEvent(world));
+				if (time != null) {
+					if (time == Time.DAY) {
+						continue;
+					}
+				}
+				time = Time.DAY;
+				ProjectKorraRPG.plugin.getServer().getPluginManager().callEvent(new WorldSunRiseEvent(world));
 			} else if (world.getTime() > 11500 && world.getTime() < 12500) {
-                                if (time != null){
-                                    if (time == Time.NIGHT){
-                                        continue;
-                                    }
-                                }
-                                time = Time.NIGHT;
+				if (time != null) {
+					if (time == Time.NIGHT) {
+						continue;
+					}
+				}
+				time = Time.NIGHT;
 				ProjectKorraRPG.plugin.getServer().getPluginManager().callEvent(new WorldSunSetEvent(world));
 			}
 		}
@@ -74,10 +74,8 @@ public class EventManager implements Runnable {
 		}
 		marker.put(world, "");
 	}
-        
-        enum Time {
-            
-            DAY,
-            NIGHT;       
-        }
+
+	enum Time {
+		DAY, NIGHT;
+	}
 }

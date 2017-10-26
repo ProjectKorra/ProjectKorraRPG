@@ -1,18 +1,5 @@
 package com.projectkorra.rpg;
 
-import com.projectkorra.projectkorra.BendingPlayer;
-import com.projectkorra.projectkorra.Element;
-import com.projectkorra.projectkorra.Element.SubElement;
-import com.projectkorra.projectkorra.GeneralMethods;
-import com.projectkorra.rpg.configuration.ConfigManager;
-import com.projectkorra.rpg.event.EventManager;
-import com.projectkorra.rpg.storage.DBConnection;
-
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.World;
-import org.bukkit.entity.Player;
-
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -23,7 +10,23 @@ import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
 
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.World;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
+
+import com.projectkorra.projectkorra.BendingPlayer;
+import com.projectkorra.projectkorra.Element;
+import com.projectkorra.projectkorra.Element.SubElement;
+import com.projectkorra.projectkorra.GeneralMethods;
+import com.projectkorra.rpg.configuration.ConfigManager;
+import com.projectkorra.rpg.event.EventManager;
+import com.projectkorra.rpg.storage.DBConnection;
+
 public class RPGMethods {
+	
+	public static EntityType[] bendingMobs = {EntityType.BLAZE, EntityType.CAVE_SPIDER, EntityType.CREEPER, EntityType.ENDERMAN, EntityType.EVOKER, EntityType.GIANT, EntityType.ILLUSIONER, EntityType.IRON_GOLEM, EntityType.PIG_ZOMBIE, EntityType.SKELETON, EntityType.SPIDER, EntityType.VINDICATOR, EntityType.WITCH, EntityType.WITHER_SKELETON, EntityType.ZOMBIE, EntityType.ZOMBIE_VILLAGER};
 
 	/**
 	 * Checks every event interval for an event
@@ -42,15 +45,16 @@ public class RPGMethods {
 			return true;
 		return false;
 	}
-	
+
 	public static void cycleAvatar(BendingPlayer bPlayer) {
-		if (Bukkit.getOnlinePlayers().size() <= 1) return; //Don't bother with 1 person or less on...
+		if (Bukkit.getOnlinePlayers().size() <= 1)
+			return; //Don't bother with 1 person or less on...
 		revokeAvatar(bPlayer.getUUID());
 		Player avatar = Bukkit.getPlayer(bPlayer.getUUID());
 		Random rand = new Random();
 		int i = rand.nextInt(Bukkit.getOnlinePlayers().size());
 		Player p = (Player) Bukkit.getOnlinePlayers().toArray()[i];
-		while (p == avatar) {	
+		while (p == avatar) {
 			i = rand.nextInt(Bukkit.getOnlinePlayers().size());
 			p = (Player) Bukkit.getOnlinePlayers().toArray()[i];
 		}
@@ -93,9 +97,7 @@ public class RPGMethods {
 	 * @return if param worldevent is happening in param world
 	 */
 	public static boolean isHappening(World world, String worldevent) {
-		if (EventManager.marker.get(world) == null)
-			return false;
-		if (EventManager.marker.get(world) == "")
+		if (!isEventHappening(world))
 			return false;
 		if (EventManager.marker.get(world).equalsIgnoreCase(worldevent))
 			return true;
@@ -265,27 +267,31 @@ public class RPGMethods {
 			return;
 		}
 	}
-	
+
 	public static void randomAssignSubElements(BendingPlayer bPlayer) {
-		if (bPlayer.hasElement(Element.CHI)) return;
-                
+		if (bPlayer.hasElement(Element.CHI))
+			return;
+
 		double chance = 0;
-		String[] subs = {"Blood", "Combustion", "Flight", "Healing", "Ice", "Lava", "Lightning", "Metal", "Plant", "Sand", "SpiritualProjection"};
+		String[] subs = { "Blood", "Combustion", "Flight", "Healing", "Ice", "Lava", "Lightning", "Metal", "Plant", "Sand", "SpiritualProjection" };
 		StringBuilder sb = new StringBuilder(ChatColor.YELLOW + "You have an affinity for ");
 		ArrayList<String> sublist = new ArrayList<>();
-		
+
 		for (String sub : subs) {
-                        double rand = Math.random();
+			double rand = Math.random();
 			chance = ConfigManager.rpgConfig.get().getDouble("SubElementAssign.Percentages." + sub);
 			String name = sub;
 			if (sub.equals("SpiritualProjection"))
 				name = "Spiritual";
 			SubElement s = (SubElement) Element.getElement(name);
 			Element e = s.getParentElement();
-			
-			if (!bPlayer.hasElement(e)) continue;
-			if (sub.equals("Metal") && sublist.contains(SubElement.LAVA)) continue;
-			if (sub.equals("Lightning") && sublist.contains(SubElement.COMBUSTION)) continue;
+
+			if (!bPlayer.hasElement(e))
+				continue;
+			if (sub.equals("Metal") && sublist.contains(SubElement.LAVA.getName()))
+				continue;
+			if (sub.equals("Lightning") && sublist.contains(SubElement.COMBUSTION.getName()))
+				continue;
 			if (rand < chance) {
 				sublist.add(sub);
 				bPlayer.addSubElement(s);
@@ -296,7 +302,8 @@ public class RPGMethods {
 		if (size >= 1) {
 			for (String sub : sublist) {
 				String name = sub;
-				if (sub.equals("SpiritualProjection")) name = "Spiritual";
+				if (sub.equals("SpiritualProjection"))
+					name = "Spiritual";
 
 				size -= 1;
 				if (size == 0) {
@@ -308,7 +315,7 @@ public class RPGMethods {
 		} else {
 			sb = new StringBuilder(ChatColor.RED + "You sadly don't have any extra affinity for your element.");
 		}
-		
+
 		Bukkit.getPlayer(bPlayer.getUUID()).sendMessage(sb.toString());
 	}
 
@@ -323,18 +330,18 @@ public class RPGMethods {
 	private static void assignElement(BendingPlayer bPlayer, Element e) {
 		bPlayer.setElement(e);
 		GeneralMethods.saveElements(bPlayer);
-		Bukkit.getPlayer(bPlayer.getUUID()).sendMessage(ChatColor.YELLOW + "You have been born as an " + e.getColor() + e.getName() + e.getType().getBender() + ChatColor.YELLOW +  "!");
+		Bukkit.getPlayer(bPlayer.getUUID()).sendMessage(ChatColor.YELLOW + "You have been born as an " + e.getColor() + e.getName() + e.getType().getBender() + ChatColor.YELLOW + "!");
 	}
-        
-        /**
+
+	/**
 	 * Returns if there is an avatar, if he/she has already been choosen or not.
 	 */
 	public static boolean isAvatarChoosen() {
 		if (ConfigManager.avatarConfig.get().contains("Avatar.Current")) {
 			if (!"".equals(ConfigManager.avatarConfig.get().getString("Avatar.Current")) || (ConfigManager.avatarConfig.get().getString("Avatar.Current")) != null)
-                                return true;
+				return true;
 		}
-                return false;
+		return false;
 	}
 
 	/**
@@ -364,16 +371,16 @@ public class RPGMethods {
 			}
 			i += 1;
 		}
-                DBConnection.sql.modifyQuery("DELETE FROM pk_avatars WHERE uuid = '" + uuid.toString() + "'");
+		DBConnection.sql.modifyQuery("DELETE FROM pk_avatars WHERE uuid = '" + uuid.toString() + "'");
 		DBConnection.sql.modifyQuery("INSERT INTO pk_avatars (uuid, player, elements) VALUES ('" + uuid.toString() + "', '" + player.getName() + "', '" + sb.toString() + "')");
 		/*
 		 * Gives them the elements
 		 */
 		bPlayer.getElements().clear();
-                Set<Element> shouldBeAdded = new HashSet<>(Arrays.asList(Element.getAllElements()));
-                if (shouldBeAdded.contains(Element.CHI)){
-                        shouldBeAdded.remove(Element.CHI);
-                }
+		Set<Element> shouldBeAdded = new HashSet<>(Arrays.asList(Element.getAllElements()));
+		if (shouldBeAdded.contains(Element.CHI)) {
+			shouldBeAdded.remove(Element.CHI);
+		}
 		bPlayer.getElements().addAll(shouldBeAdded);
 		GeneralMethods.saveElements(bPlayer);
 		ConfigManager.avatarConfig.save();
@@ -411,7 +418,8 @@ public class RPGMethods {
 		boolean valid = false;
 		try {
 			valid = rs.next();
-		} catch (SQLException e) {
+		}
+		catch (SQLException e) {
 			e.printStackTrace();
 			return false;
 		}
@@ -425,8 +433,8 @@ public class RPGMethods {
 	 * @param uuid UUID of player being checked
 	 */
 	public static void revokeAvatar(UUID uuid) {
-                if (uuid == null)
-                        return;
+		if (uuid == null)
+			return;
 		if (!isCurrentAvatar(uuid))
 			return;
 		List<Element> elements = new ArrayList<>();
@@ -434,27 +442,28 @@ public class RPGMethods {
 		if (bPlayer == null)
 			return;
 		String elements2 = "";
-                if (DBConnection.sql == null)
-                        return;
-                if (DBConnection.sql.getConnection() == null)
-                        return;
+		if (DBConnection.sql == null)
+			return;
+		if (DBConnection.sql.getConnection() == null)
+			return;
 		ResultSet rs = DBConnection.sql.readQuery("SELECT elements FROM pk_avatars WHERE uuid = '" + uuid.toString() + "'");
 		try {
 			if (rs.next()) {
 				elements2 = rs.getString("elements");
 			}
-		} catch (SQLException e) {
+		}
+		catch (SQLException e) {
 			e.printStackTrace();
 			return;
 		}
 		for (String s : elements2.split(":")) {
 			elements.add(Element.fromString(s));
 		}
-                
+
 		bPlayer.getElements().clear();
 		bPlayer.getElements().addAll(elements);
 		GeneralMethods.saveElements(bPlayer);
 		ConfigManager.avatarConfig.get().set("Avatar.Current", "");
-                ConfigManager.avatarConfig.save();
+		ConfigManager.avatarConfig.save();
 	}
 }

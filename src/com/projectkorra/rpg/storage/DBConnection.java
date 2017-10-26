@@ -17,7 +17,8 @@ public class DBConnection {
 
 	public static void init() {
 		open();
-		if (!isOpen) return;
+		if (!isOpen)
+			return;
 		String createQuery = "CREATE TABLE pk_avatars (id INTEGER PRIMARY KEY, uuid %uuid%, player %player%, elements %elements%)";
 		if (host.equalsIgnoreCase("mysql")) {
 			createQuery = createQuery.replace("%uuid%", "varchar(255)");
@@ -33,12 +34,12 @@ public class DBConnection {
 			sql.modifyQuery(createQuery);
 		}
 	}
-	
+
 	public static void close() {
 		isOpen = false;
 		sql.close();
 	}
-	
+
 	public static void open() {
 		engine = ConfigManager.rpgConfig.get().getString("Storage.engine");
 		host = ConfigManager.rpgConfig.get().getString("Storage.MySQL.host");
@@ -46,7 +47,7 @@ public class DBConnection {
 		pass = ConfigManager.rpgConfig.get().getString("Storage.MySQL.pass");
 		db = ConfigManager.rpgConfig.get().getString("Storage.MySQL.db");
 		user = ConfigManager.rpgConfig.get().getString("Storage.MySQL.user");
-		if (isOpen) 
+		if (isOpen)
 			return;
 		if (engine.equalsIgnoreCase("mysql")) {
 			sql = new MySQL(ProjectKorraRPG.log, "Establishing MySQL Connection... ", host, port, user, pass, db);
@@ -66,7 +67,7 @@ public class DBConnection {
 			ProjectKorraRPG.log.info("Database connection established.");
 		}
 	}
-	
+
 	public static boolean isOpen() {
 		return isOpen;
 	}

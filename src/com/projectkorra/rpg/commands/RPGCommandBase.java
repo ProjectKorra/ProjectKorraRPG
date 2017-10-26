@@ -13,7 +13,7 @@ import org.bukkit.ChatColor;
 public class RPGCommandBase extends PKCommand {
 
 	public RPGCommandBase() {
-		super("rpg", "/bending rpg", "Base command for the RPG side plugin", new String[] {"rpg"});
+		super("rpg", "/bending rpg", "Base command for the RPG side plugin", new String[] { "rpg" });
 	}
 
 	@Override
@@ -30,7 +30,7 @@ public class RPGCommandBase extends PKCommand {
 			}
 		}
 	}
-	
+
 	@Override
 	protected List<String> getTabCompletion(CommandSender sender, List<String> args) {
 		if (args.size() == 0) {
@@ -40,18 +40,17 @@ public class RPGCommandBase extends PKCommand {
 			}
 			Collections.sort(l);
 			return l;
-		}
-		else
-		for (RPGCommand cmd : RPGCommand.instances.values()) {
-			if (Arrays.asList(cmd.getAliases()).contains(args.get(0).toLowerCase()) && sender.hasPermission("bending.command.rpg." + cmd.getName())) {
-				List<String> newargs = new ArrayList<String>();
-				for (int i = 1; i < args.size(); i++) {
-					if (!(args.get(i).equals("") || args.get(i).equals(" ")) && args.size() >= 1)
-					newargs.add(args.get(i));
+		} else
+			for (RPGCommand cmd : RPGCommand.instances.values()) {
+				if (Arrays.asList(cmd.getAliases()).contains(args.get(0).toLowerCase()) && sender.hasPermission("bending.command.rpg." + cmd.getName())) {
+					List<String> newargs = new ArrayList<String>();
+					for (int i = 1; i < args.size(); i++) {
+						if (!(args.get(i).equals("") || args.get(i).equals(" ")) && args.size() >= 1)
+							newargs.add(args.get(i));
+					}
+					return cmd.getTabCompletion(sender, newargs);
 				}
-				return cmd.getTabCompletion(sender, newargs);
 			}
-		}
 		return new ArrayList<String>();
 	}
 }

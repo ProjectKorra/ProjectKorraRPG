@@ -7,6 +7,7 @@ import org.bukkit.command.CommandSender;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import org.bukkit.ChatColor;
 
@@ -38,7 +39,7 @@ public class RPGCommandBase extends PKCommand {
 			for (RPGCommand cmd : RPGCommand.instances.values()) {
 				l.add(cmd.getName());
 			}
-			Collections.sort(l);
+			Collections.sort(l, Comparator.nullsLast(Comparator.naturalOrder()));
 			return l;
 		} else
 			for (RPGCommand cmd : RPGCommand.instances.values()) {

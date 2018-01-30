@@ -1,37 +1,7 @@
 name: ProjectKorraRPG
 author: ProjectKorra
-version: 1.0.0
-api-version: 1.15
+version: 1.1.1
 main: com.projectkorra.rpg.ProjectKorraRPG
-depend: [ProjectKorra]
-description: RPG side-plugin for ProjectKorra core
-permissions:
-  bending.rpg.admin:
-    default: op
-    children:
-      bending.rpg.command.avatar: true
-      bending.rpg.command.worldevent.*: true
-      bending.rpg.command.unlock: true
-      bending.rpg.command.xp: true
-  bending.rpg.command.avatar:
-    default: op
-  bending.rpg.command.help:
-    default: true
-  bending.rpg.command.worldevent:
-    default: true
-    children:
-      bending.rpg.command.worldevent.current: true
-      bending.rpg.command.worldevent.end: false
-      bending.rpg.command.worldevent.skip: false
-      bending.rpg.command.worldevent.noskip: false
-      bending.rpg.command.worldevent.start: false
-  bending.rpg.command.who:
-    default: true
-  bending.rpg.command.chakra:
-    default: true
-  bending.rpg.command.unlock:
-    default: op
-  bending.rpg.command.xp:
-    default: op
-  bending.rpg.command.scroll:
-    default: op
+softdepend: [ProjectKorra]
+description: Rpg side-plugin for ProjectKorra core
+api-version: 1.13

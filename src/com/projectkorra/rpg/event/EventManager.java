@@ -24,9 +24,12 @@ public class EventManager implements Runnable {
 	@Override
 	public void run() {
 		for (World world : Bukkit.getServer().getWorlds()) {
-			if (world.getEnvironment() == World.Environment.NETHER || world.getEnvironment() == World.Environment.THE_END) {
-				continue;
-			}
+			// Due to null pointer exception accessing marker on core plugin, I've commented this.
+			// You don't lose any functionality while having a chance to have sozin's comet
+			// spawned on Nether and The End worlds.
+			//if (world.getEnvironment() == World.Environment.NETHER || world.getEnvironment() == World.Environment.THE_END) {
+			//	continue;
+			//}
 
 			if (ConfigManager.defaultConfig.get().getStringList("Properties.DisabledWorlds").contains(world.getName())) {
 				continue;

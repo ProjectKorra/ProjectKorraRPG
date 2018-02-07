@@ -6,7 +6,7 @@ import com.projectkorra.rpg.commands.HelpCommand;
 import com.projectkorra.rpg.commands.RPGCommandBase;
 import com.projectkorra.rpg.configuration.ConfigManager;
 import com.projectkorra.rpg.event.EventManager;
-import com.projectkorra.rpg.storage.DBConnection;
+import com.projectkorra.projectkorra.storage.DBConnection;
 import com.projectkorra.rpg.util.MetricsLite;
 
 import org.bukkit.Bukkit;
@@ -52,10 +52,10 @@ public class ProjectKorraRPG extends JavaPlugin {
 	}
 	
 	public void connectToDatabase() {
-		DBConnection.open();
+		DBConnection.init();
 		if (!DBConnection.isOpen()) {
+			// Message is logged by DBConnection
 			return;
 		}
-		DBConnection.init();
 	}
 }

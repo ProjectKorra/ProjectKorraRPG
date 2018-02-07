@@ -1,7 +1,7 @@
 package com.projectkorra.rpg.commands;
 
 import com.projectkorra.rpg.RPGMethods;
-import com.projectkorra.rpg.storage.DBConnection;
+import com.projectkorra.projectkorra.storage.DBConnection;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;

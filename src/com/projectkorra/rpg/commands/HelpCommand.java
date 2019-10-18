@@ -1,6 +1,7 @@
 package com.projectkorra.rpg.commands;
 
 import com.projectkorra.projectkorra.Element;
+import com.projectkorra.rpg.worldevent.WorldEvent;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -12,14 +13,10 @@ import java.util.List;
 
 public class HelpCommand extends RPGCommand{
 	
-	private String[] fullmoon = {"fullmoon", "fm", "fmoon", "fullm"}; 
-	private String[] lunar = {"lunareclipse", "le", "leclipse", "lunare"}; 
-	private String[] solar = {"solareclipse", "se", "seclipse", "solare"}; 
-	private String[] sozins = {"sozinscomet", "sc", "sozins", "sozinsc", "scomet", "comet"};
 	private String modifiers = ChatColor.GOLD + "Commands: <required> [optional]";
 
 	public HelpCommand() {
-		super("help", "/bending rpg help <Command/Event>", "Shows all helpful information for rpg", new String[] {"help", "h", "?"});
+		super("help", "/bending rpg help <command/worldevent>", "Shows all helpful information for rpg", new String[] {"help", "h", "?"});
 	}
 
 	@Override
@@ -50,22 +47,13 @@ public class HelpCommand extends RPGCommand{
 				}
 				continue;
 			}
-			if (Arrays.asList(fullmoon).contains(args.get(0).toLowerCase())) {
-				if (!hasPermission(sender, fullmoon[1]))
+			
+			for (WorldEvent event : WorldEvent.getEvents()) {
+				if (args.get(0).equalsIgnoreCase(event.getName()) || event.getAliases().contains(args.get(0).toLowerCase())) {
+					sender.sendMessage(ChatColor.BOLD + event.getName());
+					sender.sendMessage(event.getElement().getColor() + event.getDescription());
 					return;
-				sender.sendMessage(Element.ICE.getColor() + "Full Moon - This is a world event in which the moon is full, enhancing the power of waterbending by a large amount.");
-			} else if (Arrays.asList(lunar).contains(args.get(0).toLowerCase())) {
-				if (!hasPermission(sender, lunar[1]))
-					return;
-				sender.sendMessage(Element.WATER.getColor() + "Lunar Eclipse - This is a world event in which the moon is unable to be seen in the night sky, causing waterbending to lose all it's power.");				
-			} else if (Arrays.asList(solar).contains(args.get(0).toLowerCase())) {
-				if (!hasPermission(sender, solar[1]))
-					return;
-				sender.sendMessage(Element.FIRE.getColor() + "Solar Eclipse - This is a world event in which the sun is unable to be seen in the day sky, causing firebending to lose all it's power.");				
-			} else if (Arrays.asList(sozins).contains(args.get(0).toLowerCase())) {
-				if (!hasPermission(sender, sozins[1]))
-					return;
-				sender.sendMessage(Element.COMBUSTION.getColor() + "Sozins Comet - This is a world event in which a comet passes by the earth, enhancing firebending by a large amount.");				
+				}
 			}
 		}
 	}
@@ -80,7 +68,7 @@ public class HelpCommand extends RPGCommand{
 			}
 		}
 		Collections.sort(l);
-		l.addAll(Arrays.asList(new String[] {"FullMoon", "LunarEclipse", "SolarEclipse", "SozinsComet"}));
+		l.addAll(WorldEvent.getEventNames());
 		return l;
 	}
 }

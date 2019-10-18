@@ -1,16 +1,16 @@
-package com.projectkorra.rpg.event;
+package com.projectkorra.rpg.worldevent.event;
 
 import org.bukkit.World;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
-public class WorldSunSetEvent extends Event{
+public class SunSetEvent extends Event{
 
 	private static final HandlerList handlers = new HandlerList();
 	
 	private World world;
 	
-	public WorldSunSetEvent(World world) {
+	public SunSetEvent(World world) {
 		this.world = world;
 	}
 	

@@ -1,314 +1,155 @@
 package com.projectkorra.rpg;
 
-import com.projectkorra.projectkorra.BendingPlayer;
-import com.projectkorra.projectkorra.Element;
-import com.projectkorra.projectkorra.Element.SubElement;
-import com.projectkorra.projectkorra.GeneralMethods;
-import com.projectkorra.rpg.configuration.ConfigManager;
-import com.projectkorra.rpg.event.EventManager;
-import com.projectkorra.rpg.storage.DBConnection;
-
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.World;
-import org.bukkit.entity.Player;
-
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
 
-public class RPGMethods {
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
 
-	/**
-	 * Checks every event interval for an event
-	 * 
-	 * @param world World being checked for an event
-	 * @return true if event interval is found
-	 */
-	public static boolean checkEveryInterval(World world) {
-		if (isFullMoon(world))
-			return true;
-		if (isLunarEclipse(world))
-			return true;
-		if (isSolarEclipse(world))
-			return true;
-		if (isSozinsComet(world))
-			return true;
-		return false;
+import com.projectkorra.projectkorra.BendingPlayer;
+import com.projectkorra.projectkorra.Element;
+import com.projectkorra.projectkorra.Element.ElementType;
+import com.projectkorra.projectkorra.Element.SubElement;
+import com.projectkorra.projectkorra.GeneralMethods;
+import com.projectkorra.rpg.configuration.ConfigManager;
+import com.projectkorra.rpg.util.AvatarCycle;
+import com.projectkorra.rpg.util.PreviousAvatar;
+
+public class RPGMethods {
+	
+	private static LinkedList<Element> avatarCycle = new LinkedList<>();
+	
+	public static void loadAvatarCycle() {
+		AvatarCycle cycle = AvatarCycle.load();
+		avatarCycle.add(cycle.first);
+		avatarCycle.add(cycle.second);
+		avatarCycle.add(cycle.third);
+		avatarCycle.add(cycle.fourth);
 	}
 	
-	public static void cycleAvatar(BendingPlayer bPlayer) {
-		if (Bukkit.getOnlinePlayers().size() <= 1) return; //Don't bother with 1 person or less on...
-		revokeAvatar(bPlayer.getUUID());
-		Player avatar = Bukkit.getPlayer(bPlayer.getUUID());
-		Random rand = new Random();
-		int i = rand.nextInt(Bukkit.getOnlinePlayers().size());
-		Player p = (Player) Bukkit.getOnlinePlayers().toArray()[i];
-		while (p == avatar) {	
-			i = rand.nextInt(Bukkit.getOnlinePlayers().size());
-			p = (Player) Bukkit.getOnlinePlayers().toArray()[i];
+	public static void saveAvatarCycle() {
+		Element first = avatarCycle.get(0);
+		Element second = avatarCycle.get(1);
+		Element third = avatarCycle.get(2);
+		Element fourth = avatarCycle.get(3);
+		new AvatarCycle(first, second, third, fourth).save();
+	}
+
+	public static void cycleAvatar(UUID curr) {
+		if (curr != null) {
+			revokeAvatar(Bukkit.getOfflinePlayer(curr));
 		}
-		setAvatar(p.getUniqueId());
-	}
+		
+		Element e = avatarCycle.poll();
+		avatarCycle.add(e);
+		
+		if (Bukkit.getOnlinePlayers().size() <= 1) {
+			if (Bukkit.getOnlinePlayers().size() == 1) {
+				if (Bukkit.getPlayer(curr) != null) {
+					new BukkitRunnable() {
 
-	/**
-	 * Checks for if the next event in the world is being skipped
-	 * 
-	 * @param world World being checked
-	 * @return true if being skipped
-	 */
-	public static boolean isBeingSkipped(World world) {
-		if (EventManager.skipper == null)
-			return false;
-		return EventManager.skipper.get(world);
-	}
-
-	/**
-	 * Returns false if the world event isn't enabled
-	 * 
-	 * @param world World being checked.
-	 * @return if FullMoon frequency lines up
-	 */
-	public static boolean isFullMoon(World world) {
-		if (!getEnabled("FullMoon"))
-			return false;
-		long days = world.getFullTime() / 24000;
-		long phase = days % getFrequency("FullMoon");
-		if (phase == 0) {
-			return true;
+						@Override
+						public void run() {
+							cycleAvatar(curr);
+						}
+						
+					}.runTaskLater(ProjectKorraRPG.getPlugin(), ConfigManager.getConfig().getLong("Avatar.AutoCycle.Interval"));
+					
+					ProjectKorraRPG.getLog().info("Avatar cycle not viable, checking again in 30 mins!");
+					return;
+				}
+			} else {
+				return;
+			}
 		}
-		return false;
-	}
-
-	/**
-	 * 
-	 * @param world World being checked
-	 * @param worldevent World event to check for in param world
-	 * @return if param worldevent is happening in param world
-	 */
-	public static boolean isHappening(World world, String worldevent) {
-		if (EventManager.marker.get(world) == null)
-			return false;
-		if (EventManager.marker.get(world) == "")
-			return false;
-		if (EventManager.marker.get(world).equalsIgnoreCase(worldevent))
-			return true;
-		return false;
-	}
-
-	/**
-	 * Checks if an event is happening in the provided world
-	 * 
-	 * @param world World being checked
-	 * @return whether there is an event happening or not
-	 */
-	public static boolean isEventHappening(World world) {
-		if (EventManager.marker.get(world) == null)
-			return false;
-		if (EventManager.marker.get(world) == "")
-			return false;
-		return true;
-	}
-
-	/**
-	 * Returns false if the world event isn't enabled
-	 * 
-	 * @param world World being checked.
-	 * @return if LunarEclipse frequency lines up
-	 */
-	public static boolean isLunarEclipse(World world) {
-		String eclipse = "LunarEclipse";
-		if (!getEnabled(eclipse))
-			return false;
-		int freq = getFrequency(eclipse);
-
-		long days = (world.getFullTime() + 500) / 24000;
-		if (days % freq == 0)
-			return true;
-		return false;
-	}
-
-	/**
-	 * Returns false if the world event isn't enabled
-	 * 
-	 * @param world World being checked.
-	 * @return if SolarEclipse frequency lines up
-	 */
-	public static boolean isSolarEclipse(World world) {
-		String eclipse = "SolarEclipse";
-		if (!getEnabled(eclipse))
-			return false;
-		int freq = getFrequency(eclipse);
-
-		long days = (world.getFullTime() + 500) / 24000;
-		if (days % freq == 0)
-			return true;
-		return false;
-	}
-
-	/**
-	 * Returns false if the world event isn't enabled
-	 * 
-	 * @param world World being checked.
-	 * @return if SozinsComet frequency lines up
-	 */
-	public static boolean isSozinsComet(World world) {
-		String comet = "SozinsComet";
-		if (!getEnabled(comet))
-			return false;
-		int freq = getFrequency(comet);
-
-		long days = (world.getFullTime() + 500) / 24000;
-		if (days % freq == 0)
-			return true;
-		return false;
-	}
-
-	/**
-	 * 
-	 * @param we World Event. Choices are LunarEclipse, SolarEclipse,
-	 *            SozinsComet, and FullMoon
-	 * @return boolean of if param we is enabled
-	 */
-	public static boolean getEnabled(String we) {
-		return ConfigManager.rpgConfig.get().getBoolean("WorldEvents." + we + ".Enabled");
-	}
-
-	/**
-	 * 
-	 * @param we World Event. Choices are LunarEclipse, SolarEclipse,
-	 *            SozinsComet, and FullMoon
-	 * @return int of frequency for param we
-	 */
-	public static int getFrequency(String we) {
-		if (we == "FullMoon")
-			return 8;
-		return ConfigManager.rpgConfig.get().getInt("WorldEvents." + we + ".Frequency");
-	}
-
-	/**
-	 * 
-	 * @param we World event. Choices are LunarEclipse, SolarEclipse,
-	 *            SozinsComet, and FullMoon
-	 * @return double of factor for param we
-	 */
-	public static double getFactor(String we) {
-		if (we == "SolarEclipse" || we == "LunarEclipse")
-			return 0;
-		return ConfigManager.rpgConfig.get().getDouble("WorldEvents." + we + ".Factor");
+		
+		List<Player> eligible = new ArrayList<>();
+		for (Player player : Bukkit.getOnlinePlayers()) {
+			BendingPlayer bPlayer = BendingPlayer.getBendingPlayer(player);
+			if (bPlayer == null) {
+				continue;
+			} else if (!hasBeenAvatar(player.getUniqueId()) && bPlayer.hasElement(avatarCycle.peek())) {
+				eligible.add(player);
+			}
+		}
+		
+		Player chosen = eligible.get(new Random().nextInt(eligible.size()));
+		setAvatar(chosen.getUniqueId());
+		Bukkit.broadcastMessage(ChatColor.WHITE + chosen.getName() + ChatColor.DARK_PURPLE + " has been reincarnated as the next avatar!");
 	}
 
 	/**
 	 * Randomly assigns an element to the param player if enabled in the config
 	 * 
-	 * @param player BendingPlayer being assigned an element to
+	 * @param bPlayer BendingPlayer being assigned an element to
 	 */
-	public static void randomAssign(BendingPlayer player) {
+	public static void randomAssignElement(BendingPlayer bPlayer) {
 		double rand = Math.random();
-		double earthchance = ConfigManager.rpgConfig.get().getDouble("ElementAssign.Percentages.Earth");
-		double firechance = ConfigManager.rpgConfig.get().getDouble("ElementAssign.Percentages.Fire");
-		double airchance = ConfigManager.rpgConfig.get().getDouble("ElementAssign.Percentages.Air");
-		double waterchance = ConfigManager.rpgConfig.get().getDouble("ElementAssign.Percentages.Water");
-		double chichance = ConfigManager.rpgConfig.get().getDouble("ElementAssign.Percentages.Chi");
-
-		if (ConfigManager.rpgConfig.get().getBoolean("ElementAssign.Enabled")) {
-			if (rand < earthchance) {
-				assignElement(player, Element.EARTH);
-				return;
+		double chance = 0;
+		Element assign = null;
+		for (Element e : Element.getAllElements()) {
+			if (!ConfigManager.getConfig().contains("ElementAssign.Percentages." + e.getName())) {
+				continue;
 			}
-
-			else if (rand < waterchance + earthchance && rand > earthchance) {
-				assignElement(player, Element.WATER);
-				return;
+			
+			chance += ConfigManager.getConfig().getDouble("ElementAssign.Percentages." + e.getName());
+			if (rand < chance) {
+				assign = e;
+				break;
 			}
-
-			else if (rand < airchance + waterchance + earthchance && rand > waterchance + earthchance) {
-				assignElement(player, Element.AIR);
-				return;
-			}
-
-			else if (rand < firechance + airchance + waterchance + earthchance && rand > airchance + waterchance + earthchance) {
-				assignElement(player, Element.FIRE);
-				return;
-			}
-
-			else if (rand < chichance + firechance + airchance + waterchance + earthchance && rand > firechance + airchance + waterchance + earthchance) {
-				assignElement(player, Element.CHI);
-				return;
-			}
-		} else {
-			String defaultElement = ConfigManager.rpgConfig.get().getString("ElementAssign.Default");
-			Element e = Element.EARTH;
-
-			if (defaultElement.equalsIgnoreCase("None")) {
-				return;
-			}
-
-			if (defaultElement.equalsIgnoreCase("Chi"))
-				e = Element.CHI;
-			else if (defaultElement.equalsIgnoreCase("Water"))
-				e = Element.WATER;
-			else if (defaultElement.equalsIgnoreCase("Earth"))
-				e = Element.EARTH;
-			else if (defaultElement.equalsIgnoreCase("Fire"))
-				e = Element.FIRE;
-			else if (defaultElement.equalsIgnoreCase("Air"))
-				e = Element.AIR;
-
-			assignElement(player, e);
-			return;
+		}
+		
+		assignElement(bPlayer, assign);
+		if (ConfigManager.getConfig().getBoolean("SubElementAssign.Enabled")) {
+			RPGMethods.randomAssignSubElements(bPlayer, assign);
 		}
 	}
-	
-	public static void randomAssignSubElements(BendingPlayer bPlayer) {
-		if (bPlayer.hasElement(Element.CHI)) return;
-                
+
+	public static void randomAssignSubElements(BendingPlayer bPlayer, Element element) {
+		if (Element.getSubElements(element).length == 0) {
+			return;
+		}
+
 		double chance = 0;
-		String[] subs = {"Blood", "Combustion", "Flight", "Healing", "Ice", "Lava", "Lightning", "Metal", "Plant", "Sand", "SpiritualProjection"};
 		StringBuilder sb = new StringBuilder(ChatColor.YELLOW + "You have an affinity for ");
 		ArrayList<String> sublist = new ArrayList<>();
-		
-		for (String sub : subs) {
-                        double rand = Math.random();
-			chance = ConfigManager.rpgConfig.get().getDouble("SubElementAssign.Percentages." + sub);
-			String name = sub;
-			if (sub.equals("SpiritualProjection"))
-				name = "Spiritual";
-			SubElement s = (SubElement) Element.getElement(name);
-			Element e = s.getParentElement();
-			
-			if (!bPlayer.hasElement(e)) continue;
-			if (sub.equals("Metal") && sublist.contains(SubElement.LAVA)) continue;
-			if (sub.equals("Lightning") && sublist.contains(SubElement.COMBUSTION)) continue;
+
+		for (SubElement sub : Element.getSubElements(element)) {
+			double rand = Math.random();
+			chance = ConfigManager.getConfig().getDouble("SubElementAssign.Percentages." + sub.getName());
+
 			if (rand < chance) {
-				sublist.add(sub);
-				bPlayer.addSubElement(s);
-				GeneralMethods.saveSubElements(bPlayer);
+				sublist.add(sub.getName());
+				bPlayer.addSubElement(sub);
 			}
 		}
+		
+		GeneralMethods.saveSubElements(bPlayer);
 		int size = sublist.size();
+		ChatColor color = Element.getSubElements(element)[0].getColor();
+		
 		if (size >= 1) {
 			for (String sub : sublist) {
-				String name = sub;
-				if (sub.equals("SpiritualProjection")) name = "Spiritual";
-
-				size -= 1;
+				size--;
 				if (size == 0) {
-					sb.append(Element.getElement(name).getColor() + sub + ChatColor.YELLOW + ".");
+					sb.append(color + sub + ChatColor.YELLOW + ".");
 				} else {
-					sb.append(Element.getElement(name).getColor() + sub + ChatColor.YELLOW + ", and ");
+					sb.append(color + sub + ChatColor.YELLOW + ", and ");
 				}
 			}
 		} else {
-			sb = new StringBuilder(ChatColor.RED + "You sadly don't have any extra affinity for your element.");
+			sb = new StringBuilder(ChatColor.RED + "Unfortunately, you don't have any extra affinity for your element.");
 		}
-		
+
 		Bukkit.getPlayer(bPlayer.getUUID()).sendMessage(sb.toString());
 	}
 
@@ -323,60 +164,71 @@ public class RPGMethods {
 	private static void assignElement(BendingPlayer bPlayer, Element e) {
 		bPlayer.setElement(e);
 		GeneralMethods.saveElements(bPlayer);
-		Bukkit.getPlayer(bPlayer.getUUID()).sendMessage(ChatColor.YELLOW + "You have been born as an " + e.getColor() + e.getName() + e.getType().getBender() + ChatColor.YELLOW +  "!");
+		Bukkit.getPlayer(bPlayer.getUUID()).sendMessage(ChatColor.YELLOW + "You have been born as " + (e.getType() == ElementType.BENDING ? "an " : "a ") + e.getColor() + e.getName() + e.getType().getBender() + ChatColor.YELLOW + "!");
 	}
-        
-        /**
+
+	/**
 	 * Returns if there is an avatar, if he/she has already been choosen or not.
 	 */
-	public static boolean isAvatarChoosen() {
-		if (ConfigManager.avatarConfig.get().contains("Avatar.Current")) {
-			if (!"".equals(ConfigManager.avatarConfig.get().getString("Avatar.Current")) || (ConfigManager.avatarConfig.get().getString("Avatar.Current")) != null)
-                                return true;
+	public static boolean isAvatarChosen() {
+		if (ConfigManager.getConfig().contains("Avatar.CurrentAvatar")) {
+			if (!ConfigManager.getConfig().getString("Avatar.CurrentAvatar").equals("")) {
+				return true;
+			}
 		}
-                return false;
+		return false;
 	}
 
 	/**
 	 * Sets a player to the avatar giving them all the elements (excluding
-	 * chiblocking) and the extra perks such as almost death avatarstate.
+	 * chiblocking) and the extra perks such as avatarstate on fatal blow.
 	 * 
 	 * @param uuid UUID of player being set as the avatar
 	 */
 	public static void setAvatar(UUID uuid) {
-		if (!isAvatarChoosen()) {
-			UUID curr = UUID.fromString(ConfigManager.avatarConfig.get().getString("Avatar.Current"));
-			revokeAvatar(curr);
+		if (isAvatarChosen()) {
+			UUID curr = null;
+			try {
+				curr = UUID.fromString(ConfigManager.getConfig().getString("Avatar.CurrentAvatar"));
+			} catch (Exception e) {
+				curr = null;
+			}
+			
+			if (curr != null) {
+				revokeAvatar(Bukkit.getOfflinePlayer(uuid));
+			}
 		}
-		ConfigManager.avatarConfig.get().set("Avatar.Current", uuid.toString());
+		
 		Player player = Bukkit.getPlayer(uuid);
 		BendingPlayer bPlayer = BendingPlayer.getBendingPlayer(player.getName());
-		StringBuilder sb = new StringBuilder();
-		int i = 0;
-		for (Element e : bPlayer.getElements()) {
-			if (e instanceof SubElement)
-				continue;
-
-			if (bPlayer.getElements().size() - 1 == i) {
-				sb.append(e.getName());
-			} else {
-				sb.append(e.getName() + ":");
+		new PreviousAvatar(uuid, player.getName(), bPlayer.getElements(), bPlayer.getSubElements()).save();
+		
+		Set<Element> elements = new HashSet<>();
+		Set<SubElement> subs = new HashSet<>();
+		for (Element e : Element.getAllElements()) {
+			if (bPlayer.hasElement(e)) {
+				elements.add(e);
+				for (SubElement se : Element.getSubElements(e)) {
+					subs.add(se);
+				}
+			} else if (e.getType() == ElementType.BENDING) {
+				elements.add(e);
+				for (SubElement se : Element.getSubElements(e)) {
+					subs.add(se);
+				}
 			}
-			i += 1;
 		}
-                DBConnection.sql.modifyQuery("DELETE FROM pk_avatars WHERE uuid = '" + uuid.toString() + "'");
-		DBConnection.sql.modifyQuery("INSERT INTO pk_avatars (uuid, player, elements) VALUES ('" + uuid.toString() + "', '" + player.getName() + "', '" + sb.toString() + "')");
-		/*
-		 * Gives them the elements
-		 */
+		
 		bPlayer.getElements().clear();
-                Set<Element> shouldBeAdded = new HashSet<>(Arrays.asList(Element.getAllElements()));
-                if (shouldBeAdded.contains(Element.CHI)){
-                        shouldBeAdded.remove(Element.CHI);
-                }
-		bPlayer.getElements().addAll(shouldBeAdded);
+		bPlayer.getElements().addAll(elements);
 		GeneralMethods.saveElements(bPlayer);
-		ConfigManager.avatarConfig.save();
+		
+		bPlayer.getSubElements().clear();
+		bPlayer.getSubElements().addAll(subs);
+		GeneralMethods.saveSubElements(bPlayer);
+		
+		ConfigManager.getConfig().set("Avatar.CurrentAvatar", uuid.toString());
+		ConfigManager.saveConfig();
 	}
 
 	/**
@@ -387,11 +239,10 @@ public class RPGMethods {
 	 * @return if player with uuid is the current avatar
 	 */
 	public static boolean isCurrentAvatar(UUID uuid) {
-		String currAvatar = ConfigManager.avatarConfig.get().getString("Avatar.Current");
+		String currAvatar = ConfigManager.getConfig().getString("Avatar.CurrentAvatar");
 		if (currAvatar == null) {
 			return false;
-		}
-		if (uuid.toString().equalsIgnoreCase(currAvatar)) {
+		} else if (uuid.toString().equalsIgnoreCase(currAvatar)) {
 			return true;
 		}
 		return false;
@@ -405,17 +256,11 @@ public class RPGMethods {
 	 * @return if player with uuid has been the avatar
 	 */
 	public static boolean hasBeenAvatar(UUID uuid) {
-		if (isCurrentAvatar(uuid))
+		if (isCurrentAvatar(uuid)) {
 			return true;
-		ResultSet rs = DBConnection.sql.readQuery("SELECT uuid FROM pk_avatars WHERE uuid = '" + uuid.toString() + "'");
-		boolean valid = false;
-		try {
-			valid = rs.next();
-		} catch (SQLException e) {
-			e.printStackTrace();
-			return false;
 		}
-		return valid;
+		
+		return ProjectKorraRPG.getStorage().hasFile(uuid.toString());
 	}
 
 	/**
@@ -424,37 +269,69 @@ public class RPGMethods {
 	 * 
 	 * @param uuid UUID of player being checked
 	 */
-	public static void revokeAvatar(UUID uuid) {
-                if (uuid == null)
-                        return;
-		if (!isCurrentAvatar(uuid))
+	public static void revokeAvatar(OfflinePlayer player) {
+		UUID uuid = player.getUniqueId();
+		if (uuid == null) {
 			return;
+		} else if (!isCurrentAvatar(uuid)) {
+			return;
+		}
+		
 		List<Element> elements = new ArrayList<>();
-		BendingPlayer bPlayer = BendingPlayer.getBendingPlayer(Bukkit.getPlayer(uuid));
-		if (bPlayer == null)
+		List<SubElement> subs = new ArrayList<>();
+		BendingPlayer bPlayer = BendingPlayer.getBendingPlayer(player);
+		if (bPlayer == null) {
 			return;
-		String elements2 = "";
-                if (DBConnection.sql == null)
-                        return;
-                if (DBConnection.sql.getConnection() == null)
-                        return;
-		ResultSet rs = DBConnection.sql.readQuery("SELECT elements FROM pk_avatars WHERE uuid = '" + uuid.toString() + "'");
-		try {
-			if (rs.next()) {
-				elements2 = rs.getString("elements");
+		}
+
+		PreviousAvatar avatar = PreviousAvatar.load(uuid.toString());
+		if (avatar == null) {
+			bPlayer.getElements().clear();
+			GeneralMethods.saveElements(bPlayer);
+
+			bPlayer.getSubElements().clear();
+			GeneralMethods.saveSubElements(bPlayer);
+			
+			ConfigManager.getConfig().set("Avatar.CurrentAvatar", "");
+			ConfigManager.saveConfig();
+			
+			if (player.isOnline()) {
+				((Player) player).sendMessage(ChatColor.RED + "Could not locate storage of your elements, your elements have been cleared!");
 			}
-		} catch (SQLException e) {
-			e.printStackTrace();
+			
+			ProjectKorraRPG.getLog().info(ChatColor.RED + "Could not locate storage of previous elements for " + ChatColor.WHITE + player.getName() + ChatColor.RED + "(" + ChatColor.WHITE + player.getUniqueId() + ChatColor.RED + "), stored elements could not be set. Elements have been removed to allow rechoosing.");
 			return;
 		}
-		for (String s : elements2.split(":")) {
-			elements.add(Element.fromString(s));
-		}
-                
+		
+		elements = avatar.getElements();
+		subs = avatar.getSubs();
+
 		bPlayer.getElements().clear();
 		bPlayer.getElements().addAll(elements);
 		GeneralMethods.saveElements(bPlayer);
-		ConfigManager.avatarConfig.get().set("Avatar.Current", "");
-                ConfigManager.avatarConfig.save();
+		
+		bPlayer.getSubElements().clear();
+		bPlayer.getSubElements().addAll(subs);
+		GeneralMethods.saveSubElements(bPlayer);
+		
+		ConfigManager.getConfig().set("Avatar.CurrentAvatar", "");
+		ConfigManager.saveConfig();
+	}
+	
+	/**
+	 * Clears the database of all previous avatars (excluding the current avatar), making it possible for them to become avatar again.
+	 */
+	public static boolean clearPastAvatars() {
+		try {
+			for (File file : ProjectKorraRPG.getStorage().getFolder().listFiles()) {
+				if (!file.getName().equals("AvatarCycle.yml")) {
+					file.delete();
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+		return true;
 	}
 }

@@ -19,9 +19,9 @@ public class RPGCommandBase extends PKCommand {
 	@Override
 	public void execute(CommandSender sender, List<String> args) {
 		if (args.size() == 0) {
-			sender.sendMessage(ChatColor.RED + "/bending rpg avatar <Player> " + ChatColor.YELLOW + "Create an Avatar.");
-			sender.sendMessage(ChatColor.RED + "/bending rpg help <Command/Event> " + ChatColor.YELLOW + "Display help.");
-			sender.sendMessage(ChatColor.RED + "/bending rpg worldevent <Argument> [Event] " + ChatColor.YELLOW + "Manipulate events.");
+			sender.sendMessage(ChatColor.RED + "/bending rpg avatar <player> " + ChatColor.YELLOW + "Create an Avatar.");
+			sender.sendMessage(ChatColor.RED + "/bending rpg help <command/worldevent> " + ChatColor.YELLOW + "Display help.");
+			sender.sendMessage(ChatColor.RED + "/bending rpg worldevent <argument> [worldevent] " + ChatColor.YELLOW + "Manipulate events.");
 			return;
 		}
 		for (RPGCommand command : RPGCommand.instances.values()) {

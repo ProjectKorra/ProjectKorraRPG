@@ -1,24 +1,30 @@
 package com.projectkorra.rpg;
 
+import java.io.IOException;
+import java.util.logging.Logger;
+
+import org.bukkit.Bukkit;
+import org.bukkit.plugin.java.JavaPlugin;
+
 import com.projectkorra.rpg.commands.AvatarCommand;
 import com.projectkorra.rpg.commands.EventCommand;
 import com.projectkorra.rpg.commands.HelpCommand;
 import com.projectkorra.rpg.commands.RPGCommandBase;
 import com.projectkorra.rpg.configuration.ConfigManager;
-import com.projectkorra.rpg.event.EventManager;
-import com.projectkorra.rpg.storage.DBConnection;
+import com.projectkorra.rpg.storage.RPGStorage;
 import com.projectkorra.rpg.util.MetricsLite;
-
-import org.bukkit.Bukkit;
-import org.bukkit.plugin.java.JavaPlugin;
-
-import java.io.IOException;
-import java.util.logging.Logger;
+import com.projectkorra.rpg.worldevent.util.EventManager;
+import com.projectkorra.rpg.worldevent.util.WorldEventDisplayManager;
+import com.projectkorra.rpg.worldevent.util.WorldEventFileManager;
 
 public class ProjectKorraRPG extends JavaPlugin {
 	
-	public static ProjectKorraRPG plugin;
-	public static Logger log;
+	private static ProjectKorraRPG plugin;
+	private static Logger log;
+	private static EventManager eventManager;
+	private static WorldEventFileManager wFileManager;
+	private static WorldEventDisplayManager wDisplayManager;
+	private static RPGStorage storage;
 
 	@Override
 	public void onEnable() {
@@ -31,11 +37,14 @@ public class ProjectKorraRPG extends JavaPlugin {
 		new AvatarCommand();
 		new EventCommand();
 		new HelpCommand();
-
-		connectToDatabase();
+		wFileManager = new WorldEventFileManager();
+		wDisplayManager = new WorldEventDisplayManager(this);
+		eventManager = new EventManager();
+		storage = new RPGStorage();
+		RPGMethods.loadAvatarCycle();
 		
 		Bukkit.getServer().getPluginManager().registerEvents(new RPGListener(), this);
-		Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, new EventManager(), 0L, 1L);
+		Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(this, eventManager, 0L, 1L);
 		
 		try {
 	        MetricsLite metrics = new MetricsLite(this);
@@ -48,14 +57,31 @@ public class ProjectKorraRPG extends JavaPlugin {
 	
 	@Override
 	public void onDisable() {
-		// Might do something later
+		wDisplayManager.removeAll();
+		RPGMethods.saveAvatarCycle();
 	}
 	
-	public void connectToDatabase() {
-		DBConnection.open();
-		if (!DBConnection.isOpen()) {
-			return;
-		}
-		DBConnection.init();
+	public static ProjectKorraRPG getPlugin() {
+		return plugin;
+	}
+	
+	public static Logger getLog() {
+		return log;
+	}
+	
+	public static EventManager getEventManager() {
+		return eventManager;
+	}
+	
+	public static WorldEventFileManager getFileManager() {
+		return wFileManager;
+	}
+	
+	public static WorldEventDisplayManager getDisplayManager() {
+		return wDisplayManager;
+	}
+	
+	public static RPGStorage getStorage() {
+		return storage;
 	}
 }

@@ -20,8 +20,12 @@ public class Config {
 	 * @param file The file to create/load
 	 */
 	public Config(File file) {
-		this.plugin = ProjectKorraRPG.plugin;
-		this.file = new File(plugin.getDataFolder() + File.separator + file);
+		this(ProjectKorraRPG.getPlugin().getDataFolder(), file);
+	}
+	
+	public Config(File folder, File file) {
+		this.plugin = ProjectKorraRPG.getPlugin();
+		this.file = new File(folder + File.separator + file);
 		this.config = YamlConfiguration.loadConfiguration(this.file);
 		reload();
 	}

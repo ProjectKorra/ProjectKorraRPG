@@ -18,7 +18,7 @@ import com.projectkorra.rpg.worldevent.util.WorldEventDisplayManager;
 import com.projectkorra.rpg.worldevent.util.WorldEventFileManager;
 
 public class ProjectKorraRPG extends JavaPlugin {
-	
+
 	private static ProjectKorraRPG plugin;
 	private static Logger log;
 	private static EventManager eventManager;
@@ -30,7 +30,7 @@ public class ProjectKorraRPG extends JavaPlugin {
 	public void onEnable() {
 		ProjectKorraRPG.log = this.getLogger();
 		plugin = this;
-		
+
 		new ConfigManager();
 		new RPGMethods();
 		new RPGCommandBase();
@@ -42,45 +42,46 @@ public class ProjectKorraRPG extends JavaPlugin {
 		eventManager = new EventManager();
 		storage = new RPGStorage();
 		RPGMethods.loadAvatarCycle();
-		
+
 		Bukkit.getServer().getPluginManager().registerEvents(new RPGListener(), this);
 		Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(this, eventManager, 0L, 1L);
-		
+
 		try {
-	        MetricsLite metrics = new MetricsLite(this);
-	        metrics.start();
-	    } catch (IOException e) {
-	        e.printStackTrace();
-	        log.info("Failed to load metric stats");
-	    }
+			MetricsLite metrics = new MetricsLite(this);
+			metrics.start();
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+			log.info("Failed to load metric stats");
+		}
 	}
-	
+
 	@Override
 	public void onDisable() {
 		wDisplayManager.removeAll();
 		RPGMethods.saveAvatarCycle();
 	}
-	
+
 	public static ProjectKorraRPG getPlugin() {
 		return plugin;
 	}
-	
+
 	public static Logger getLog() {
 		return log;
 	}
-	
+
 	public static EventManager getEventManager() {
 		return eventManager;
 	}
-	
+
 	public static WorldEventFileManager getFileManager() {
 		return wFileManager;
 	}
-	
+
 	public static WorldEventDisplayManager getDisplayManager() {
 		return wDisplayManager;
 	}
-	
+
 	public static RPGStorage getStorage() {
 		return storage;
 	}

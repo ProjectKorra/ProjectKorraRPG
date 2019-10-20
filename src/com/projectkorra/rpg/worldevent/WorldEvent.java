@@ -12,11 +12,11 @@ import com.projectkorra.rpg.ProjectKorraRPG;
 import com.projectkorra.rpg.worldevent.util.Time;
 import com.projectkorra.rpg.worldevent.util.WorldEventFile;
 
-public class WorldEvent implements IWorldEvent{
-	
+public class WorldEvent implements IWorldEvent {
+
 	protected static Map<String, WorldEvent> events = new HashMap<>();
 	protected static Map<Element, Set<WorldEvent>> eventsByElement = new HashMap<>();
-	
+
 	static {
 		for (Element e : Element.getAllElements()) {
 			eventsByElement.put(e, new HashSet<>());
@@ -35,11 +35,11 @@ public class WorldEvent implements IWorldEvent{
 	private String endMessage;
 	private boolean darkenSky;
 	private boolean createFog;
-	
+
 	public WorldEvent(WorldEventFile wFile) {
 		this(wFile.getName(), wFile.getDescription(), wFile.getAliases(), wFile.getAttributes(), Element.getElement(wFile.getElement()), Time.valueOf(wFile.getTime().toUpperCase()), wFile.getFrequency(), wFile.getModifier(), wFile.getStartMessage(), wFile.getEndMessage(), wFile.getDarkenSky(), wFile.getCreateFog());
 	}
-	
+
 	public WorldEvent(String name, String description, List<String> aliases, List<String> attributes, Element element, Time time, int frequency, double modifier, String startMessage, String endMessage, boolean darkenSky, boolean createFog) {
 		this.name = name;
 		this.description = description;
@@ -59,7 +59,7 @@ public class WorldEvent implements IWorldEvent{
 		}
 		eventsByElement.get(element).add(this);
 	}
-	
+
 	@Override
 	public String getName() {
 		return name;
@@ -74,7 +74,7 @@ public class WorldEvent implements IWorldEvent{
 	public List<String> getAliases() {
 		return aliases;
 	}
-	
+
 	@Override
 	public List<String> getAttributes() {
 		return attributes;
@@ -123,18 +123,18 @@ public class WorldEvent implements IWorldEvent{
 	public static WorldEvent get(String name) {
 		return events.containsKey(name.toLowerCase()) ? events.get(name.toLowerCase()) : (ProjectKorraRPG.getFileManager().loadFile(name.toLowerCase()) == null ? null : get(name));
 	}
-	
+
 	public static Set<WorldEvent> getEventsByElement(Element e) {
 		if (!eventsByElement.containsKey(e)) {
 			eventsByElement.put(e, new HashSet<>());
 		}
 		return eventsByElement.get(e);
 	}
-	
+
 	public static Set<String> getEventNames() {
 		return events.keySet();
 	}
-	
+
 	public static Collection<WorldEvent> getEvents() {
 		return events.values();
 	}

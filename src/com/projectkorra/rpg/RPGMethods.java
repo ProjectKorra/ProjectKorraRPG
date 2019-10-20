@@ -25,9 +25,9 @@ import com.projectkorra.rpg.util.AvatarCycle;
 import com.projectkorra.rpg.util.PreviousAvatar;
 
 public class RPGMethods {
-	
+
 	private static LinkedList<Element> avatarCycle = new LinkedList<>();
-	
+
 	public static void loadAvatarCycle() {
 		AvatarCycle cycle = AvatarCycle.load();
 		avatarCycle.add(cycle.first);
@@ -35,7 +35,7 @@ public class RPGMethods {
 		avatarCycle.add(cycle.third);
 		avatarCycle.add(cycle.fourth);
 	}
-	
+
 	public static void saveAvatarCycle() {
 		Element first = avatarCycle.get(0);
 		Element second = avatarCycle.get(1);
@@ -48,10 +48,10 @@ public class RPGMethods {
 		if (curr != null) {
 			revokeAvatar(Bukkit.getOfflinePlayer(curr));
 		}
-		
+
 		Element e = avatarCycle.poll();
 		avatarCycle.add(e);
-		
+
 		if (Bukkit.getOnlinePlayers().size() <= 1) {
 			if (Bukkit.getOnlinePlayers().size() == 1) {
 				if (Bukkit.getPlayer(curr) != null) {
@@ -61,9 +61,9 @@ public class RPGMethods {
 						public void run() {
 							cycleAvatar(curr);
 						}
-						
+
 					}.runTaskLater(ProjectKorraRPG.getPlugin(), ConfigManager.getConfig().getLong("Avatar.AutoCycle.Interval"));
-					
+
 					ProjectKorraRPG.getLog().info("Avatar cycle not viable, checking again in 30 mins!");
 					return;
 				}
@@ -71,7 +71,7 @@ public class RPGMethods {
 				return;
 			}
 		}
-		
+
 		List<Player> eligible = new ArrayList<>();
 		for (Player player : Bukkit.getOnlinePlayers()) {
 			BendingPlayer bPlayer = BendingPlayer.getBendingPlayer(player);
@@ -81,7 +81,7 @@ public class RPGMethods {
 				eligible.add(player);
 			}
 		}
-		
+
 		Player chosen = eligible.get(new Random().nextInt(eligible.size()));
 		setAvatar(chosen.getUniqueId());
 		Bukkit.broadcastMessage(ChatColor.WHITE + chosen.getName() + ChatColor.DARK_PURPLE + " has been reincarnated as the next avatar!");
@@ -100,14 +100,14 @@ public class RPGMethods {
 			if (!ConfigManager.getConfig().contains("ElementAssign.Percentages." + e.getName())) {
 				continue;
 			}
-			
+
 			chance += ConfigManager.getConfig().getDouble("ElementAssign.Percentages." + e.getName());
 			if (rand < chance) {
 				assign = e;
 				break;
 			}
 		}
-		
+
 		assignElement(bPlayer, assign);
 		if (ConfigManager.getConfig().getBoolean("SubElementAssign.Enabled")) {
 			RPGMethods.randomAssignSubElements(bPlayer, assign);
@@ -132,11 +132,11 @@ public class RPGMethods {
 				bPlayer.addSubElement(sub);
 			}
 		}
-		
+
 		GeneralMethods.saveSubElements(bPlayer);
 		int size = sublist.size();
 		ChatColor color = Element.getSubElements(element)[0].getColor();
-		
+
 		if (size >= 1) {
 			for (String sub : sublist) {
 				size--;
@@ -190,19 +190,20 @@ public class RPGMethods {
 			UUID curr = null;
 			try {
 				curr = UUID.fromString(ConfigManager.getConfig().getString("Avatar.CurrentAvatar"));
-			} catch (Exception e) {
+			}
+			catch (Exception e) {
 				curr = null;
 			}
-			
+
 			if (curr != null) {
 				revokeAvatar(Bukkit.getOfflinePlayer(uuid));
 			}
 		}
-		
+
 		Player player = Bukkit.getPlayer(uuid);
 		BendingPlayer bPlayer = BendingPlayer.getBendingPlayer(player.getName());
 		new PreviousAvatar(uuid, player.getName(), bPlayer.getElements(), bPlayer.getSubElements()).save();
-		
+
 		Set<Element> elements = new HashSet<>();
 		Set<SubElement> subs = new HashSet<>();
 		for (Element e : Element.getAllElements()) {
@@ -218,15 +219,15 @@ public class RPGMethods {
 				}
 			}
 		}
-		
+
 		bPlayer.getElements().clear();
 		bPlayer.getElements().addAll(elements);
 		GeneralMethods.saveElements(bPlayer);
-		
+
 		bPlayer.getSubElements().clear();
 		bPlayer.getSubElements().addAll(subs);
 		GeneralMethods.saveSubElements(bPlayer);
-		
+
 		ConfigManager.getConfig().set("Avatar.CurrentAvatar", uuid.toString());
 		ConfigManager.saveConfig();
 	}
@@ -259,7 +260,7 @@ public class RPGMethods {
 		if (isCurrentAvatar(uuid)) {
 			return true;
 		}
-		
+
 		return ProjectKorraRPG.getStorage().hasFile(uuid.toString());
 	}
 
@@ -276,7 +277,7 @@ public class RPGMethods {
 		} else if (!isCurrentAvatar(uuid)) {
 			return;
 		}
-		
+
 		List<Element> elements = new ArrayList<>();
 		List<SubElement> subs = new ArrayList<>();
 		BendingPlayer bPlayer = BendingPlayer.getBendingPlayer(player);
@@ -291,35 +292,36 @@ public class RPGMethods {
 
 			bPlayer.getSubElements().clear();
 			GeneralMethods.saveSubElements(bPlayer);
-			
+
 			ConfigManager.getConfig().set("Avatar.CurrentAvatar", "");
 			ConfigManager.saveConfig();
-			
+
 			if (player.isOnline()) {
 				((Player) player).sendMessage(ChatColor.RED + "Could not locate storage of your elements, your elements have been cleared!");
 			}
-			
+
 			ProjectKorraRPG.getLog().info(ChatColor.RED + "Could not locate storage of previous elements for " + ChatColor.WHITE + player.getName() + ChatColor.RED + "(" + ChatColor.WHITE + player.getUniqueId() + ChatColor.RED + "), stored elements could not be set. Elements have been removed to allow rechoosing.");
 			return;
 		}
-		
+
 		elements = avatar.getElements();
 		subs = avatar.getSubs();
 
 		bPlayer.getElements().clear();
 		bPlayer.getElements().addAll(elements);
 		GeneralMethods.saveElements(bPlayer);
-		
+
 		bPlayer.getSubElements().clear();
 		bPlayer.getSubElements().addAll(subs);
 		GeneralMethods.saveSubElements(bPlayer);
-		
+
 		ConfigManager.getConfig().set("Avatar.CurrentAvatar", "");
 		ConfigManager.saveConfig();
 	}
-	
+
 	/**
-	 * Clears the database of all previous avatars (excluding the current avatar), making it possible for them to become avatar again.
+	 * Clears the database of all previous avatars (excluding the current
+	 * avatar), making it possible for them to become avatar again.
 	 */
 	public static boolean clearPastAvatars() {
 		try {
@@ -328,7 +330,8 @@ public class RPGMethods {
 					file.delete();
 				}
 			}
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			e.printStackTrace();
 			return false;
 		}

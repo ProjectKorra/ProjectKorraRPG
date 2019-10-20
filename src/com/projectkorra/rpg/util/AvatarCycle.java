@@ -9,13 +9,13 @@ import com.projectkorra.projectkorra.Element;
 import com.projectkorra.rpg.ProjectKorraRPG;
 import com.projectkorra.rpg.storage.Storable;
 
-public class AvatarCycle implements Storable{
+public class AvatarCycle implements Storable {
 
 	public Element first;
 	public Element second;
 	public Element third;
 	public Element fourth;
-	
+
 	public AvatarCycle(Element first, Element second, Element third, Element fourth) {
 		this.first = first;
 		this.second = second;
@@ -35,7 +35,7 @@ public class AvatarCycle implements Storable{
 		storage.put("second", second.getName());
 		storage.put("third", third.getName());
 		storage.put("fourth", fourth.getName());
-		
+
 		ProjectKorraRPG.getStorage().save(this, storage);
 	}
 
@@ -44,15 +44,15 @@ public class AvatarCycle implements Storable{
 		if (config == null) {
 			return new AvatarCycle(Element.FIRE, Element.AIR, Element.WATER, Element.EARTH);
 		}
-		
-		String[] order = {"first", "second", "third", "fourth"};
+
+		String[] order = { "first", "second", "third", "fourth" };
 		Element[] elements = new Element[4];
 		for (int i = 0; i < 4; i++) {
 			String element = config.getString(order[i]);
 			Element e = Element.getElement(element);
 			elements[i] = e;
 		}
-		
+
 		return new AvatarCycle(elements[0], elements[1], elements[2], elements[3]);
 	}
 }

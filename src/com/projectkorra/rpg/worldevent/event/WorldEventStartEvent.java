@@ -7,22 +7,22 @@ import org.bukkit.event.HandlerList;
 
 import com.projectkorra.rpg.worldevent.WorldEvent;
 
-public class WorldEventStartEvent extends Event implements Cancellable{
-	
+public class WorldEventStartEvent extends Event implements Cancellable {
+
 	public static final HandlerList handlers = new HandlerList();
 	public boolean cancel = false;
 	public World world;
 	public WorldEvent event;
-	
+
 	public WorldEventStartEvent(World world, WorldEvent event) {
 		this.world = world;
 		this.event = event;
 	}
-	
+
 	public World getWorld() {
 		return world;
 	}
-	
+
 	public WorldEvent getEvent() {
 		return event;
 	}
@@ -31,7 +31,7 @@ public class WorldEventStartEvent extends Event implements Cancellable{
 	public HandlerList getHandlers() {
 		return handlers;
 	}
-	
+
 	public static HandlerList getHandlerList() {
 		return handlers;
 	}

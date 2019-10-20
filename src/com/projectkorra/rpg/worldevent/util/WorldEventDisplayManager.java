@@ -20,7 +20,7 @@ import com.projectkorra.rpg.ProjectKorraRPG;
 import com.projectkorra.rpg.worldevent.WorldEvent;
 
 public class WorldEventDisplayManager {
-	
+
 	private Map<Element, BarColor> colors;
 	private Map<World, Set<BossBar>> active;
 	private ProjectKorraRPG plugin;
@@ -33,22 +33,22 @@ public class WorldEventDisplayManager {
 		colors.put(Element.EARTH, BarColor.GREEN);
 		colors.put(Element.FIRE, BarColor.RED);
 		colors.put(Element.WATER, BarColor.BLUE);
-		
+
 		active = new HashMap<>();
-		
+
 		this.plugin = plugin;
 	}
-	
+
 	public void addColor(Element e, BarColor color) {
 		if (!colors.containsKey(e)) {
 			colors.put(e, color);
 		}
 	}
-	
+
 	public BarColor getBarColor(Element e) {
 		return colors.containsKey(e) ? colors.get(e) : BarColor.PINK;
 	}
-	
+
 	public BossBar createBossBar(World world, WorldEvent event) {
 		if (ProjectKorraRPG.getEventManager().isHappening(world, event)) {
 			List<BarFlag> flags = new ArrayList<>();
@@ -71,24 +71,24 @@ public class WorldEventDisplayManager {
 		}
 		return null;
 	}
-	
+
 	public void removeBossBar(World world, WorldEvent event) {
 		if (!active.containsKey(world)) {
 			return;
 		}
 		BossBar remove = getBossBar(world, event);
-		
+
 		if (remove != null) {
 			remove.removeAll();
 			active.get(world).remove(remove);
 		}
 	}
-	
+
 	public BossBar getBossBar(World world, WorldEvent event) {
 		if (!active.containsKey(world)) {
 			return null;
 		}
-		
+
 		BossBar get = null;
 		for (BossBar bar : active.get(world)) {
 			if (ChatColor.stripColor(bar.getTitle()).equals(event.getName())) {
@@ -96,13 +96,13 @@ public class WorldEventDisplayManager {
 				break;
 			}
 		}
-		
+
 		if (get != null) {
 			return get;
 		}
 		return null;
 	}
-	
+
 	public void removeAll() {
 		for (World world : active.keySet()) {
 			for (BossBar bar : active.get(world)) {
@@ -110,18 +110,18 @@ public class WorldEventDisplayManager {
 			}
 		}
 	}
-	
+
 	public void update(World world) {
 		if (active.containsKey(world)) {
 			if (active.get(world).isEmpty()) {
 				active.remove(world);
 			}
 		}
-		
+
 		if (!active.containsKey(world)) {
 			return;
 		}
-		
+
 		List<BossBar> remove = new ArrayList<>();
 		for (BossBar bar : active.get(world)) {
 			for (Player player : world.getPlayers()) {
@@ -129,7 +129,7 @@ public class WorldEventDisplayManager {
 					bar.addPlayer(player);
 				}
 			}
-			
+
 			long currTime = world.getTime() % 12000;
 			if (currTime >= 12000) {
 				bar.removeAll();
@@ -138,7 +138,7 @@ public class WorldEventDisplayManager {
 			double progress = 1 - (currTime / 12000);
 			bar.setProgress(progress);
 		}
-		
+
 		for (BossBar bar : remove) {
 			active.get(world).remove(bar);
 		}

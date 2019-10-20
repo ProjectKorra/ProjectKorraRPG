@@ -14,10 +14,10 @@ import org.bukkit.entity.Player;
 import com.projectkorra.rpg.ProjectKorraRPG;
 import com.projectkorra.rpg.RPGMethods;
 
-public class AvatarCommand extends RPGCommand{
+public class AvatarCommand extends RPGCommand {
 
 	public AvatarCommand() {
-		super("avatar", "/bending rpg avatar <player | --list | --clear>", "This command defines a player as the avatar and gives them all the elements and other perks. \n--list: list all past avatars\n--clear: clear all past avatars", new String[] {"avatar", "av", "avy"});
+		super("avatar", "/bending rpg avatar <player | --list | --clear>", "This command defines a player as the avatar and gives them all the elements and other perks. \n--list: list all past avatars\n--clear: clear all past avatars", new String[] { "avatar", "av", "avy" });
 	}
 
 	@Override
@@ -50,7 +50,7 @@ public class AvatarCommand extends RPGCommand{
 			}
 			return;
 		}
-		
+
 		Player target = Bukkit.getPlayer(args.get(0));
 		if (target == null) {
 			sender.sendMessage(ChatColor.RED + "Player not found!");
@@ -58,14 +58,15 @@ public class AvatarCommand extends RPGCommand{
 		} else if (RPGMethods.hasBeenAvatar(target.getUniqueId())) {
 			sender.sendMessage(ChatColor.RED + "Player has already been the avatar!");
 			return;
-		} 
+		}
 		RPGMethods.setAvatar(target.getUniqueId());
 		Bukkit.broadcastMessage(ChatColor.WHITE + target.getName() + ChatColor.DARK_PURPLE + " has been declared avatar!");
 	}
-	
+
 	@Override
 	protected List<String> getTabCompletion(CommandSender sender, List<String> args) {
-		if (args.size() >= 1) return new ArrayList<String>();
+		if (args.size() >= 1)
+			return new ArrayList<String>();
 		List<String> players = new ArrayList<String>();
 		for (Player p : Bukkit.getOnlinePlayers()) {
 			players.add(p.getName());

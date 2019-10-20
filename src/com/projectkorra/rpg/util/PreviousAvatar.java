@@ -13,32 +13,32 @@ import com.projectkorra.projectkorra.Element.SubElement;
 import com.projectkorra.rpg.ProjectKorraRPG;
 import com.projectkorra.rpg.storage.Storable;
 
-public class PreviousAvatar implements Storable{
+public class PreviousAvatar implements Storable {
 
 	public UUID uuid;
 	public String name;
 	public List<Element> elements;
 	public List<SubElement> subs;
-	
+
 	public PreviousAvatar(UUID uuid, String name, List<Element> elements, List<SubElement> subs) {
 		this.uuid = uuid;
 		this.name = name;
 		this.elements = elements;
 		this.subs = subs;
 	}
-	
+
 	public UUID getUniqueId() {
 		return uuid;
 	}
-	
+
 	public String getName() {
 		return name;
 	}
-	
+
 	public List<Element> getElements() {
 		return elements;
 	}
-	
+
 	public List<SubElement> getSubs() {
 		return subs;
 	}
@@ -53,19 +53,19 @@ public class PreviousAvatar implements Storable{
 		Map<String, Object> storage = new HashMap<>();
 		storage.put("uuid", uuid.toString());
 		storage.put("name", name);
-		
+
 		List<String> names = new ArrayList<>();
 		for (Element e : elements) {
 			names.add(e.getName());
 		}
 		storage.put("elements", names);
-		
+
 		List<String> names2 = new ArrayList<>();
 		for (SubElement se : subs) {
 			names2.add(se.getName());
 		}
 		storage.put("subs", names2);
-		
+
 		ProjectKorraRPG.getStorage().save(this, storage);
 	}
 
@@ -74,7 +74,7 @@ public class PreviousAvatar implements Storable{
 		if (config == null) {
 			return null;
 		}
-		
+
 		UUID uuid = UUID.fromString(config.getString("uuid"));
 		String name = config.getString("name");
 		List<Element> elements = new ArrayList<>();
@@ -84,7 +84,7 @@ public class PreviousAvatar implements Storable{
 				elements.add(e);
 			}
 		}
-		
+
 		List<SubElement> subs = new ArrayList<>();
 		for (String sub : config.getStringList("subs")) {
 			Element e = Element.fromString(sub);
@@ -92,7 +92,7 @@ public class PreviousAvatar implements Storable{
 				subs.add((SubElement) e);
 			}
 		}
-		
+
 		return new PreviousAvatar(uuid, name, elements, subs);
 	}
 }

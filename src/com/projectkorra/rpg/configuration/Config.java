@@ -22,7 +22,7 @@ public class Config {
 	public Config(File file) {
 		this(ProjectKorraRPG.getPlugin().getDataFolder(), file);
 	}
-	
+
 	public Config(File folder, File file) {
 		this.plugin = ProjectKorraRPG.getPlugin();
 		this.file = new File(folder + File.separator + file);

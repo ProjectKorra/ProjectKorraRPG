@@ -47,14 +47,14 @@ public class RPGListener implements Listener {
 			if (event.getEntity() instanceof Player) {
 				Player player = (Player) event.getEntity();
 				BendingPlayer bPlayer = BendingPlayer.getBendingPlayer(player.getName());
-				
+
 				if (bPlayer != null && RPGMethods.isCurrentAvatar(player.getUniqueId())) {
 					if (event.getCause() == DamageCause.FALL && bPlayer.hasElement(Element.AIR)) {
 						return;
 					} else if (event.getCause() == DamageCause.FALL && bPlayer.hasElement(Element.EARTH) && EarthAbility.isEarthbendable(player, player.getLocation().getBlock().getRelative(BlockFace.DOWN))) {
 						return;
 					}
-					
+
 					if (player.getHealth() - event.getDamage() <= 0) {
 						if (bPlayer.canBendIgnoreBindsCooldowns(CoreAbility.getAbility("AvatarState"))) {
 							if (!bPlayer.isOnCooldown("AvatarState")) {
@@ -64,7 +64,7 @@ public class RPGListener implements Listener {
 								return;
 							}
 						}
-						
+
 						if (ConfigManager.getConfig().getBoolean("Avatar.AutoCycle.Enabled")) {
 							RPGMethods.cycleAvatar(player.getUniqueId());
 						}
@@ -73,7 +73,7 @@ public class RPGListener implements Listener {
 			}
 		}
 	}
-	
+
 	@EventHandler
 	public void onAbilityStart(AbilityStartEvent event) {
 		CoreAbility ability = (CoreAbility) event.getAbility();
@@ -83,11 +83,11 @@ public class RPGListener implements Listener {
 		} else {
 			world = ability.getLocation().getWorld();
 		}
-		
+
 		if (world == null) {
 			return;
 		}
-		
+
 		for (WorldEvent we : ProjectKorraRPG.getEventManager().getEventsHappening(world)) {
 			if (ability.getElement().equals(we.getElement())) {
 				if (we.getModifier() <= 0) {
@@ -101,7 +101,7 @@ public class RPGListener implements Listener {
 			}
 		}
 	}
-	
+
 	@EventHandler
 	public void onElementChange(PlayerChangeElementEvent event) {
 		if (event.getResult() == Result.REMOVE) {
@@ -131,32 +131,32 @@ public class RPGListener implements Listener {
 			if (wEvent.getTime() == Time.BOTH && ProjectKorraRPG.getEventManager().isHappening(event.getWorld(), wEvent)) {
 				WorldEventEndEvent endEvent = new WorldEventEndEvent(event.getWorld(), wEvent);
 				Bukkit.getServer().getPluginManager().callEvent(endEvent);
-				
+
 				if (endEvent.isCancelled()) {
 					continue;
 				}
-				
+
 				ProjectKorraRPG.getEventManager().endEvent(event.getWorld(), wEvent);
 			} else if (wEvent.getTime() == Time.DAY || wEvent.getTime() == Time.BOTH) {
-				if ((Math.ceil((event.getWorld().getFullTime()/24000)) + 1) % wEvent.getFrequency() == 0) {
+				if ((Math.ceil((event.getWorld().getFullTime() / 24000)) + 1) % wEvent.getFrequency() == 0) {
 					WorldEventStartEvent startEvent = new WorldEventStartEvent(event.getWorld(), wEvent);
 					Bukkit.getServer().getPluginManager().callEvent(startEvent);
-					
+
 					if (startEvent.isCancelled()) {
 						continue;
 					}
-					
+
 					ProjectKorraRPG.getEventManager().startEvent(event.getWorld(), wEvent);
 				}
 			} else {
 				if (ProjectKorraRPG.getEventManager().isHappening(event.getWorld(), wEvent)) {
 					WorldEventEndEvent endEvent = new WorldEventEndEvent(event.getWorld(), wEvent);
 					Bukkit.getServer().getPluginManager().callEvent(endEvent);
-					
+
 					if (endEvent.isCancelled()) {
 						continue;
 					}
-					
+
 					ProjectKorraRPG.getEventManager().endEvent(event.getWorld(), wEvent);
 				}
 			}
@@ -167,43 +167,43 @@ public class RPGListener implements Listener {
 	public void onSunSet(SunSetEvent event) {
 		for (WorldEvent wEvent : WorldEvent.getEvents()) {
 			if (wEvent.getTime() == Time.NIGHT) {
-				if ((Math.ceil((event.getWorld().getFullTime()/24000)) + 1) % wEvent.getFrequency() == 0) {
+				if ((Math.ceil((event.getWorld().getFullTime() / 24000)) + 1) % wEvent.getFrequency() == 0) {
 					WorldEventStartEvent startEvent = new WorldEventStartEvent(event.getWorld(), wEvent);
 					Bukkit.getServer().getPluginManager().callEvent(startEvent);
-					
+
 					if (startEvent.isCancelled()) {
 						continue;
 					}
-					
+
 					ProjectKorraRPG.getEventManager().startEvent(event.getWorld(), wEvent);
 				}
-			} else if (wEvent.getTime() == Time.DAY){
+			} else if (wEvent.getTime() == Time.DAY) {
 				if (ProjectKorraRPG.getEventManager().isHappening(event.getWorld(), wEvent)) {
 					WorldEventEndEvent endEvent = new WorldEventEndEvent(event.getWorld(), wEvent);
 					Bukkit.getServer().getPluginManager().callEvent(endEvent);
-					
+
 					if (endEvent.isCancelled()) {
 						continue;
 					}
-					
+
 					ProjectKorraRPG.getEventManager().endEvent(event.getWorld(), wEvent);
 				}
 			}
 		}
 	}
-	
+
 	@EventHandler
 	public void onTeleport(PlayerTeleportEvent event) {
 		if (event.getTo().getWorld().equals(event.getFrom().getWorld())) {
 			return;
 		}
-		
+
 		for (WorldEvent we : WorldEvent.getEvents()) {
 			if (ProjectKorraRPG.getEventManager().isHappening(event.getFrom().getWorld(), we)) {
 				BossBar bar = ProjectKorraRPG.getDisplayManager().getBossBar(event.getTo().getWorld(), we);
 				bar.removePlayer(event.getPlayer());
 			}
-			
+
 			if (ProjectKorraRPG.getEventManager().isHappening(event.getTo().getWorld(), we)) {
 				BossBar bar = ProjectKorraRPG.getDisplayManager().getBossBar(event.getTo().getWorld(), we);
 				bar.addPlayer(event.getPlayer());

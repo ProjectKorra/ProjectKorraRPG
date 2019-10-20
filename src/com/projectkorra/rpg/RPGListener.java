@@ -13,9 +13,9 @@ import org.bukkit.event.player.PlayerTeleportEvent;
 
 import com.projectkorra.projectkorra.BendingPlayer;
 import com.projectkorra.projectkorra.Element;
-import com.projectkorra.projectkorra.ability.Ability;
 import com.projectkorra.projectkorra.ability.CoreAbility;
 import com.projectkorra.projectkorra.ability.EarthAbility;
+import com.projectkorra.projectkorra.attribute.AttributeModifier;
 import com.projectkorra.projectkorra.avatar.AvatarState;
 import com.projectkorra.projectkorra.event.AbilityStartEvent;
 import com.projectkorra.projectkorra.event.BendingPlayerCreationEvent;
@@ -53,20 +53,20 @@ public class RPGListener implements Listener {
 						return;
 					} else if (event.getCause() == DamageCause.FALL && bPlayer.hasElement(Element.EARTH) && EarthAbility.isEarthbendable(player, player.getLocation().getBlock().getRelative(BlockFace.DOWN))) {
 						return;
-					} else {
-						if (player.getHealth() - event.getDamage() <= 0) {
-							if (bPlayer.canBendIgnoreBindsCooldowns(CoreAbility.getAbility("AvatarState"))) {
-								if (!bPlayer.isOnCooldown("AvatarState")) {
-									player.setHealth(2);
-									event.setCancelled(true);
-									new AvatarState(player);
-									return;
-								}
+					}
+					
+					if (player.getHealth() - event.getDamage() <= 0) {
+						if (bPlayer.canBendIgnoreBindsCooldowns(CoreAbility.getAbility("AvatarState"))) {
+							if (!bPlayer.isOnCooldown("AvatarState")) {
+								player.setHealth(2);
+								event.setCancelled(true);
+								new AvatarState(player);
+								return;
 							}
-							
-							if (ConfigManager.getConfig().getBoolean("Avatar.AutoCycle.Enabled")) {
-								RPGMethods.cycleAvatar(player.getUniqueId());
-							}
+						}
+						
+						if (ConfigManager.getConfig().getBoolean("Avatar.AutoCycle.Enabled")) {
+							RPGMethods.cycleAvatar(player.getUniqueId());
 						}
 					}
 				}
@@ -90,7 +90,14 @@ public class RPGListener implements Listener {
 		
 		for (WorldEvent we : ProjectKorraRPG.getEventManager().getEventsHappening(world)) {
 			if (ability.getElement().equals(we.getElement())) {
-				
+				if (we.getModifier() <= 0) {
+					event.setCancelled(true);
+				} else {
+					for (String attribute : we.getAttributes()) {
+						String[] split = attribute.split("::");
+						ability.addAttributeModifier(split[0], we.getModifier(), AttributeModifier.valueOf(split[1].toUpperCase()));
+					}
+				}
 			}
 		}
 	}

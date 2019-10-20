@@ -64,6 +64,10 @@ public class WorldEventFile {
 		return config.getStringList("aliases");
 	}
 	
+	public List<String> getAttributes() {
+		return config.getStringList("attributes");
+	}
+	
 	public FileConfiguration getConfig() {
 		return config;
 	}

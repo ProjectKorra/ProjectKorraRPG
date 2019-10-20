@@ -6,10 +6,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.projectkorra.projectkorra.Element;
+import com.projectkorra.projectkorra.attribute.Attribute;
 import com.projectkorra.rpg.ProjectKorraRPG;
 import com.projectkorra.rpg.worldevent.WorldEvent;
 
 public class WorldEventFileManager {
+	
+	private static String mult = "::MULTIPLICATION", divi = "::DIVISION";
 
 	protected Map<String, WorldEventFile> files;
 	protected File folder;
@@ -29,6 +32,7 @@ public class WorldEventFileManager {
 		new WorldEventFileBuilder()
 			.name("FullMoon")
 			.setAliases(Arrays.asList("fm", "fullm", "fmoon", "moon"))
+			.setAttributes(Arrays.asList(Attribute.DAMAGE + mult, Attribute.HEIGHT + mult, Attribute.RANGE + mult, Attribute.WIDTH + mult, Attribute.KNOCKBACK + mult, Attribute.CHARGE_DURATION + divi, Attribute.COOLDOWN + divi, Attribute.SPEED + mult))
 			.element(Element.WATER)
 			.modifier(3.0)
 			.frequency(8)
@@ -41,6 +45,7 @@ public class WorldEventFileManager {
 		new WorldEventFileBuilder()
 			.name("SozinsComet")
 			.setAliases(Arrays.asList("sc", "sozinsc", "scomet", "comet"))
+			.setAttributes(Arrays.asList(Attribute.DAMAGE + mult, Attribute.RANGE + mult, Attribute.KNOCKBACK + mult, Attribute.CHARGE_DURATION + divi, Attribute.DURATION + mult, Attribute.SPEED + mult, Attribute.WIDTH + mult))
 			.element(Element.FIRE)
 			.modifier(5.0)
 			.frequency(100)

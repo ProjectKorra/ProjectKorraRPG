@@ -1,6 +1,7 @@
 name: ProjectKorraRPG
 author: ProjectKorra
 version: 1.0.0
+api-version: 1.13
 main: com.projectkorra.rpg.ProjectKorraRPG
 softdepend: [ProjectKorra]
 description: RPG side-plugin for ProjectKorra core

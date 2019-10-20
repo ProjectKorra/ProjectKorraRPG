@@ -26,6 +26,7 @@ public class WorldEvent implements IWorldEvent{
 	private String name;
 	private String description;
 	private List<String> aliases;
+	private List<String> attributes;
 	private Element element;
 	private Time time;
 	private int frequency;
@@ -36,13 +37,14 @@ public class WorldEvent implements IWorldEvent{
 	private boolean createFog;
 	
 	public WorldEvent(WorldEventFile wFile) {
-		this(wFile.getName(), wFile.getDescription(), wFile.getAliases(), Element.getElement(wFile.getElement()), Time.valueOf(wFile.getTime().toUpperCase()), wFile.getFrequency(), wFile.getModifier(), wFile.getStartMessage(), wFile.getEndMessage(), wFile.getDarkenSky(), wFile.getCreateFog());
+		this(wFile.getName(), wFile.getDescription(), wFile.getAliases(), wFile.getAttributes(), Element.getElement(wFile.getElement()), Time.valueOf(wFile.getTime().toUpperCase()), wFile.getFrequency(), wFile.getModifier(), wFile.getStartMessage(), wFile.getEndMessage(), wFile.getDarkenSky(), wFile.getCreateFog());
 	}
 	
-	public WorldEvent(String name, String description, List<String> aliases, Element element, Time time, int frequency, double modifier, String startMessage, String endMessage, boolean darkenSky, boolean createFog) {
+	public WorldEvent(String name, String description, List<String> aliases, List<String> attributes, Element element, Time time, int frequency, double modifier, String startMessage, String endMessage, boolean darkenSky, boolean createFog) {
 		this.name = name;
 		this.description = description;
 		this.aliases = aliases;
+		this.attributes = attributes;
 		this.element = element;
 		this.time = time;
 		this.frequency = frequency;
@@ -71,6 +73,11 @@ public class WorldEvent implements IWorldEvent{
 	@Override
 	public List<String> getAliases() {
 		return aliases;
+	}
+	
+	@Override
+	public List<String> getAttributes() {
+		return attributes;
 	}
 
 	@Override

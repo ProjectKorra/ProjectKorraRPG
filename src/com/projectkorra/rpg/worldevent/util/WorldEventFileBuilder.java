@@ -12,6 +12,7 @@ public class WorldEventFileBuilder {
 	private String name;
 	private String description;
 	private List<String> aliases;
+	private List<String> attributes;
 	private String element;
 	private int frequency;
 	private double modifier;
@@ -25,11 +26,12 @@ public class WorldEventFileBuilder {
 		this.name = "GenericName";
 		this.description = "GenericDescription";
 		this.aliases = new ArrayList<>();
+		this.attributes = new ArrayList<>();
 		this.frequency = 3;
 		this.modifier = 2.0;
 		this.time = "BOTH";
-		this.startMessage = "GenericStart";
-		this.endMessage = "GenericEnd";
+		this.startMessage = "GenericStartMessage";
+		this.endMessage = "GenericEndMessage";
 	}
 	
 	public WorldEventFileBuilder name(String name) {
@@ -59,6 +61,23 @@ public class WorldEventFileBuilder {
 			aliases.set(i, aliases.get(i).toLowerCase());
 		}
 		this.aliases = aliases;
+		return this;
+	}
+	
+	public WorldEventFileBuilder addAttribute(String attribute) {
+		this.attributes.add(attribute);
+		return this;
+	}
+	
+	public WorldEventFileBuilder addAttributes(String... attributes) {
+		for (String attribute : attributes) {
+			this.attributes.add(attribute);
+		}
+		return this;
+	}
+	
+	public WorldEventFileBuilder setAttributes(List<String> attributes) {
+		this.attributes = attributes;
 		return this;
 	}
 	
@@ -112,6 +131,7 @@ public class WorldEventFileBuilder {
 		config.addDefault("element", element);
 		config.addDefault("time", time);
 		config.addDefault("modifier", modifier);
+		config.addDefault("attributes", attributes);
 		config.addDefault("frequency", frequency);
 		config.addDefault("startmessage", startMessage);
 		config.addDefault("endmessage", endMessage);

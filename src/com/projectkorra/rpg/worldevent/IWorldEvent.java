@@ -26,6 +26,12 @@ public interface IWorldEvent {
 	public List<String> getAliases();
 	
 	/**
+	 * A list of attributes to be modified while the WorldEvent is active 
+	 * @return list of attributes
+	 */
+	public List<String> getAttributes();
+	
+	/**
 	 * Which element the WorldEvent should affect. This will work with custom elements, but be sure the custom element does exist!
 	 * @return element the WorldEvent affects
 	 */

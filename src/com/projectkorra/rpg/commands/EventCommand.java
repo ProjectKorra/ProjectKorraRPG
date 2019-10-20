@@ -161,7 +161,7 @@ public class EventCommand extends RPGCommand {
 			} else if (ProjectKorraRPG.getEventManager().isHappening(world, event)) {
 				sender.sendMessage(ChatColor.RED + "That WorldEvent is already happening!");
 			} else {
-				ProjectKorraRPG.getEventManager().startEvent(world, event);
+				ProjectKorraRPG.getEventManager().startEvent(world, event, false);
 				sender.sendMessage(ChatColor.GOLD + "Successfully started the " + event.getName() + " event!");
 			}
 		}

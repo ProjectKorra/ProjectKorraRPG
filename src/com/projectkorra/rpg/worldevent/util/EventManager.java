@@ -68,25 +68,28 @@ public class EventManager implements Runnable {
 		}
 	}
 
-	public void startEvent(World world, WorldEvent event) {
+	public void startEvent(World world, WorldEvent event, boolean natural) {
 		if (marker.get(world).contains(event)) {
 			return;
 		}
 
-		double daysLeft = ((Math.ceil((world.getFullTime() / 24000)) + 1) % event.getFrequency());
-		if (daysLeft > 0) {
-			world.setFullTime(world.getFullTime() + (long) daysLeft * 24000);
-		}
-
-		if (event.getTime() != Time.BOTH && event.getTime() != time) {
-			long difference = 0;
-			if (event.getTime() == Time.DAY) {
-				difference = 24000 - world.getTime();
-			} else {
-				difference = 12000 - world.getTime();
+		if (!natural) {
+			double daysLeft = event.getFrequency() - (Math.ceil((world.getFullTime() / 24000)) % event.getFrequency());
+			
+			if (daysLeft > 0) {
+				world.setFullTime(world.getFullTime() + (long) daysLeft * 24000);
 			}
-			world.setFullTime(world.getFullTime() + difference);
-			time = event.getTime();
+	
+			if (event.getTime() != Time.BOTH && event.getTime() != time) {
+				long difference = 0;
+				if (event.getTime() == Time.DAY) {
+					difference = 24000 - world.getTime();
+				} else {
+					difference = 12000 - world.getTime();
+				}
+				world.setFullTime(world.getFullTime() + difference);
+				time = event.getTime();
+			}
 		}
 
 		marker.get(world).add(event);

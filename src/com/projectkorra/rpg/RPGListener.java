@@ -138,7 +138,7 @@ public class RPGListener implements Listener {
 
 				ProjectKorraRPG.getEventManager().endEvent(event.getWorld(), wEvent);
 			} else if (wEvent.getTime() == Time.DAY || wEvent.getTime() == Time.BOTH) {
-				if ((Math.ceil((event.getWorld().getFullTime() / 24000)) + 1) % wEvent.getFrequency() == 0) {
+				if (Math.ceil((event.getWorld().getFullTime() / 24000)) % wEvent.getFrequency() == 0) {
 					WorldEventStartEvent startEvent = new WorldEventStartEvent(event.getWorld(), wEvent);
 					Bukkit.getServer().getPluginManager().callEvent(startEvent);
 
@@ -146,7 +146,7 @@ public class RPGListener implements Listener {
 						continue;
 					}
 
-					ProjectKorraRPG.getEventManager().startEvent(event.getWorld(), wEvent);
+					ProjectKorraRPG.getEventManager().startEvent(event.getWorld(), wEvent, true);
 				}
 			} else {
 				if (ProjectKorraRPG.getEventManager().isHappening(event.getWorld(), wEvent)) {
@@ -167,7 +167,7 @@ public class RPGListener implements Listener {
 	public void onSunSet(SunSetEvent event) {
 		for (WorldEvent wEvent : WorldEvent.getEvents()) {
 			if (wEvent.getTime() == Time.NIGHT) {
-				if ((Math.ceil((event.getWorld().getFullTime() / 24000)) + 1) % wEvent.getFrequency() == 0) {
+				if (Math.ceil((event.getWorld().getFullTime() / 24000)) % wEvent.getFrequency() == 0) {
 					WorldEventStartEvent startEvent = new WorldEventStartEvent(event.getWorld(), wEvent);
 					Bukkit.getServer().getPluginManager().callEvent(startEvent);
 
@@ -175,7 +175,7 @@ public class RPGListener implements Listener {
 						continue;
 					}
 
-					ProjectKorraRPG.getEventManager().startEvent(event.getWorld(), wEvent);
+					ProjectKorraRPG.getEventManager().startEvent(event.getWorld(), wEvent, true);
 				}
 			} else if (wEvent.getTime() == Time.DAY) {
 				if (ProjectKorraRPG.getEventManager().isHappening(event.getWorld(), wEvent)) {

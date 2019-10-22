@@ -161,7 +161,7 @@ public class RPGListener implements Listener {
 					continue;
 				}
 
-				ProjectKorraRPG.getEventManager().endEvent(event.getWorld(), wEvent);
+				ProjectKorraRPG.getEventManager().endEvent(event.getWorld(), wEvent, false);
 			} else if (wEvent.getTime() == Time.DAY || wEvent.getTime() == Time.BOTH) {
 				if (Math.ceil((event.getWorld().getFullTime() / 24000)) % wEvent.getFrequency() == 0) {
 					WorldEventStartEvent startEvent = new WorldEventStartEvent(event.getWorld(), wEvent);
@@ -182,7 +182,7 @@ public class RPGListener implements Listener {
 						continue;
 					}
 
-					ProjectKorraRPG.getEventManager().endEvent(event.getWorld(), wEvent);
+					ProjectKorraRPG.getEventManager().endEvent(event.getWorld(), wEvent, false);
 				}
 			}
 		}
@@ -211,7 +211,7 @@ public class RPGListener implements Listener {
 						continue;
 					}
 
-					ProjectKorraRPG.getEventManager().endEvent(event.getWorld(), wEvent);
+					ProjectKorraRPG.getEventManager().endEvent(event.getWorld(), wEvent, false);
 				}
 			}
 		}

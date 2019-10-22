@@ -1,14 +1,11 @@
 package com.projectkorra.rpg.worldevent;
 
-import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import org.bukkit.ChatColor;
-import org.bukkit.boss.BarColor;
 
 import com.projectkorra.projectkorra.Element;
 import com.projectkorra.rpg.ProjectKorraRPG;
@@ -18,12 +15,19 @@ import com.projectkorra.rpg.worldevent.util.WorldEventFile;
 public class WorldEvent implements IWorldEvent {
 
 	protected static Map<String, WorldEvent> events = new HashMap<>();
+	protected static Map<Element, Set<WorldEvent>> eventsByElement = new HashMap<>();
+
+	static {
+		for (Element e : Element.getAllElements()) {
+			eventsByElement.put(e, new HashSet<>());
+		}
+	}
 
 	private String name;
 	private String description;
 	private List<String> aliases;
 	private List<String> attributes;
-	private Set<Element> elements;
+	private Element element;
 	private Time time;
 	private int frequency;
 	private double modifier;
@@ -32,19 +36,17 @@ public class WorldEvent implements IWorldEvent {
 	private boolean darkenSky;
 	private boolean createFog;
 	private List<String> eventBlacklist;
-	private ChatColor text;
-	private BarColor bar;
 
 	public WorldEvent(WorldEventFile wFile) {
-		this(wFile.getName(), wFile.getDescription(), wFile.getAliases(), wFile.getAttributes(), wFile.getElements(), wFile.getTime(), wFile.getFrequency(), wFile.getModifier(), wFile.getStartMessage(), wFile.getEndMessage(), wFile.getDarkenSky(), wFile.getCreateFog(), wFile.getEventBlacklist(), wFile.getTextColor(), wFile.getBarColor());
+		this(wFile.getName(), wFile.getDescription(), wFile.getAliases(), wFile.getAttributes(), Element.getElement(wFile.getElement()), Time.valueOf(wFile.getTime().toUpperCase()), wFile.getFrequency(), wFile.getModifier(), wFile.getStartMessage(), wFile.getEndMessage(), wFile.getDarkenSky(), wFile.getCreateFog(), wFile.getEventBlacklist());
 	}
 
-	public WorldEvent(String name, String description, List<String> aliases, List<String> attributes, Element[] elements, Time time, int frequency, double modifier, String startMessage, String endMessage, boolean darkenSky, boolean createFog, List<String> eventBlacklist, ChatColor text, BarColor bar) {
+	public WorldEvent(String name, String description, List<String> aliases, List<String> attributes, Element element, Time time, int frequency, double modifier, String startMessage, String endMessage, boolean darkenSky, boolean createFog, List<String> eventBlacklist) {
 		this.name = name;
 		this.description = description;
 		this.aliases = aliases;
 		this.attributes = attributes;
-		this.elements = new HashSet<>(Arrays.asList(elements));
+		this.element = element;
 		this.time = time;
 		this.frequency = frequency;
 		this.modifier = modifier;
@@ -53,9 +55,11 @@ public class WorldEvent implements IWorldEvent {
 		this.darkenSky = darkenSky;
 		this.createFog = createFog;
 		this.eventBlacklist = eventBlacklist;
-		this.text = text;
-		this.bar = bar;
 		events.put(name.toLowerCase(), this);
+		if (!eventsByElement.containsKey(element)) {
+			eventsByElement.put(element, new HashSet<>());
+		}
+		eventsByElement.get(element).add(this);
 	}
 
 	@Override
@@ -84,8 +88,8 @@ public class WorldEvent implements IWorldEvent {
 	}
 
 	@Override
-	public Set<Element> getElements() {
-		return elements;
+	public Element getElement() {
+		return element;
 	}
 
 	@Override
@@ -122,26 +126,23 @@ public class WorldEvent implements IWorldEvent {
 	public boolean getCreateFog() {
 		return createFog;
 	}
-	
-	@Override
-	public ChatColor getTextColor() {
-		return text;
-	}
-	
-	@Override
-	public BarColor getBarColor() {
-		return bar;
-	}
 
 	public static WorldEvent get(String name) {
 		return events.containsKey(name.toLowerCase()) ? events.get(name.toLowerCase()) : (ProjectKorraRPG.getFileManager().loadFile(name.toLowerCase()) == null ? null : get(name));
 	}
 
-	public static Set<String> getEventNames() {
-		return new HashSet<>(events.keySet());
+	public static Set<WorldEvent> getEventsByElement(Element e) {
+		if (!eventsByElement.containsKey(e)) {
+			eventsByElement.put(e, new HashSet<>());
+		}
+		return eventsByElement.get(e);
 	}
 
-	public static Set<WorldEvent> getEvents() {
-		return new HashSet<>(events.values());
+	public static Set<String> getEventNames() {
+		return events.keySet();
+	}
+
+	public static Collection<WorldEvent> getEvents() {
+		return events.values();
 	}
 }

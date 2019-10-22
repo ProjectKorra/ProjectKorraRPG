@@ -72,6 +72,21 @@ public class EventManager implements Runnable {
 		if (marker.get(world).contains(event)) {
 			return;
 		}
+		
+		List<WorldEvent> removal = new ArrayList<>();
+		for (WorldEvent we : marker.get(world)) {
+			if (we.getBlacklistedEvents().contains(event.getName())) {
+				return;
+			}
+			
+			if (event.getBlacklistedEvents().contains(we.getName())) {
+				removal.add(we);
+			}
+		}
+		
+		for (WorldEvent we : removal) {
+			endEvent(world, we, true);
+		}
 
 		if (!natural) {
 			double daysLeft = event.getFrequency() - (Math.ceil((world.getFullTime() / 24000)) % event.getFrequency());
@@ -101,7 +116,7 @@ public class EventManager implements Runnable {
 		}
 	}
 
-	public void endEvent(World world, WorldEvent event) {
+	public void endEvent(World world, WorldEvent event, boolean blacklisted) {
 		if (!marker.get(world).contains(event)) {
 			return;
 		}
@@ -110,7 +125,11 @@ public class EventManager implements Runnable {
 		ProjectKorraRPG.getDisplayManager().removeBossBar(world, event);
 
 		for (Player player : world.getPlayers()) {
-			player.sendMessage(event.getElement().getColor() + event.getEndMessage());
+			if (blacklisted) {
+				player.sendMessage(event.getElement().getColor() + event.getName() + " was overpowered by another event!");
+			} else {
+				player.sendMessage(event.getElement().getColor() + event.getEndMessage());
+			}
 		}
 	}
 

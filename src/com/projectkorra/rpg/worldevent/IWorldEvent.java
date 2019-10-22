@@ -34,6 +34,13 @@ public interface IWorldEvent {
 	 * @return list of attributes
 	 */
 	public List<String> getAttributes();
+	
+	/**
+	 * A list of worldevents which cannot concurrently occur with this worldevent
+	 * 
+	 * @return blacklisted events
+	 */
+	public List<String> getBlacklistedEvents();
 
 	/**
 	 * Which element the WorldEvent should affect. This will work with custom

@@ -84,7 +84,11 @@ public class WorldEventFile {
 	}
 
 	public String getEndMessage() {
-		return config.getString("endmessage");
+		return config.getString("end-message");
+	}
+	
+	public List<String> getEventBlacklist() {
+		return config.getStringList("event-blacklist");
 	}
 
 	public File getFile() {
@@ -104,7 +108,7 @@ public class WorldEventFile {
 	}
 
 	public String getStartMessage() {
-		return config.getString("startmessage");
+		return config.getString("start-message");
 	}
 
 	public String getTime() {
@@ -112,11 +116,11 @@ public class WorldEventFile {
 	}
 
 	public boolean getDarkenSky() {
-		return config.getBoolean("darkensky");
+		return config.getBoolean("darken-sky");
 	}
 
 	public boolean getCreateFog() {
-		return config.getBoolean("createfog");
+		return config.getBoolean("create-fog");
 	}
 
 	public void setWorldEvent(WorldEvent event) {

@@ -21,6 +21,7 @@ public class WorldEventFileBuilder {
 	private String endMessage;
 	private boolean darkenSky;
 	private boolean createFog;
+	private List<String> eventBlacklist;
 
 	public WorldEventFileBuilder() {
 		this.name = "GenericName";
@@ -32,6 +33,7 @@ public class WorldEventFileBuilder {
 		this.time = "BOTH";
 		this.startMessage = "GenericStartMessage";
 		this.endMessage = "GenericEndMessage";
+		this.eventBlacklist = new ArrayList<>();
 	}
 
 	public WorldEventFileBuilder name(String name) {
@@ -78,6 +80,23 @@ public class WorldEventFileBuilder {
 
 	public WorldEventFileBuilder setAttributes(List<String> attributes) {
 		this.attributes = attributes;
+		return this;
+	}
+	
+	public WorldEventFileBuilder addBlacklistedEvent(String event) {
+		this.eventBlacklist.add(event);
+		return this;
+	}
+	
+	public WorldEventFileBuilder addBlacklistedEvents(String... events) {
+		for (String event : events) {
+			this.eventBlacklist.add(event);
+		}
+		return this;
+	}
+	
+	public WorldEventFileBuilder setBlacklistedEvents(List<String> events) {
+		this.eventBlacklist = events;
 		return this;
 	}
 
@@ -133,10 +152,11 @@ public class WorldEventFileBuilder {
 		config.addDefault("modifier", modifier);
 		config.addDefault("attributes", attributes);
 		config.addDefault("frequency", frequency);
-		config.addDefault("startmessage", startMessage);
-		config.addDefault("endmessage", endMessage);
-		config.addDefault("darkensky", darkenSky);
-		config.addDefault("createfog", createFog);
+		config.addDefault("start-message", startMessage);
+		config.addDefault("end-message", endMessage);
+		config.addDefault("darken-sky", darkenSky);
+		config.addDefault("create-fog", createFog);
+		config.addDefault("event-blacklist", eventBlacklist);
 
 		wFile.save();
 		return wFile;

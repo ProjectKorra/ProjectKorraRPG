@@ -35,12 +35,13 @@ public class WorldEvent implements IWorldEvent {
 	private String endMessage;
 	private boolean darkenSky;
 	private boolean createFog;
+	private List<String> eventBlacklist;
 
 	public WorldEvent(WorldEventFile wFile) {
-		this(wFile.getName(), wFile.getDescription(), wFile.getAliases(), wFile.getAttributes(), Element.getElement(wFile.getElement()), Time.valueOf(wFile.getTime().toUpperCase()), wFile.getFrequency(), wFile.getModifier(), wFile.getStartMessage(), wFile.getEndMessage(), wFile.getDarkenSky(), wFile.getCreateFog());
+		this(wFile.getName(), wFile.getDescription(), wFile.getAliases(), wFile.getAttributes(), Element.getElement(wFile.getElement()), Time.valueOf(wFile.getTime().toUpperCase()), wFile.getFrequency(), wFile.getModifier(), wFile.getStartMessage(), wFile.getEndMessage(), wFile.getDarkenSky(), wFile.getCreateFog(), wFile.getEventBlacklist());
 	}
 
-	public WorldEvent(String name, String description, List<String> aliases, List<String> attributes, Element element, Time time, int frequency, double modifier, String startMessage, String endMessage, boolean darkenSky, boolean createFog) {
+	public WorldEvent(String name, String description, List<String> aliases, List<String> attributes, Element element, Time time, int frequency, double modifier, String startMessage, String endMessage, boolean darkenSky, boolean createFog, List<String> eventBlacklist) {
 		this.name = name;
 		this.description = description;
 		this.aliases = aliases;
@@ -53,6 +54,7 @@ public class WorldEvent implements IWorldEvent {
 		this.endMessage = endMessage;
 		this.darkenSky = darkenSky;
 		this.createFog = createFog;
+		this.eventBlacklist = eventBlacklist;
 		events.put(name.toLowerCase(), this);
 		if (!eventsByElement.containsKey(element)) {
 			eventsByElement.put(element, new HashSet<>());
@@ -78,6 +80,11 @@ public class WorldEvent implements IWorldEvent {
 	@Override
 	public List<String> getAttributes() {
 		return attributes;
+	}
+	
+	@Override
+	public List<String> getBlacklistedEvents() {
+		return eventBlacklist;
 	}
 
 	@Override

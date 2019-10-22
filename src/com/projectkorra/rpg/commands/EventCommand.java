@@ -71,7 +71,7 @@ public class EventCommand extends RPGCommand {
 				sender.sendMessage(ChatColor.RED + "There is no WorldEvent to end at the moment.");
 			} else if (args.size() == 1) {
 				for (WorldEvent event : WorldEvent.getEvents()) {
-					ProjectKorraRPG.getEventManager().endEvent(world, event);
+					ProjectKorraRPG.getEventManager().endEvent(world, event, false);
 				}
 
 				sender.sendMessage(ChatColor.GOLD + "All WorldEvents have been ended!");
@@ -84,7 +84,7 @@ public class EventCommand extends RPGCommand {
 				} else if (!ProjectKorraRPG.getEventManager().isHappening(world, event)) {
 					sender.sendMessage(ChatColor.RED + "That event is currently not happening in this world!");
 				} else {
-					ProjectKorraRPG.getEventManager().endEvent(world, event);
+					ProjectKorraRPG.getEventManager().endEvent(world, event, false);
 					sender.sendMessage(ChatColor.GOLD + "You have ended the " + event.getName() + " event!");
 				}
 			}

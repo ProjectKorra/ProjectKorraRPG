@@ -48,7 +48,7 @@ public class EventCommand extends RPGCommand {
 				sender.sendMessage(ChatColor.YELLOW + "Current WorldEvents: ");
 
 				for (WorldEvent event : ProjectKorraRPG.getEventManager().getEventsHappening(world)) {
-					sender.sendMessage(event.getElement().getColor() + "- " + event.getName());
+					sender.sendMessage(event.getTextColor() + "- " + event.getName());
 				}
 			} else if (args.size() == 2) {
 				String name = args.get(1);

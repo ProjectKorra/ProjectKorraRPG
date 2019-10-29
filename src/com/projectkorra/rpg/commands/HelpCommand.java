@@ -52,7 +52,11 @@ public class HelpCommand extends RPGCommand {
 			for (WorldEvent event : WorldEvent.getEvents()) {
 				if (args.get(0).equalsIgnoreCase(event.getName()) || event.getAliases().contains(args.get(0).toLowerCase())) {
 					sender.sendMessage(ChatColor.BOLD + event.getName());
-					sender.sendMessage(event.getElement().getColor() + event.getDescription());
+					sender.sendMessage(event.getTextColor() + event.getDescription());
+					sender.sendMessage(ChatColor.WHITE + "Affected Elements:");
+					for (Element e : event.getElements()) {
+						sender.sendMessage("- " + e.getColor() + e.getName());
+					}
 					return;
 				}
 			}

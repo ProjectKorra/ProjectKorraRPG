@@ -1,4 +1,4 @@
-package com.projectkorra.rpg.worldevent.event;
+package com.projectkorra.rpg.events;
 
 import org.bukkit.World;
 import org.bukkit.event.Cancellable;

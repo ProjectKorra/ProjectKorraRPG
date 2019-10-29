@@ -2,51 +2,28 @@ package com.projectkorra.rpg.worldevent.util;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.bukkit.ChatColor;
 import org.bukkit.World;
-import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarFlag;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Player;
 
-import com.projectkorra.projectkorra.Element;
 import com.projectkorra.rpg.ProjectKorraRPG;
 import com.projectkorra.rpg.worldevent.WorldEvent;
 
 public class WorldEventDisplayManager {
 
-	private Map<Element, BarColor> colors;
-	private Map<World, Set<BossBar>> active;
+	private Map<World, Map<BossBar, WorldEvent>> active;
 	private ProjectKorraRPG plugin;
 
 	public WorldEventDisplayManager(ProjectKorraRPG plugin) {
-		colors = new HashMap<>();
-		colors.put(Element.AIR, BarColor.WHITE);
-		colors.put(Element.AVATAR, BarColor.PURPLE);
-		colors.put(Element.CHI, BarColor.YELLOW);
-		colors.put(Element.EARTH, BarColor.GREEN);
-		colors.put(Element.FIRE, BarColor.RED);
-		colors.put(Element.WATER, BarColor.BLUE);
-
 		active = new HashMap<>();
 
 		this.plugin = plugin;
-	}
-
-	public void addColor(Element e, BarColor color) {
-		if (!colors.containsKey(e)) {
-			colors.put(e, color);
-		}
-	}
-
-	public BarColor getBarColor(Element e) {
-		return colors.containsKey(e) ? colors.get(e) : BarColor.PINK;
 	}
 
 	public BossBar createBossBar(World world, WorldEvent event) {
@@ -61,11 +38,11 @@ public class WorldEventDisplayManager {
 				size++;
 				flags.add(BarFlag.CREATE_FOG);
 			}
-			BossBar bar = plugin.getServer().createBossBar(event.getElement().getColor() + event.getName(), getBarColor(event.getElement()), BarStyle.SOLID, flags.toArray(new BarFlag[size]));
+			BossBar bar = plugin.getServer().createBossBar("§l" + event.getTextColor() + event.getName(), event.getBarColor(), BarStyle.SOLID, flags.toArray(new BarFlag[size]));
 			if (!active.containsKey(world)) {
-				active.put(world, new HashSet<>());
+				active.put(world, new HashMap<>());
 			}
-			active.get(world).add(bar);
+			active.get(world).put(bar, event);
 			bar.setVisible(true);
 			return bar;
 		}
@@ -90,7 +67,7 @@ public class WorldEventDisplayManager {
 		}
 
 		BossBar get = null;
-		for (BossBar bar : active.get(world)) {
+		for (BossBar bar : active.get(world).keySet()) {
 			if (ChatColor.stripColor(bar.getTitle()).equals(event.getName())) {
 				get = bar;
 				break;
@@ -105,7 +82,7 @@ public class WorldEventDisplayManager {
 
 	public void removeAll() {
 		for (World world : active.keySet()) {
-			for (BossBar bar : active.get(world)) {
+			for (BossBar bar : active.get(world).keySet()) {
 				bar.removeAll();
 			}
 		}
@@ -123,20 +100,27 @@ public class WorldEventDisplayManager {
 		}
 
 		List<BossBar> remove = new ArrayList<>();
-		for (BossBar bar : active.get(world)) {
+		for (BossBar bar : active.get(world).keySet()) {
 			for (Player player : world.getPlayers()) {
 				if (!bar.getPlayers().contains(player)) {
 					bar.addPlayer(player);
 				}
 			}
+			
+			WorldEvent we = active.get(world).get(bar);
+			long time = 24000;
+			if (we.getTime() == Time.DAY) {
+				time = 12000;
+			}
 
-			long currTime = world.getTime() % 12000;
-			if (currTime >= 12000) {
+			long currTime = world.getTime() % time;
+			if (currTime >= time) {
 				bar.removeAll();
 				remove.add(bar);
+			} else {
+				double progress = 1 - (currTime / time);
+				bar.setProgress(progress);
 			}
-			double progress = 1 - (currTime / 12000);
-			bar.setProgress(progress);
 		}
 
 		for (BossBar bar : remove) {

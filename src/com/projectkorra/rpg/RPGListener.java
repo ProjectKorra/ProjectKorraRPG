@@ -13,8 +13,10 @@ import org.bukkit.event.player.PlayerTeleportEvent;
 
 import com.projectkorra.projectkorra.BendingPlayer;
 import com.projectkorra.projectkorra.Element;
+import com.projectkorra.projectkorra.Element.SubElement;
 import com.projectkorra.projectkorra.ability.CoreAbility;
 import com.projectkorra.projectkorra.ability.EarthAbility;
+import com.projectkorra.projectkorra.attribute.Attribute;
 import com.projectkorra.projectkorra.attribute.AttributeModifier;
 import com.projectkorra.projectkorra.avatar.AvatarState;
 import com.projectkorra.projectkorra.event.AbilityStartEvent;
@@ -22,11 +24,11 @@ import com.projectkorra.projectkorra.event.BendingPlayerCreationEvent;
 import com.projectkorra.projectkorra.event.PlayerChangeElementEvent;
 import com.projectkorra.projectkorra.event.PlayerChangeElementEvent.Result;
 import com.projectkorra.rpg.configuration.ConfigManager;
+import com.projectkorra.rpg.events.SunRiseEvent;
+import com.projectkorra.rpg.events.SunSetEvent;
+import com.projectkorra.rpg.events.WorldEventEndEvent;
+import com.projectkorra.rpg.events.WorldEventStartEvent;
 import com.projectkorra.rpg.worldevent.WorldEvent;
-import com.projectkorra.rpg.worldevent.event.SunRiseEvent;
-import com.projectkorra.rpg.worldevent.event.SunSetEvent;
-import com.projectkorra.rpg.worldevent.event.WorldEventEndEvent;
-import com.projectkorra.rpg.worldevent.event.WorldEventStartEvent;
 import com.projectkorra.rpg.worldevent.util.Time;
 
 public class RPGListener implements Listener {
@@ -89,12 +91,34 @@ public class RPGListener implements Listener {
 		}
 
 		for (WorldEvent we : ProjectKorraRPG.getEventManager().getEventsHappening(world)) {
-			if (ability.getElement().equals(we.getElement())) {
+			Element e = ability.getElement();
+			
+			if (e instanceof SubElement && !we.getElements().contains(e)) {
+				e = ((SubElement) e).getParentElement();
+			}
+			
+			if (we.getElements().contains(e)) {
 				if (we.getModifier() <= 0) {
 					event.setCancelled(true);
 				} else {
+					if (!ability.getClass().isAnnotationPresent(Attribute.class)) {
+						continue;
+					}
+					
 					for (String attribute : we.getAttributes()) {
 						String[] split = attribute.split("::");
+						boolean passed = false;
+						for (Attribute a : ability.getClass().getAnnotationsByType(Attribute.class)) {
+							if (a.value().equalsIgnoreCase(split[0])) {
+								passed = true;
+								break;
+							}
+						}
+						
+						if (!passed) {
+							continue;
+						}
+						
 						ability.addAttributeModifier(split[0], we.getModifier(), AttributeModifier.valueOf(split[1].toUpperCase()));
 					}
 				}
@@ -136,7 +160,7 @@ public class RPGListener implements Listener {
 					continue;
 				}
 
-				ProjectKorraRPG.getEventManager().endEvent(event.getWorld(), wEvent, false);
+				ProjectKorraRPG.getEventManager().endEvent(event.getWorld(), wEvent);
 			} else if (wEvent.getTime() == Time.DAY || wEvent.getTime() == Time.BOTH) {
 				if (Math.ceil((event.getWorld().getFullTime() / 24000)) % wEvent.getFrequency() == 0) {
 					WorldEventStartEvent startEvent = new WorldEventStartEvent(event.getWorld(), wEvent);
@@ -146,7 +170,7 @@ public class RPGListener implements Listener {
 						continue;
 					}
 
-					ProjectKorraRPG.getEventManager().startEvent(event.getWorld(), wEvent, true);
+					ProjectKorraRPG.getEventManager().startEvent(event.getWorld(), wEvent);
 				}
 			} else {
 				if (ProjectKorraRPG.getEventManager().isHappening(event.getWorld(), wEvent)) {
@@ -157,7 +181,7 @@ public class RPGListener implements Listener {
 						continue;
 					}
 
-					ProjectKorraRPG.getEventManager().endEvent(event.getWorld(), wEvent, false);
+					ProjectKorraRPG.getEventManager().endEvent(event.getWorld(), wEvent);
 				}
 			}
 		}
@@ -175,7 +199,7 @@ public class RPGListener implements Listener {
 						continue;
 					}
 
-					ProjectKorraRPG.getEventManager().startEvent(event.getWorld(), wEvent, true);
+					ProjectKorraRPG.getEventManager().startEvent(event.getWorld(), wEvent);
 				}
 			} else if (wEvent.getTime() == Time.DAY) {
 				if (ProjectKorraRPG.getEventManager().isHappening(event.getWorld(), wEvent)) {
@@ -186,7 +210,7 @@ public class RPGListener implements Listener {
 						continue;
 					}
 
-					ProjectKorraRPG.getEventManager().endEvent(event.getWorld(), wEvent, false);
+					ProjectKorraRPG.getEventManager().endEvent(event.getWorld(), wEvent);
 				}
 			}
 		}

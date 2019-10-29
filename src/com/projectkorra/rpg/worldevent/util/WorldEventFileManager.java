@@ -5,6 +5,9 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.bukkit.ChatColor;
+import org.bukkit.boss.BarColor;
+
 import com.projectkorra.projectkorra.Element;
 import com.projectkorra.projectkorra.attribute.Attribute;
 import com.projectkorra.rpg.ProjectKorraRPG;
@@ -33,7 +36,9 @@ public class WorldEventFileManager {
 		.name("FullMoon")
 		.setAliases(Arrays.asList("fm", "fullm", "fmoon", "moon"))
 		.setAttributes(Arrays.asList(Attribute.DAMAGE + mult, Attribute.HEIGHT + mult, Attribute.RANGE + mult, Attribute.WIDTH + mult, Attribute.KNOCKBACK + mult, Attribute.CHARGE_DURATION + divi, Attribute.COOLDOWN + divi, Attribute.SPEED + mult))
-		.element(Element.WATER)
+		.addElement(Element.WATER)
+		.barColor(BarColor.BLUE)
+		.textColor(ChatColor.DARK_AQUA)
 		.modifier(3.0)
 		.frequency(8)
 		.time(Time.NIGHT)
@@ -46,7 +51,9 @@ public class WorldEventFileManager {
 		.name("SozinsComet")
 		.setAliases(Arrays.asList("sc", "sozinsc", "scomet", "comet"))
 		.setAttributes(Arrays.asList(Attribute.DAMAGE + mult, Attribute.RANGE + mult, Attribute.KNOCKBACK + mult, Attribute.CHARGE_DURATION + divi, Attribute.DURATION + mult, Attribute.SPEED + mult, Attribute.WIDTH + mult))
-		.element(Element.FIRE)
+		.addElement(Element.FIRE)
+		.barColor(BarColor.RED)
+		.textColor(ChatColor.DARK_RED)
 		.modifier(5.0)
 		.frequency(100)
 		.time(Time.BOTH)
@@ -60,7 +67,9 @@ public class WorldEventFileManager {
 		new WorldEventFileBuilder()
 		.name("SolarEclipse")
 		.setAliases(Arrays.asList("se", "solare", "seclipse", "solar"))
-		.element(Element.FIRE)
+		.addElement(Element.FIRE)
+		.barColor(BarColor.RED)
+		.textColor(ChatColor.RED)
 		.modifier(0.0)
 		.frequency(14)
 		.time(Time.DAY)
@@ -72,7 +81,9 @@ public class WorldEventFileManager {
 		new WorldEventFileBuilder()
 		.name("LunarEclipse")
 		.setAliases(Arrays.asList("le", "lunare", "leclipse", "lunar"))
-		.element(Element.WATER)
+		.addElement(Element.WATER)
+		.barColor(BarColor.BLUE)
+		.textColor(ChatColor.AQUA)
 		.modifier(0.0)
 		.frequency(22)
 		.time(Time.NIGHT)
@@ -80,6 +91,37 @@ public class WorldEventFileManager {
 		.startMessage("A lunar eclipse is out! Waterbenders are temporarily powerless.")
 		.endMessage("The lunar eclipse has ended!")
 		.addBlacklistedEvent("FullMoon")
+		.build();
+		
+		new WorldEventFileBuilder()
+		.name("HarmonicConvergence")
+		.setAliases(Arrays.asList("hc", "harmonic", "convergence", "hconvergence"))
+		.setAttributes(Arrays.asList(Attribute.DAMAGE + mult, Attribute.CHARGE_DURATION + divi, Attribute.COOLDOWN + divi, Attribute.KNOCKBACK + mult, Attribute.DURATION + mult, Attribute.WIDTH + mult, Attribute.SPEED + mult, Attribute.HEIGHT + mult))
+		.addElements(Element.AIR, Element.EARTH, Element.FIRE, Element.WATER)
+		.barColor(BarColor.PINK)
+		.textColor(ChatColor.WHITE)
+		.modifier(3.0)
+		.frequency(10000)
+		.time(Time.BOTH)
+		.description("Harmonic Convergence is a supernatural phenomenon that occurs once every ten thousand years. When the planets align, spiritual energy is greatly amplified, causing the spirit portals at the North and South Poles to merge, while an aura of spirit energy envelops the Earth.")
+		.startMessage("Harmonic Convergence has flooded the world with spiritual energy, empowering all bending for the day!")
+		.endMessage("Harmonic Convergence has ended!")
+		.addBlacklistedEvents("SolarEclipse", "LunarEclipse")
+		.build();
+		
+		new WorldEventFileBuilder()
+		.name("BloodMoon")
+		.setAliases(Arrays.asList("bloodm", "bm", "bmoon"))
+		.addElements(Element.FIRE, Element.WATER)
+		.barColor(BarColor.RED)
+		.textColor(ChatColor.DARK_AQUA)
+		.modifier(0.0)
+		.frequency(64)
+		.time(Time.NIGHT)
+		.description("A bloodmoon occurs when someone disgraces the moon spirit, subsequently causing the moon to turn a blood-red and breaking firebenders and waterbenders spiritual connections!")
+		.startMessage("Someone disgraced the moon spirit and has caused the moon to turn blood-red and causing firebending and waterbending to subside. Firebenders and waterbenders are powerless!")
+		.endMessage("The moon spirit has been restored and the blood moon has gone away!")
+		.addBlacklistedEvents("SozinsComet", "LunarEclipse", "FullMoon")
 		.build();
 	}
 
@@ -125,10 +167,8 @@ public class WorldEventFileManager {
 			throw new WorldEventFileException(message.replaceAll("(f)", "Description"));
 		} else if (wFile.getAliases() == null || wFile.getAliases().isEmpty()) {
 			throw new WorldEventFileException(message.replaceAll("(f)", "Aliases"));
-		} else if (wFile.getElement() == null || wFile.getElement().isEmpty() || Element.getElement(wFile.getElement()) == null) {
-			throw new WorldEventFileException(message.replaceAll("(f)", "Element"));
-		} else if (wFile.getTime() == null || wFile.getTime().isEmpty() || Time.valueOf(wFile.getTime().toUpperCase()) == null) {
-			throw new WorldEventFileException(message.replaceAll("(f)", "Time"));
+		} else if (wFile.getElements().length == 0) {
+			throw new WorldEventFileException(message.replaceAll("(f)", "Elements"));
 		} else if (wFile.getEndMessage() == null || wFile.getEndMessage().isEmpty()) {
 			throw new WorldEventFileException(message.replaceAll("(f)", "End Message"));
 		} else if (wFile.getStartMessage() == null || wFile.getStartMessage().isEmpty()) {

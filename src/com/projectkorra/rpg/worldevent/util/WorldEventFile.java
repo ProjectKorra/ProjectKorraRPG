@@ -4,9 +4,12 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
+import org.bukkit.ChatColor;
+import org.bukkit.boss.BarColor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
+import com.projectkorra.projectkorra.Element;
 import com.projectkorra.rpg.ProjectKorraRPG;
 import com.projectkorra.rpg.worldevent.WorldEvent;
 
@@ -79,8 +82,8 @@ public class WorldEventFile {
 		return config.getString("description");
 	}
 
-	public String getElement() {
-		return config.getString("element");
+	public Element[] getElements() {
+		return config.getStringList("elements").stream().map(Element::getElement).filter((a) -> a != null).toArray(Element[]::new);
 	}
 
 	public String getEndMessage() {
@@ -111,8 +114,14 @@ public class WorldEventFile {
 		return config.getString("start-message");
 	}
 
-	public String getTime() {
-		return config.getString("time");
+	public Time getTime() {
+		Time time = Time.valueOf(config.getString("time").toUpperCase());
+		
+		if (time == null) {
+			time = Time.BOTH;
+		}
+		
+		return time;
 	}
 
 	public boolean getDarkenSky() {
@@ -121,6 +130,26 @@ public class WorldEventFile {
 
 	public boolean getCreateFog() {
 		return config.getBoolean("create-fog");
+	}
+	
+	public ChatColor getTextColor() {
+		ChatColor text = ChatColor.valueOf(config.getString("text-color").toUpperCase());
+		
+		if (text == null) {
+			text = ChatColor.WHITE;
+		}
+		
+		return text;
+	}
+	
+	public BarColor getBarColor() {
+		BarColor bar = BarColor.valueOf(config.getString("bar-color").toUpperCase());
+		
+		if (bar == null) {
+			bar = BarColor.WHITE;
+		}
+		
+		return bar;
 	}
 
 	public void setWorldEvent(WorldEvent event) {

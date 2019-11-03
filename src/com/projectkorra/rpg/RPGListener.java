@@ -1,5 +1,7 @@
 package com.projectkorra.rpg;
 
+import java.lang.reflect.Field;
+
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.block.BlockFace;
@@ -101,17 +103,16 @@ public class RPGListener implements Listener {
 				if (we.getModifier() <= 0) {
 					event.setCancelled(true);
 				} else {
-					if (!ability.getClass().isAnnotationPresent(Attribute.class)) {
-						continue;
-					}
-					
 					for (String attribute : we.getAttributes()) {
 						String[] split = attribute.split("::");
 						boolean passed = false;
-						for (Attribute a : ability.getClass().getAnnotationsByType(Attribute.class)) {
-							if (a.value().equalsIgnoreCase(split[0])) {
-								passed = true;
-								break;
+						
+						for (Field f : ability.getClass().getDeclaredFields()) {
+							if (f.isAnnotationPresent(Attribute.class)) {
+								if (f.getAnnotation(Attribute.class).value().equals(split[0])) {
+									passed = true;
+									break;
+								}
 							}
 						}
 						

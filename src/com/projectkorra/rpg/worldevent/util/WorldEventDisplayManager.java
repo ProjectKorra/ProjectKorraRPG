@@ -38,7 +38,7 @@ public class WorldEventDisplayManager {
 				size++;
 				flags.add(BarFlag.CREATE_FOG);
 			}
-			BossBar bar = plugin.getServer().createBossBar("§l" + event.getTextColor() + event.getName(), event.getBarColor(), BarStyle.SOLID, flags.toArray(new BarFlag[size]));
+			BossBar bar = plugin.getServer().createBossBar(ChatColor.BOLD + event.getTextColor() + event.getName(), event.getBarColor(), BarStyle.SOLID, flags.toArray(new BarFlag[size]));
 			if (!active.containsKey(world)) {
 				active.put(world, new HashMap<>());
 			}

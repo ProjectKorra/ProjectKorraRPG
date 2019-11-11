@@ -12,9 +12,9 @@ import org.bukkit.entity.Player;
 import com.projectkorra.projectkorra.command.Commands;
 import com.projectkorra.projectkorra.configuration.ConfigManager;
 import com.projectkorra.rpg.ProjectKorraRPG;
+import com.projectkorra.rpg.events.SunRiseEvent;
+import com.projectkorra.rpg.events.SunSetEvent;
 import com.projectkorra.rpg.worldevent.WorldEvent;
-import com.projectkorra.rpg.worldevent.event.SunRiseEvent;
-import com.projectkorra.rpg.worldevent.event.SunSetEvent;
 
 public class EventManager implements Runnable {
 
@@ -67,10 +67,29 @@ public class EventManager implements Runnable {
 			}
 		}
 	}
+	
+	public void startEvent(World world, WorldEvent event) {
+		startEvent(world, event, true);
+	}
 
 	public void startEvent(World world, WorldEvent event, boolean natural) {
 		if (marker.get(world).contains(event)) {
 			return;
+		}
+		
+		List<WorldEvent> removal = new ArrayList<>();
+		for (WorldEvent we : marker.get(world)) {
+			if (we.getBlacklistedEvents().contains(event.getName())) {
+				return;
+			}
+			
+			if (event.getBlacklistedEvents().contains(we.getName())) {
+				removal.add(we);
+			}
+		}
+		
+		for (WorldEvent we : removal) {
+			endEvent(world, we, true);
 		}
 
 		if (!natural) {
@@ -96,12 +115,16 @@ public class EventManager implements Runnable {
 		BossBar bar = ProjectKorraRPG.getDisplayManager().createBossBar(world, event);
 
 		for (Player player : world.getPlayers()) {
-			player.sendMessage(event.getElement().getColor() + event.getStartMessage());
+			player.sendMessage(event.getTextColor() + event.getStartMessage());
 			bar.addPlayer(player);
 		}
 	}
-
+	
 	public void endEvent(World world, WorldEvent event) {
+		endEvent(world, event, false);
+	}
+
+	public void endEvent(World world, WorldEvent event, boolean blacklisted) {
 		if (!marker.get(world).contains(event)) {
 			return;
 		}
@@ -110,22 +133,26 @@ public class EventManager implements Runnable {
 		ProjectKorraRPG.getDisplayManager().removeBossBar(world, event);
 
 		for (Player player : world.getPlayers()) {
-			player.sendMessage(event.getElement().getColor() + event.getEndMessage());
+			if (blacklisted) {
+				player.sendMessage(event.getTextColor() + event.getName() + " was overpowered by another event!");
+			} else {
+				player.sendMessage(event.getTextColor() + event.getEndMessage());
+			}
 		}
 	}
 
-	public boolean shouldSkip(World world, WorldEvent event) {
+	public boolean isSkipping(World world, WorldEvent event) {
 		return skipper.get(world).contains(event);
 	}
 
 	public boolean setSkipping(World world, WorldEvent event, boolean skip) {
 		if (skip) {
-			if (!shouldSkip(world, event)) {
+			if (!isSkipping(world, event)) {
 				skipper.get(world).add(event);
 				return true;
 			}
 		} else {
-			if (shouldSkip(world, event)) {
+			if (isSkipping(world, event)) {
 				skipper.get(world).remove(event);
 				return true;
 			}

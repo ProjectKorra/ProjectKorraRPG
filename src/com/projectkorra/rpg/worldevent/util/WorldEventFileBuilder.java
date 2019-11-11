@@ -1,8 +1,11 @@
 package com.projectkorra.rpg.worldevent.util;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
+import org.bukkit.ChatColor;
+import org.bukkit.boss.BarColor;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import com.projectkorra.projectkorra.Element;
@@ -13,7 +16,7 @@ public class WorldEventFileBuilder {
 	private String description;
 	private List<String> aliases;
 	private List<String> attributes;
-	private String element;
+	private List<String> elements;
 	private int frequency;
 	private double modifier;
 	private String time;
@@ -21,6 +24,9 @@ public class WorldEventFileBuilder {
 	private String endMessage;
 	private boolean darkenSky;
 	private boolean createFog;
+	private List<String> eventBlacklist;
+	private String textColor;
+	private String barColor;
 
 	public WorldEventFileBuilder() {
 		this.name = "GenericName";
@@ -32,6 +38,10 @@ public class WorldEventFileBuilder {
 		this.time = "BOTH";
 		this.startMessage = "GenericStartMessage";
 		this.endMessage = "GenericEndMessage";
+		this.eventBlacklist = new ArrayList<>();
+		this.elements = new ArrayList<>();
+		this.textColor = "WHITE";
+		this.barColor = "WHITE";
 	}
 
 	public WorldEventFileBuilder name(String name) {
@@ -80,9 +90,38 @@ public class WorldEventFileBuilder {
 		this.attributes = attributes;
 		return this;
 	}
+	
+	public WorldEventFileBuilder addBlacklistedEvent(String event) {
+		this.eventBlacklist.add(event);
+		return this;
+	}
+	
+	public WorldEventFileBuilder addBlacklistedEvents(String... events) {
+		for (String event : events) {
+			this.eventBlacklist.add(event);
+		}
+		return this;
+	}
+	
+	public WorldEventFileBuilder setBlacklistedEvents(List<String> events) {
+		this.eventBlacklist = events;
+		return this;
+	}
 
-	public WorldEventFileBuilder element(Element element) {
-		this.element = element.getName();
+	public WorldEventFileBuilder addElement(Element element) {
+		this.elements.add(element.getName());
+		return this;
+	}
+	
+	public WorldEventFileBuilder addElements(Element... elements) {
+		for (Element element : elements) {
+			this.elements.add(element.getName());
+		}
+		return this;
+	}
+	
+	public WorldEventFileBuilder setElements(List<Element> elements) {
+		this.elements = Arrays.asList(elements.stream().map(Element::getName).toArray(String[]::new));
 		return this;
 	}
 
@@ -120,6 +159,16 @@ public class WorldEventFileBuilder {
 		this.createFog = createFog;
 		return this;
 	}
+	
+	public WorldEventFileBuilder barColor(BarColor color) {
+		this.barColor = color.toString();
+		return this;
+	}
+	
+	public WorldEventFileBuilder textColor(ChatColor color) {
+		this.textColor = color.name();
+		return this;
+	}
 
 	public WorldEventFile build() {
 		WorldEventFile wFile = new WorldEventFile(name);
@@ -128,15 +177,18 @@ public class WorldEventFileBuilder {
 		config.addDefault("name", name);
 		config.addDefault("description", description);
 		config.addDefault("aliases", aliases);
-		config.addDefault("element", element);
+		config.addDefault("elements", elements);
 		config.addDefault("time", time);
 		config.addDefault("modifier", modifier);
 		config.addDefault("attributes", attributes);
 		config.addDefault("frequency", frequency);
-		config.addDefault("startmessage", startMessage);
-		config.addDefault("endmessage", endMessage);
-		config.addDefault("darkensky", darkenSky);
-		config.addDefault("createfog", createFog);
+		config.addDefault("start-message", startMessage);
+		config.addDefault("end-message", endMessage);
+		config.addDefault("darken-sky", darkenSky);
+		config.addDefault("create-fog", createFog);
+		config.addDefault("event-blacklist", eventBlacklist);
+		config.addDefault("text-color", textColor);
+		config.addDefault("bar-color", barColor);
 
 		wFile.save();
 		return wFile;

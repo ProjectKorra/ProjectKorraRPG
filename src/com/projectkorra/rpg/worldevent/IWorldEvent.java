@@ -1,6 +1,10 @@
 package com.projectkorra.rpg.worldevent;
 
 import java.util.List;
+import java.util.Set;
+
+import org.bukkit.ChatColor;
+import org.bukkit.boss.BarColor;
 
 import com.projectkorra.projectkorra.Element;
 import com.projectkorra.rpg.worldevent.util.Time;
@@ -34,6 +38,13 @@ public interface IWorldEvent {
 	 * @return list of attributes
 	 */
 	public List<String> getAttributes();
+	
+	/**
+	 * A list of worldevents which cannot concurrently occur with this worldevent
+	 * 
+	 * @return blacklisted events
+	 */
+	public List<String> getBlacklistedEvents();
 
 	/**
 	 * Which element the WorldEvent should affect. This will work with custom
@@ -41,7 +52,7 @@ public interface IWorldEvent {
 	 * 
 	 * @return element the WorldEvent affects
 	 */
-	public Element getElement();
+	public Set<Element> getElements();
 
 	/**
 	 * Denotes when the WorldEvent should occur
@@ -99,4 +110,18 @@ public interface IWorldEvent {
 	 * @return true if the WorldEvent will create fog in the world
 	 */
 	public boolean getCreateFog();
+	
+	/**
+	 * Gets the color of chat text for the event
+	 * 
+	 * @return color of chat text
+	 */
+	public ChatColor getTextColor();
+	
+	/**
+	 * Gets the color of the bossbar for the event
+	 * 
+	 * @return color of the bossbar
+	 */
+	public BarColor getBarColor();
 }

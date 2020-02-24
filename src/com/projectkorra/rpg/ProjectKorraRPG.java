@@ -6,6 +6,7 @@ import java.util.logging.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import com.projectkorra.rpg.ability.AbilityTiers;
 import com.projectkorra.rpg.commands.AvatarCommand;
 import com.projectkorra.rpg.commands.EventCommand;
 import com.projectkorra.rpg.commands.HelpCommand;
@@ -25,6 +26,7 @@ public class ProjectKorraRPG extends JavaPlugin {
 	private static WorldEventFileManager wFileManager;
 	private static WorldEventDisplayManager wDisplayManager;
 	private static RPGStorage storage;
+	private static AbilityTiers tiers;
 
 	@Override
 	public void onEnable() {
@@ -41,6 +43,7 @@ public class ProjectKorraRPG extends JavaPlugin {
 		wDisplayManager = new WorldEventDisplayManager(this);
 		eventManager = new EventManager();
 		storage = new RPGStorage();
+		tiers = new AbilityTiers();
 		RPGMethods.loadAvatarCycle();
 
 		Bukkit.getServer().getPluginManager().registerEvents(new RPGListener(), this);
@@ -84,5 +87,9 @@ public class ProjectKorraRPG extends JavaPlugin {
 
 	public static RPGStorage getStorage() {
 		return storage;
+	}
+	
+	public static AbilityTiers getAbilityTiers() {
+		return tiers;
 	}
 }

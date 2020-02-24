@@ -1,21 +1,25 @@
 package com.projectkorra.rpg;
 
 import java.lang.reflect.Field;
+import java.util.Random;
 
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.block.BlockFace;
 import org.bukkit.boss.BossBar;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 
 import com.projectkorra.projectkorra.BendingPlayer;
 import com.projectkorra.projectkorra.Element;
 import com.projectkorra.projectkorra.Element.SubElement;
+import com.projectkorra.projectkorra.GeneralMethods;
 import com.projectkorra.projectkorra.ability.CoreAbility;
 import com.projectkorra.projectkorra.ability.EarthAbility;
 import com.projectkorra.projectkorra.attribute.Attribute;
@@ -25,6 +29,7 @@ import com.projectkorra.projectkorra.event.AbilityStartEvent;
 import com.projectkorra.projectkorra.event.BendingPlayerCreationEvent;
 import com.projectkorra.projectkorra.event.PlayerChangeElementEvent;
 import com.projectkorra.projectkorra.event.PlayerChangeElementEvent.Result;
+import com.projectkorra.rpg.ability.AbilityScroll;
 import com.projectkorra.rpg.configuration.ConfigManager;
 import com.projectkorra.rpg.events.SunRiseEvent;
 import com.projectkorra.rpg.events.SunSetEvent;
@@ -124,6 +129,15 @@ public class RPGListener implements Listener {
 					}
 				}
 			}
+		}
+	}
+	
+	@EventHandler
+	public void onEntityDeath(EntityDeathEvent event) {
+		LivingEntity e = event.getEntity();
+		
+		if (GeneralMethods.isUndead(e) && new Random().nextInt(1000) < 10) {
+			event.getDrops().add(AbilityScroll.getRandomScroll());
 		}
 	}
 

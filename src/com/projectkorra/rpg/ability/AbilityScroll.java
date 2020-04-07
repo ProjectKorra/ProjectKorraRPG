@@ -1,9 +1,8 @@
 package com.projectkorra.rpg.ability;
 
 import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -12,29 +11,42 @@ import com.projectkorra.projectkorra.ability.CoreAbility;
 import com.projectkorra.rpg.ProjectKorraRPG;
 import com.projectkorra.rpg.ability.AbilityTiers.AbilityTier;
 
-public class AbilityScroll {
+public class AbilityScroll extends ItemStack {
+	
+	private CoreAbility ability;
 
-	public static ItemStack get(CoreAbility ability) {
-		ItemStack is = new ItemStack(Material.PAPER);
-		ItemMeta im = is.getItemMeta();
+	public AbilityScroll(CoreAbility ability) {
+		super(Material.PAPER);
+		this.ability = ability;
 		
-		im.setDisplayName(ability.getName() + " Scroll");
-		String element = "Element: " + ability.getElement().getColor() + ability.getElement().getName();
-		String tier = "Tier: " + ProjectKorraRPG.getAbilityTiers().getAbilityTier(ability);
-		String scrolls = "# needed to learn: " + ProjectKorraRPG.getAbilityTiers().getAbilityTier(ability).getLevel() / 10;
-		im.setLore(Arrays.asList(element, tier, scrolls));
+		ItemMeta im = this.getItemMeta();
 		
-		is.setItemMeta(im);
-		return is;
+		im.setDisplayName(ability.getElement().getColor() + ability.getName() + " Scroll");
+		
+		AbilityTier tier = ProjectKorraRPG.getAbilityTiers().getAbilityTier(ability);
+		
+		String first = tier.getDisplay() + " " + ChatColor.WHITE + ability.getElement().getName() + " ability";
+		String second = ChatColor.WHITE + "This ability requires " + tier.getColor() + tier.getRequiredScrolls() + ChatColor.WHITE + " scrolls to learn!";
+		
+		im.setLore(Arrays.asList(first, second));
+		this.setItemMeta(im);
 	}
 	
-	public static ItemStack getRandomScroll() {
-		List<CoreAbility> abilities = ProjectKorraRPG.getAbilityTiers().getAbilitiesFromTiers(AbilityTier.NOVICE, AbilityTier.INTERMEDIATE, AbilityTier.ADVANCED, AbilityTier.MASTER);
-		Random rand = new Random();
-		for (int i = 0; i < 10; i++) {
-			rand.nextInt(abilities.size());
+	public CoreAbility getAbility() {
+		return ability;
+	}
+	
+	public static boolean isScroll(ItemStack is) {
+		if (is.getType() != Material.PAPER) {
+			return false;
+		} else if (!is.hasItemMeta()) {
+			return false;
+		} else if (!is.getItemMeta().getDisplayName().endsWith("Scroll")) {
+			return false;
+		} else if (is.getItemMeta().getLore().size() != 2) {
+			return false;
 		}
 		
-		return get(abilities.get(rand.nextInt(abilities.size())));
+		return true;
 	}
 }

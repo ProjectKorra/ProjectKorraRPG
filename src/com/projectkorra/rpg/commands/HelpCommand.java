@@ -1,22 +1,37 @@
 package com.projectkorra.rpg.commands;
 
-import com.projectkorra.projectkorra.Element;
-import com.projectkorra.rpg.worldevent.WorldEvent;
-
-import org.bukkit.ChatColor;
-import org.bukkit.command.CommandSender;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collector;
+
+import org.bukkit.ChatColor;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+
+import com.projectkorra.projectkorra.Element;
+import com.projectkorra.projectkorra.ability.CoreAbility;
+import com.projectkorra.rpg.ProjectKorraRPG;
+import com.projectkorra.rpg.RPGMethods;
+import com.projectkorra.rpg.ability.AbilityTiers.AbilityTier;
+import com.projectkorra.rpg.player.RPGPlayer;
+import com.projectkorra.rpg.worldevent.WorldEvent;
 
 public class HelpCommand extends RPGCommand {
 
 	private String modifiers = ChatColor.GOLD + "Commands: <required> [optional]";
+	private String help = null;
 
 	public HelpCommand() {
 		super("help", "/bending rpg help <command/worldevent>", "Shows all helpful information for rpg", new String[] { "help", "h", "?" });
+		
+		StringBuilder help = new StringBuilder(modifiers);
+		for (RPGCommand command : RPGCommand.instances.values()) {
+			help.append(ChatColor.YELLOW + "\n" + command.getProperUse());
+		}
+		
+		this.help = help.toString();
 	}
 
 	@Override
@@ -25,13 +40,8 @@ public class HelpCommand extends RPGCommand {
 			return;
 		}
 
-		StringBuilder help = new StringBuilder(modifiers);
-		for (RPGCommand command : RPGCommand.instances.values()) {
-			help.append(ChatColor.YELLOW + "\n" + command.getProperUse());
-		}
-
 		if (args.size() == 0) {
-			sender.sendMessage(help.toString());
+			sender.sendMessage(help);
 		} else if (args.size() == 1) {
 			for (RPGCommand command : RPGCommand.instances.values()) {
 				if (command instanceof HelpCommand)
@@ -46,7 +56,6 @@ public class HelpCommand extends RPGCommand {
 					}
 					return;
 				}
-				continue;
 			}
 
 			for (WorldEvent event : WorldEvent.getEvents()) {
@@ -59,6 +68,31 @@ public class HelpCommand extends RPGCommand {
 					}
 					return;
 				}
+			}
+			
+			CoreAbility ability = CoreAbility.getAbility(args.get(0));
+			
+			if (ability != null) {
+				AbilityTier tier = ProjectKorraRPG.getAbilityTiers().getAbilityTier(ability);
+				ChatColor color = ability.getElement().getColor();
+				
+				sender.sendMessage(color + ability.getName());
+				sender.sendMessage("Tier: " + tier.getDisplay() + ChatColor.WHITE + "(" + tier.getColor() + tier.getLevel() + (tier == AbilityTier.MASTER ? "" : "+") + ChatColor.WHITE + ")");
+				sender.sendMessage("Scrolls: " + tier.getRequiredScrolls());
+				sender.sendMessage("Attributes: " + RPGMethods.getListCommaSeparated(RPGMethods.getAttributes(ability)));
+				
+				if (sender instanceof Player) {
+					RPGPlayer player = RPGPlayer.get((Player) sender);
+					
+					if (player == null) {
+						return;
+					}
+					
+					String lock = player.hasUnlocked(ability) ? ChatColor.GREEN + "Unlocked" : ChatColor.RED + "Locked";
+					sender.sendMessage("Status: " + lock);
+				}
+				
+				return;
 			}
 		}
 	}
@@ -75,6 +109,7 @@ public class HelpCommand extends RPGCommand {
 		}
 		Collections.sort(l);
 		l.addAll(WorldEvent.getEventNames());
+		l.addAll(CoreAbility.getAbilities().stream().map(CoreAbility::getName).collect(Collector.of(ArrayList::new, ArrayList::add, (left, right) -> {left.addAll(right); return left;})));
 		return l;
 	}
 }

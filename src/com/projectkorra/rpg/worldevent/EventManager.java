@@ -1,24 +1,27 @@
-package com.projectkorra.rpg.worldevent.util;
+package com.projectkorra.rpg.worldevent;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import com.projectkorra.projectkorra.command.Commands;
 import com.projectkorra.projectkorra.configuration.ConfigManager;
 import com.projectkorra.rpg.ProjectKorraRPG;
 import com.projectkorra.rpg.events.SunRiseEvent;
 import com.projectkorra.rpg.events.SunSetEvent;
-import com.projectkorra.rpg.worldevent.WorldEvent;
+import com.projectkorra.rpg.worldevent.util.Time;
 
 public class EventManager implements Runnable {
 
-	private ConcurrentHashMap<World, List<WorldEvent>> marker = new ConcurrentHashMap<>();
+	private ConcurrentHashMap<World, Map<WorldEvent, WorldEventInstance>> marker = new ConcurrentHashMap<>();
 	private ConcurrentHashMap<World, List<WorldEvent>> skipper = new ConcurrentHashMap<>();
 
 	private Time time = Time.BOTH;
@@ -39,29 +42,29 @@ public class EventManager implements Runnable {
 			}
 
 			if (!marker.containsKey(world)) {
-				marker.put(world, new ArrayList<>());
+				marker.put(world, new HashMap<>());
 			}
 
 			if (!skipper.containsKey(world)) {
 				skipper.put(world, new ArrayList<>());
 			}
 
-			ProjectKorraRPG.getDisplayManager().update(world);
+			for (WorldEventInstance instance : marker.get(world).values()) {
+				ProjectKorraRPG.getDisplayManager().update(instance);
+			}
 
 			if (world.getTime() >= 23500 && world.getTime() <= 24000) {
-				if (time != null) {
-					if (time == Time.DAY) {
-						continue;
-					}
+				if (time != null && time == Time.DAY) {
+					continue;
 				}
+				
 				time = Time.DAY;
 				ProjectKorraRPG.getPlugin().getServer().getPluginManager().callEvent(new SunRiseEvent(world));
 			} else if (world.getTime() >= 11500 && world.getTime() <= 12000) {
-				if (time != null) {
-					if (time == Time.NIGHT) {
-						continue;
-					}
+				if (time != null && time == Time.NIGHT) {
+					continue;
 				}
+				
 				time = Time.NIGHT;
 				ProjectKorraRPG.getPlugin().getServer().getPluginManager().callEvent(new SunSetEvent(world));
 			}
@@ -73,12 +76,14 @@ public class EventManager implements Runnable {
 	}
 
 	public void startEvent(World world, WorldEvent event, boolean natural) {
-		if (marker.get(world).contains(event)) {
+		if (marker.get(world).containsKey(event)) {
+			return;
+		} else if (ConfigManager.defaultConfig.get().getStringList("Properties.DisabledWorlds").contains(world.getName())) {
 			return;
 		}
 		
 		List<WorldEvent> removal = new ArrayList<>();
-		for (WorldEvent we : marker.get(world)) {
+		for (WorldEvent we : marker.get(world).keySet()) {
 			if (we.getBlacklistedEvents().contains(event.getName())) {
 				return;
 			}
@@ -111,8 +116,20 @@ public class EventManager implements Runnable {
 			}
 		}
 
-		marker.get(world).add(event);
-		BossBar bar = ProjectKorraRPG.getDisplayManager().createBossBar(world, event);
+		BukkitRunnable run = new BukkitRunnable() {
+
+			@Override
+			public void run() {
+				EventManager.this.endEvent(world, event, false, true);
+			}
+			
+		};
+		
+		WorldEventInstance instance = new WorldEventInstance(event, world, run);
+		
+		marker.get(world).put(event, instance);
+		run.runTaskLater(ProjectKorraRPG.getPlugin(), event.getDuration());
+		BossBar bar = ProjectKorraRPG.getDisplayManager().createBossBar(instance);
 
 		for (Player player : world.getPlayers()) {
 			player.sendMessage(event.getTextColor() + event.getStartMessage());
@@ -123,14 +140,24 @@ public class EventManager implements Runnable {
 	public void endEvent(World world, WorldEvent event) {
 		endEvent(world, event, false);
 	}
-
+	
 	public void endEvent(World world, WorldEvent event, boolean blacklisted) {
-		if (!marker.get(world).contains(event)) {
+		endEvent(world, event, blacklisted, false);
+	}
+
+	private void endEvent(World world, WorldEvent event, boolean blacklisted, boolean natural) {
+		if (!marker.get(world).containsKey(event)) {
 			return;
 		}
-
+		
+		WorldEventInstance instance = marker.get(world).get(event);
+		
+		if (!natural) {
+			instance.remove();
+		}
+	
+		ProjectKorraRPG.getDisplayManager().removeBossBar(instance);
 		marker.get(world).remove(event);
-		ProjectKorraRPG.getDisplayManager().removeBossBar(world, event);
 
 		for (Player player : world.getPlayers()) {
 			if (blacklisted) {
@@ -146,6 +173,10 @@ public class EventManager implements Runnable {
 	}
 
 	public boolean setSkipping(World world, WorldEvent event, boolean skip) {
+		if (world == null) {
+			return false;
+		}
+		
 		if (skip) {
 			if (!isSkipping(world, event)) {
 				skipper.get(world).add(event);
@@ -161,15 +192,39 @@ public class EventManager implements Runnable {
 	}
 
 	public boolean isHappening(World world, WorldEvent event) {
-		if (!marker.containsKey(world)) {
-			marker.put(world, new ArrayList<>());
+		if (world == null) {
 			return false;
 		}
-		return marker.get(world).contains(event);
+		
+		if (!marker.containsKey(world)) {
+			marker.put(world, new HashMap<>());
+			return false;
+		}
+		return marker.get(world).containsKey(event);
 	}
 
 	public List<WorldEvent> getEventsHappening(World world) {
-		return marker.get(world);
+		if (world == null) {
+			return new ArrayList<>();
+		}
+		
+		if (!marker.containsKey(world)) {
+			return new ArrayList<>();
+		}
+		
+		return new ArrayList<>(marker.get(world).keySet());
+	}
+	
+	public List<WorldEventInstance> getEventInstances(World world) {
+		if (world == null) {
+			return new ArrayList<>();
+		}
+		
+		if (!marker.containsKey(world)) {
+			return new ArrayList<>();
+		}
+		
+		return new ArrayList<>(marker.get(world).values());
 	}
 
 	public Time getCurrentTime() {

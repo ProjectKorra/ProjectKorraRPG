@@ -9,7 +9,7 @@ import org.bukkit.boss.BarColor;
 import com.projectkorra.projectkorra.Element;
 import com.projectkorra.rpg.worldevent.util.Time;
 
-public interface IWorldEvent {
+public interface RPGWorldEvent {
 
 	/**
 	 * The name of the WorldEvent
@@ -82,6 +82,13 @@ public interface IWorldEvent {
 	 *         element
 	 */
 	public double getModifier();
+	
+	/**
+	 * Returns how long the event lasts
+	 * in-game hour = 1000;
+	 * @return duration of the event
+	 */
+	public long getDuration();
 
 	/**
 	 * The message to be displayed when the event starts

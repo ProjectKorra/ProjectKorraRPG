@@ -32,7 +32,7 @@ public class RPGStorage {
 	}
 
 	public FileConfiguration load(String fileName) {
-		if (!fileName.contains(".yml")) {
+		if (!fileName.endsWith(".yml")) {
 			fileName = fileName + ".yml";
 		}
 

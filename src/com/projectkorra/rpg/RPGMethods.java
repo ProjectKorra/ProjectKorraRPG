@@ -1,10 +1,15 @@
 package com.projectkorra.rpg;
 
 import java.io.File;
+import java.lang.reflect.Field;
+import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
@@ -12,6 +17,7 @@ import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -20,13 +26,43 @@ import com.projectkorra.projectkorra.Element;
 import com.projectkorra.projectkorra.Element.ElementType;
 import com.projectkorra.projectkorra.Element.SubElement;
 import com.projectkorra.projectkorra.GeneralMethods;
+import com.projectkorra.projectkorra.ability.CoreAbility;
+import com.projectkorra.projectkorra.attribute.Attribute;
+import com.projectkorra.projectkorra.attribute.AttributeModifier;
+import com.projectkorra.projectkorra.storage.DBConnection;
+import com.projectkorra.rpg.ability.AbilityScroll;
+import com.projectkorra.rpg.ability.AbilityTiers.AbilityTier;
 import com.projectkorra.rpg.configuration.ConfigManager;
+import com.projectkorra.rpg.player.RPGPlayer;
 import com.projectkorra.rpg.util.AvatarCycle;
 import com.projectkorra.rpg.util.PreviousAvatar;
 
 public class RPGMethods {
 
 	private static LinkedList<Element> avatarCycle = new LinkedList<>();
+	private static Map<String, AttributeModifier> lightAttributes;
+	private static Random rand;
+
+	static {
+		lightAttributes = new HashMap<>();
+
+		for (String s : ConfigManager.getConfig().getStringList("LightChakraAttributes")) {
+			String[] ss = s.split("::");
+
+			if (ss.length != 2) {
+				continue;
+			}
+
+			AttributeModifier mod = AttributeModifier.valueOf(ss[1].toUpperCase());
+			if (mod == null) {
+				continue;
+			}
+
+			lightAttributes.put(ss[0], mod);
+		}
+		
+		rand = new Random();
+	}
 
 	public static void loadAvatarCycle() {
 		AvatarCycle cycle = AvatarCycle.load();
@@ -336,5 +372,140 @@ public class RPGMethods {
 			return false;
 		}
 		return true;
+	}
+
+	public static boolean isLightChakraAttribute(String attr) {
+		return lightAttributes.containsKey(attr);
+	}
+
+	public static AttributeModifier getLightChakraAttributeModifier(String attr) {
+		if (lightAttributes.containsKey(attr)) {
+			return lightAttributes.get(attr);
+		}
+
+		return AttributeModifier.MULTIPLICATION;
+	}
+
+	public static List<String> getAttributes(CoreAbility ability) {
+		List<String> list = new ArrayList<>();
+
+		for (Field f : ability.getClass().getDeclaredFields()) {
+			if (f.isAnnotationPresent(Attribute.class)) {
+				list.add(f.getAnnotation(Attribute.class).value());
+			}
+		}
+
+		return list;
+	}
+	
+	public static boolean hasEnoughScrolls(Player player, CoreAbility ability) {
+		AbilityTier tier = ProjectKorraRPG.getAbilityTiers().getAbilityTier(ability);
+		AbilityScroll scroll = new AbilityScroll(ability);
+		
+		return player.getInventory().containsAtLeast(scroll, tier.getRequiredScrolls());
+	}
+	
+	public static boolean useScrolls(Player player, CoreAbility ability) {
+		RPGPlayer rpgPlayer = RPGPlayer.get(player);
+		
+		if (rpgPlayer == null) {
+			return false;
+		}
+		
+		AbilityTier tier = ProjectKorraRPG.getAbilityTiers().getAbilityTier(ability);
+		AbilityScroll scroll = new AbilityScroll(ability);
+		
+		scroll.setAmount(tier.getRequiredScrolls());
+		
+		if (rpgPlayer.unlock(ability)) {
+			player.getInventory().removeItem(scroll);
+			player.updateInventory();
+			return true;
+		}
+		
+		return false;
+	}
+	
+	public static AbilityScroll getRandomScroll(AbilityTier...tiers) {
+		List<CoreAbility> selection = new ArrayList<>(ProjectKorraRPG.getAbilityTiers().getAbilitiesFromTiers(tiers));
+		
+		if (selection.isEmpty()) {
+			return null;
+		}
+		
+		CoreAbility ability = selection.get(rand.nextInt(selection.size()));
+		
+		return new AbilityScroll(ability);
+	}
+	
+	public static int getMobDropXP(EntityType type) {
+		if (!type.isAlive()) {
+			return 0;
+		}
+		
+		return ConfigManager.getConfig().getInt("MobDrops." + type.toString() + ".XP");
+	}
+	
+	public static List<AbilityScroll> getMobDropScrolls(EntityType type) {
+		List<AbilityScroll> scrolls = new ArrayList<>();
+		
+		if (!type.isAlive()) {
+			return scrolls;
+		}
+		
+		for (String s : ConfigManager.getConfig().getStringList("MobDrops." + type.toString() + ".DefiniteDrops")) {
+			CoreAbility ability = CoreAbility.getAbility(s);
+			
+			if (ability != null) {
+				scrolls.add(new AbilityScroll(ability));
+			}
+		}
+		
+		int chance = ConfigManager.getConfig().getInt("MobDrops." + type.toString() + ".RandomChance");
+		List<String> list = ConfigManager.getConfig().getStringList("MobDrops." + type.toString() + ".RandomDropTiers");
+		
+		if (!list.isEmpty() && chance > rand.nextInt(100)) {
+			AbilityTier[] tiers = list.stream().map(String::toUpperCase).map(AbilityTier::valueOf).toArray(AbilityTier[]::new);
+			scrolls.add(getRandomScroll(tiers));
+		}
+		
+		return scrolls;
+	}
+	
+	public static int getAbilityID(CoreAbility ability) {
+		return getAbilityID(ability.getName());
+	}
+	
+	public static String getListCommaSeparated(Collection<String> group) {
+		StringBuilder build = new StringBuilder();
+		for (String s : group) {
+			if (build.length() != 0) {
+				build.append(", ");
+			}
+			
+			build.append(s);
+		}
+		
+		return build.toString();
+	}
+
+	public static int getAbilityID(String ability) {
+		ResultSet r = DBConnection.sql.readQuery("SELECT id FROM rpg_ability_ids WHERE name = '" + ability + "';");
+		int id = -1;
+
+		try {
+			if (!r.next()) {
+				DBConnection.sql.modifyQuery("INSERT INTO rpg_ability_ids (name) VALUES ('" + ability + "');", false);
+				r = DBConnection.sql.readQuery("SELECT id FROM rpg_ability_ids WHERE name = '" + ability + "';");
+				r.next();
+			}
+
+			id = r.getInt("id");
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return id;
 	}
 }

@@ -81,6 +81,10 @@ public class WorldEventFile {
 	public String getDescription() {
 		return config.getString("description");
 	}
+	
+	public long getDuration() {
+		return config.getLong("duration");
+	}
 
 	public Element[] getElements() {
 		return config.getStringList("elements").stream().map(Element::getElement).filter((a) -> a != null).toArray(Element[]::new);

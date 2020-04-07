@@ -1,10 +1,12 @@
 package com.projectkorra.rpg.configuration;
 
-import com.projectkorra.projectkorra.configuration.ConfigType;
+import java.io.File;
+import java.util.Arrays;
 
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.EntityType;
 
-import java.io.File;
+import com.projectkorra.projectkorra.configuration.ConfigType;
 
 public class ConfigManager {
 
@@ -19,6 +21,8 @@ public class ConfigManager {
 
 	public static void configCheck(ConfigType type) {
 		FileConfiguration config = rpgConfig.get();
+		
+		config.addDefault("ResetLevelOnElementChange", true);
 
 		config.addDefault("Avatar.AvatarStateOnFinalBlow", true);
 		config.addDefault("Avatar.CurrentAvatar", "");
@@ -45,6 +49,23 @@ public class ConfigManager {
 		config.addDefault("SubElementAssign.Percentages.Plant", 0.7);
 		config.addDefault("SubElementAssign.Percentages.Sand", 1);
 		config.addDefault("SubElementAssign.Percentages.Spiritual", 0.4);
+		
+		config.addDefault("LightChakraAttributes", Arrays.asList("Knockback::MULTIPLICATION", "Knockup::MULTIPLICATION", "Radius::ADDITION"));
+		
+		config.addDefault("ChatColors.DEFAULT", "GRAY");
+		config.addDefault("ChatColors.NOVICE", "YELLOW");
+		config.addDefault("ChatColors.INTERMEDIATE", "AQUA");
+		config.addDefault("ChatColors.ADVANCED", "RED");
+		config.addDefault("ChatColors.MASTER", "GREEN");
+		
+		for (EntityType etype : EntityType.values()) {
+			if (etype.isAlive()) {
+				config.addDefault("MobDrops." + etype.toString() + ".XP", 25);
+				config.addDefault("MobDrops." + etype.toString() + ".DefiniteDrops", Arrays.asList("list abilities here"));
+				config.addDefault("MobDrops." + etype.toString() + ".RandomChance", 12);
+				config.addDefault("MobDrops." + etype.toString() + ".RandomDropTiers", Arrays.asList("NOVICE", "INTERMEDIATE", "ADVANCED", "MASTER"));
+			}
+		}
 
 		config.addDefault("Storage.engine", "sqlite");
 

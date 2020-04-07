@@ -15,7 +15,7 @@ import com.projectkorra.rpg.ProjectKorraRPG;
 import com.projectkorra.rpg.worldevent.util.Time;
 import com.projectkorra.rpg.worldevent.util.WorldEventFile;
 
-public class WorldEvent implements IWorldEvent {
+public class WorldEvent implements RPGWorldEvent {
 
 	protected static Map<String, WorldEvent> events = new HashMap<>();
 
@@ -27,6 +27,7 @@ public class WorldEvent implements IWorldEvent {
 	private Time time;
 	private int frequency;
 	private double modifier;
+	private long duration;
 	private String startMessage;
 	private String endMessage;
 	private boolean darkenSky;
@@ -36,10 +37,10 @@ public class WorldEvent implements IWorldEvent {
 	private BarColor bar;
 
 	public WorldEvent(WorldEventFile wFile) {
-		this(wFile.getName(), wFile.getDescription(), wFile.getAliases(), wFile.getAttributes(), wFile.getElements(), wFile.getTime(), wFile.getFrequency(), wFile.getModifier(), wFile.getStartMessage(), wFile.getEndMessage(), wFile.getDarkenSky(), wFile.getCreateFog(), wFile.getEventBlacklist(), wFile.getTextColor(), wFile.getBarColor());
+		this(wFile.getName(), wFile.getDescription(), wFile.getAliases(), wFile.getAttributes(), wFile.getElements(), wFile.getTime(), wFile.getFrequency(), wFile.getModifier(), wFile.getDuration(), wFile.getStartMessage(), wFile.getEndMessage(), wFile.getDarkenSky(), wFile.getCreateFog(), wFile.getEventBlacklist(), wFile.getTextColor(), wFile.getBarColor());
 	}
 
-	public WorldEvent(String name, String description, List<String> aliases, List<String> attributes, Element[] elements, Time time, int frequency, double modifier, String startMessage, String endMessage, boolean darkenSky, boolean createFog, List<String> eventBlacklist, ChatColor text, BarColor bar) {
+	public WorldEvent(String name, String description, List<String> aliases, List<String> attributes, Element[] elements, Time time, int frequency, double modifier, long duration, String startMessage, String endMessage, boolean darkenSky, boolean createFog, List<String> eventBlacklist, ChatColor text, BarColor bar) {
 		this.name = name;
 		this.description = description;
 		this.aliases = aliases;
@@ -48,6 +49,7 @@ public class WorldEvent implements IWorldEvent {
 		this.time = time;
 		this.frequency = frequency;
 		this.modifier = modifier;
+		this.duration = duration;
 		this.startMessage = startMessage;
 		this.endMessage = endMessage;
 		this.darkenSky = darkenSky;
@@ -101,6 +103,11 @@ public class WorldEvent implements IWorldEvent {
 	@Override
 	public double getModifier() {
 		return modifier;
+	}
+	
+	@Override
+	public long getDuration() {
+		return duration;
 	}
 
 	@Override

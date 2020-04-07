@@ -6,18 +6,17 @@ import java.util.List;
 import java.util.Map;
 
 import org.bukkit.ChatColor;
-import org.bukkit.World;
 import org.bukkit.boss.BarFlag;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
 import org.bukkit.entity.Player;
 
 import com.projectkorra.rpg.ProjectKorraRPG;
-import com.projectkorra.rpg.worldevent.WorldEvent;
+import com.projectkorra.rpg.worldevent.WorldEventInstance;
 
 public class WorldEventDisplayManager {
 
-	private Map<World, Map<BossBar, WorldEvent>> active;
+	private Map<WorldEventInstance, BossBar> active;
 	private ProjectKorraRPG plugin;
 
 	public WorldEventDisplayManager(ProjectKorraRPG plugin) {
@@ -26,105 +25,70 @@ public class WorldEventDisplayManager {
 		this.plugin = plugin;
 	}
 
-	public BossBar createBossBar(World world, WorldEvent event) {
-		if (ProjectKorraRPG.getEventManager().isHappening(world, event)) {
+	public BossBar createBossBar(WorldEventInstance instance) {
+		if (ProjectKorraRPG.getEventManager().isHappening(instance.getWorld(), instance.getEvent())) {
 			List<BarFlag> flags = new ArrayList<>();
 			int size = 0;
-			if (event.getDarkenSky()) {
+			if (instance.getEvent().getDarkenSky()) {
 				size++;
 				flags.add(BarFlag.DARKEN_SKY);
 			}
-			if (event.getCreateFog()) {
+			if (instance.getEvent().getCreateFog()) {
 				size++;
 				flags.add(BarFlag.CREATE_FOG);
 			}
-			BossBar bar = plugin.getServer().createBossBar(ChatColor.BOLD + (event.getTextColor() + event.getName()), event.getBarColor(), BarStyle.SOLID, flags.toArray(new BarFlag[size]));
-			if (!active.containsKey(world)) {
-				active.put(world, new HashMap<>());
-			}
-			active.get(world).put(bar, event);
+			BossBar bar = plugin.getServer().createBossBar(ChatColor.BOLD + (instance.getEvent().getTextColor() + instance.getEvent().getName()), instance.getEvent().getBarColor(), BarStyle.SOLID, flags.toArray(new BarFlag[size]));
+			active.put(instance, bar);
 			bar.setVisible(true);
 			return bar;
 		}
 		return null;
 	}
 
-	public void removeBossBar(World world, WorldEvent event) {
-		if (!active.containsKey(world)) {
+	public void removeBossBar(WorldEventInstance instance) {
+		if (!active.containsKey(instance)) {
 			return;
 		}
-		BossBar remove = getBossBar(world, event);
-
-		if (remove != null) {
-			remove.removeAll();
-			active.get(world).remove(remove);
-		}
+		
+		active.get(instance).removeAll();
+		active.remove(instance);
 	}
 
-	public BossBar getBossBar(World world, WorldEvent event) {
-		if (!active.containsKey(world)) {
+	public BossBar getBossBar(WorldEventInstance instance) {
+		if (!active.containsKey(instance)) {
 			return null;
 		}
 
-		BossBar get = null;
-		for (BossBar bar : active.get(world).keySet()) {
-			if (ChatColor.stripColor(bar.getTitle()).equals(event.getName())) {
-				get = bar;
-				break;
-			}
-		}
-
-		if (get != null) {
-			return get;
-		}
-		return null;
+		return active.get(instance);
 	}
 
 	public void removeAll() {
-		for (World world : active.keySet()) {
-			for (BossBar bar : active.get(world).keySet()) {
-				bar.removeAll();
-			}
+		for (BossBar bar : active.values()) {
+			bar.removeAll();
 		}
 	}
 
-	public void update(World world) {
-		if (active.containsKey(world)) {
-			if (active.get(world).isEmpty()) {
-				active.remove(world);
-			}
-		}
-
-		if (!active.containsKey(world)) {
+	public void update(WorldEventInstance instance) {
+		if (!active.containsKey(instance)) {
 			return;
 		}
-
-		List<BossBar> remove = new ArrayList<>();
-		for (BossBar bar : active.get(world).keySet()) {
-			for (Player player : world.getPlayers()) {
-				if (!bar.getPlayers().contains(player)) {
-					bar.addPlayer(player);
-				}
-			}
-			
-			WorldEvent we = active.get(world).get(bar);
-			long time = 24000;
-			if (we.getTime() == Time.DAY) {
-				time = 12000;
-			}
-
-			long currTime = world.getTime() % time;
-			if (currTime >= time) {
-				bar.removeAll();
-				remove.add(bar);
-			} else {
-				double progress = 1 - (currTime / time);
-				bar.setProgress(progress);
+		
+		BossBar bar = active.get(instance);
+		
+		for (Player player : instance.getWorld().getPlayers()) {
+			if (!bar.getPlayers().contains(player)) {
+				bar.addPlayer(player);
 			}
 		}
-
-		for (BossBar bar : remove) {
-			active.get(world).remove(bar);
+		
+		double elapsed = instance.getElapsedTime() <= 0 ? 0 : instance.getElapsedTime();
+		
+		if (elapsed >= instance.getDuration()) {
+			bar.removeAll();
+			active.remove(instance);
+		} else {
+			double progress = 1.0 - (elapsed / (double) instance.getDuration());
+			bar.setProgress(progress);
 		}
 	}
 }

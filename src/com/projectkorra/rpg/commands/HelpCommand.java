@@ -6,17 +6,17 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collector;
 
+import com.projectkorra.projectkorra.Element;
+import com.projectkorra.projectkorra.ability.CoreAbility;
+import com.projectkorra.rpg.RPGMethods;
+import com.projectkorra.rpg.ability.AbilityTier;
+import com.projectkorra.rpg.ability.AbilityTiers;
+import com.projectkorra.rpg.player.RPGPlayer;
+import com.projectkorra.rpg.worldevent.WorldEvent;
+
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-
-import com.projectkorra.projectkorra.Element;
-import com.projectkorra.projectkorra.ability.CoreAbility;
-import com.projectkorra.rpg.ProjectKorraRPG;
-import com.projectkorra.rpg.RPGMethods;
-import com.projectkorra.rpg.ability.AbilityTiers.AbilityTier;
-import com.projectkorra.rpg.player.RPGPlayer;
-import com.projectkorra.rpg.worldevent.WorldEvent;
 
 public class HelpCommand extends RPGCommand {
 
@@ -73,7 +73,7 @@ public class HelpCommand extends RPGCommand {
 			CoreAbility ability = CoreAbility.getAbility(args.get(0));
 			
 			if (ability != null) {
-				AbilityTier tier = ProjectKorraRPG.getAbilityTiers().getAbilityTier(ability);
+				AbilityTier tier = AbilityTiers.getAbilityTier(ability);
 				ChatColor color = ability.getElement().getColor();
 				
 				sender.sendMessage(color + ability.getName());

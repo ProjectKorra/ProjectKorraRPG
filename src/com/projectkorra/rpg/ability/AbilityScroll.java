@@ -2,14 +2,12 @@ package com.projectkorra.rpg.ability;
 
 import java.util.Arrays;
 
+import com.projectkorra.projectkorra.ability.CoreAbility;
+
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-
-import com.projectkorra.projectkorra.ability.CoreAbility;
-import com.projectkorra.rpg.ProjectKorraRPG;
-import com.projectkorra.rpg.ability.AbilityTiers.AbilityTier;
 
 public class AbilityScroll extends ItemStack {
 	
@@ -23,7 +21,7 @@ public class AbilityScroll extends ItemStack {
 		
 		im.setDisplayName(ability.getElement().getColor() + ability.getName() + " Scroll");
 		
-		AbilityTier tier = ProjectKorraRPG.getAbilityTiers().getAbilityTier(ability);
+		AbilityTier tier = AbilityTiers.getAbilityTier(ability);
 		
 		String first = tier.getDisplay() + " " + ChatColor.WHITE + ability.getElement().getName() + " ability";
 		String second = ChatColor.WHITE + "This ability requires " + tier.getColor() + tier.getRequiredScrolls() + ChatColor.WHITE + " scrolls to learn!";

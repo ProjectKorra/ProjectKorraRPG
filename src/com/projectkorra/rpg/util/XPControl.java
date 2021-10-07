@@ -1,8 +1,13 @@
 package com.projectkorra.rpg.util;
 
-public class XPControl {
+import com.projectkorra.rpg.configuration.ConfigManager;
 
-	private static final int MAX_LEVEL = 40;
+public final class XPControl {
+
+	private XPControl() {}
+
+	public static final int MAX_LEVEL = ConfigManager.getConfig().getInt("LevelCap");
+	private static final double XP_FACTOR = 4.0 / MAX_LEVEL;
 	private static final int[] XP_LEVEL = loadXPPerLevel(); // the required xp at the level matching the index to level up
 	
 	/**
@@ -26,7 +31,7 @@ public class XPControl {
 	
 	/**
 	 * Returns the required amount of <b>total</b> XP to level up at the given level
-	 * @param level current level, must be in the range [0, 40)
+	 * @param level current level, must be in the range [0, MAX_LEVEL)
 	 * @return xp required to level up
 	 */
 	public static int getXPRequired(int level) throws IndexOutOfBoundsException {
@@ -42,7 +47,7 @@ public class XPControl {
 		xp_level[0] = 0;
 		
 		for (int i = 1; i < MAX_LEVEL; i++) {
-			xp_level[i] = ((int) Math.pow(Math.E, 0.125 * i)) * 100 + xp_level[i - 1];
+			xp_level[i] = ((int) Math.pow(Math.E, XP_FACTOR * (i - 1))) * 100 + xp_level[i - 1];
 		}
 		
 		return xp_level;

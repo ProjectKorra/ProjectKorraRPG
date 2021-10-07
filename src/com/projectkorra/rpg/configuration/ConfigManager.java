@@ -6,6 +6,8 @@ import java.util.Arrays;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.EntityType;
 
+import net.md_5.bungee.api.ChatColor;
+
 import com.projectkorra.projectkorra.configuration.ConfigType;
 
 public class ConfigManager {
@@ -22,6 +24,7 @@ public class ConfigManager {
 	public static void configCheck(ConfigType type) {
 		FileConfiguration config = rpgConfig.get();
 		
+		config.addDefault("LevelCap", 100);
 		config.addDefault("ResetLevelOnElementChange", true);
 
 		config.addDefault("Avatar.AvatarStateOnFinalBlow", true);
@@ -52,11 +55,11 @@ public class ConfigManager {
 		
 		config.addDefault("LightChakraAttributes", Arrays.asList("Knockback::MULTIPLICATION", "Knockup::MULTIPLICATION", "Radius::ADDITION"));
 		
-		config.addDefault("ChatColors.DEFAULT", "GRAY");
-		config.addDefault("ChatColors.NOVICE", "YELLOW");
-		config.addDefault("ChatColors.INTERMEDIATE", "AQUA");
-		config.addDefault("ChatColors.ADVANCED", "RED");
-		config.addDefault("ChatColors.MASTER", "GREEN");
+		config.addDefault("ChatColors.DEFAULT", ChatColor.DARK_BLUE.getName());
+		config.addDefault("ChatColors.NOVICE", ChatColor.GOLD.getName());
+		config.addDefault("ChatColors.INTERMEDIATE", ChatColor.DARK_GREEN.getName());
+		config.addDefault("ChatColors.ADVANCED", ChatColor.DARK_RED.getName());
+		config.addDefault("ChatColors.MASTER", ChatColor.DARK_PURPLE.getName());
 		
 		for (EntityType etype : EntityType.values()) {
 			if (etype.isAlive()) {

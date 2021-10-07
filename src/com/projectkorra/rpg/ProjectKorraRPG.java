@@ -3,9 +3,6 @@ package com.projectkorra.rpg;
 import java.io.IOException;
 import java.util.logging.Logger;
 
-import org.bukkit.Bukkit;
-import org.bukkit.plugin.java.JavaPlugin;
-
 import com.projectkorra.projectkorra.storage.DBConnection;
 import com.projectkorra.projectkorra.storage.MySQL;
 import com.projectkorra.rpg.ability.AbilityTiers;
@@ -28,6 +25,9 @@ import com.projectkorra.rpg.worldevent.EventManager;
 import com.projectkorra.rpg.worldevent.util.WorldEventDisplayManager;
 import com.projectkorra.rpg.worldevent.util.WorldEventFileManager;
 
+import org.bukkit.Bukkit;
+import org.bukkit.plugin.java.JavaPlugin;
+
 public class ProjectKorraRPG extends JavaPlugin {
 
 	private static ProjectKorraRPG plugin;
@@ -36,7 +36,6 @@ public class ProjectKorraRPG extends JavaPlugin {
 	private static WorldEventFileManager wFileManager;
 	private static WorldEventDisplayManager wDisplayManager;
 	private static RPGStorage storage;
-	private static AbilityTiers tiers;
 
 	@Override
 	public void onEnable() {
@@ -45,15 +44,14 @@ public class ProjectKorraRPG extends JavaPlugin {
 
 		new ConfigManager();
 		initDatabase();
-		new RPGMethods();
 		enableCommands();
 		
 		wFileManager = new WorldEventFileManager();
 		wDisplayManager = new WorldEventDisplayManager(this);
 		eventManager = new EventManager();
 		storage = new RPGStorage();
-		tiers = new AbilityTiers();
-		
+
+		AbilityTiers.init();
 		RPGMethods.loadAvatarCycle();
 
 		Bukkit.getServer().getPluginManager().registerEvents(new RPGListener(), this);
@@ -140,9 +138,5 @@ public class ProjectKorraRPG extends JavaPlugin {
 
 	public static RPGStorage getStorage() {
 		return storage;
-	}
-	
-	public static AbilityTiers getAbilityTiers() {
-		return tiers;
 	}
 }

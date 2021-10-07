@@ -1,13 +1,14 @@
 package com.projectkorra.rpg.player;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Arrays;
+
+import com.projectkorra.rpg.util.XPControl;
 
 import org.bukkit.ChatColor;
 
 public class ChakraStats {
 	
-	private static final int MAX_POINTS = 10;
+	public static final int MAX_POINTS = (XPControl.MAX_LEVEL + 25 - (XPControl.MAX_LEVEL % 5)) / 5;
 
 	public static enum Chakra {
 		AIR (0.01, ChatColor.GRAY, "increases bending range, 1% per point"),
@@ -57,29 +58,19 @@ public class ChakraStats {
 		}
 	}
 	
-	private Map<Chakra, Integer> points;
+	private int[] points;
 	
 	public ChakraStats() {
-		this.points = new HashMap<>();
-		for (Chakra stat : Chakra.values()) {
-			points.put(stat, 0);
-		}
+		this.points = new int[Chakra.values().length];
 	}
 	
-	public ChakraStats(Map<Chakra, Integer> copy) {
-		this.points = new HashMap<>();
-		for (Chakra stat : Chakra.values()) {
-			if (copy.containsKey(stat)) {
-				points.put(stat, copy.get(stat));
-			} else {
-				points.put(stat, 0);
-			}
-		}
+	public ChakraStats(int[] copy) {
+		this.points = Arrays.copyOf(copy, copy.length);
 	}
 	
 	public int getTotalPointsUsed() {
 		int sum = 0;
-		for (int i : points.values()) {
+		for (int i : this.points) {
 			sum += i;
 		}
 		
@@ -87,7 +78,7 @@ public class ChakraStats {
 	}
 	
 	public int getPoints(Chakra stat) {
-		return points.containsKey(stat) ? points.get(stat) : 0;
+		return points[stat.ordinal()];
 	}
 	
 	public double getPercent(Chakra stat) {
@@ -95,12 +86,8 @@ public class ChakraStats {
 	}
 	
 	public boolean increase(Chakra stat) {
-		if (!points.containsKey(stat)) {
-			points.put(stat, 0);
-		}
-		
-		if (points.get(stat) < MAX_POINTS) {
-			points.put(stat, points.get(stat) + 1);
+		if (getPoints(stat) < MAX_POINTS) {
+			++points[stat.ordinal()];
 			return true;
 		}
 		
@@ -108,23 +95,19 @@ public class ChakraStats {
 	}
 	
 	public boolean decrease(Chakra stat) {
-		if (!points.containsKey(stat)) {
-			points.put(stat, 0);
-		}
-		
-		if (points.get(stat) > 0) {
-			points.put(stat, points.get(stat) - 1);
+		if (getPoints(stat) > 0) {
+			--points[stat.ordinal()];
 			return true;
 		}
 		
 		return false;
 	}
 	
-	public void clear(Chakra chakra) {
-		this.points.put(chakra, 0);
+	public void clear(Chakra stat) {
+		this.points[stat.ordinal()] = 0;
 	}
 	
 	public void clearAll() {
-		this.points = new HashMap<>();
+		Arrays.fill(this.points, 0);
 	}
 }

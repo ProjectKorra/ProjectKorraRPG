@@ -2,7 +2,41 @@ package com.projectkorra.rpg;
 
 import java.lang.reflect.Field;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+
+import com.projectkorra.projectkorra.BendingPlayer;
+import com.projectkorra.projectkorra.Element;
+import com.projectkorra.projectkorra.Element.SubElement;
+import com.projectkorra.projectkorra.ability.CoreAbility;
+import com.projectkorra.projectkorra.ability.EarthAbility;
+import com.projectkorra.projectkorra.ability.PassiveAbility;
+import com.projectkorra.projectkorra.attribute.Attribute;
+import com.projectkorra.projectkorra.attribute.AttributeModifier;
+import com.projectkorra.projectkorra.avatar.AvatarState;
+import com.projectkorra.projectkorra.event.AbilityDamageEntityEvent;
+import com.projectkorra.projectkorra.event.AbilityStartEvent;
+import com.projectkorra.projectkorra.event.BendingPlayerCreationEvent;
+import com.projectkorra.projectkorra.event.EntityBendingDeathEvent;
+import com.projectkorra.projectkorra.event.PlayerBindChangeEvent;
+import com.projectkorra.projectkorra.event.PlayerChangeElementEvent;
+import com.projectkorra.projectkorra.event.PlayerChangeElementEvent.Result;
+import com.projectkorra.projectkorra.util.ActionBar;
+import com.projectkorra.rpg.ability.AbilityScroll;
+import com.projectkorra.rpg.ability.AbilityTier;
+import com.projectkorra.rpg.ability.AbilityTiers;
+import com.projectkorra.rpg.configuration.ConfigManager;
+import com.projectkorra.rpg.events.RPGPlayerGainXPEvent;
+import com.projectkorra.rpg.events.RPGPlayerLevelUpEvent;
+import com.projectkorra.rpg.events.SunRiseEvent;
+import com.projectkorra.rpg.events.SunSetEvent;
+import com.projectkorra.rpg.events.WorldEventEndEvent;
+import com.projectkorra.rpg.events.WorldEventStartEvent;
+import com.projectkorra.rpg.player.ChakraStats.Chakra;
+import com.projectkorra.rpg.player.RPGPlayer;
+import com.projectkorra.rpg.worldevent.WorldEvent;
+import com.projectkorra.rpg.worldevent.WorldEventInstance;
+import com.projectkorra.rpg.worldevent.util.Time;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -27,38 +61,6 @@ import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.inventory.AnvilInventory;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-
-import com.projectkorra.projectkorra.BendingPlayer;
-import com.projectkorra.projectkorra.Element;
-import com.projectkorra.projectkorra.Element.SubElement;
-import com.projectkorra.projectkorra.ability.CoreAbility;
-import com.projectkorra.projectkorra.ability.EarthAbility;
-import com.projectkorra.projectkorra.ability.PassiveAbility;
-import com.projectkorra.projectkorra.attribute.Attribute;
-import com.projectkorra.projectkorra.attribute.AttributeModifier;
-import com.projectkorra.projectkorra.avatar.AvatarState;
-import com.projectkorra.projectkorra.event.AbilityDamageEntityEvent;
-import com.projectkorra.projectkorra.event.AbilityStartEvent;
-import com.projectkorra.projectkorra.event.BendingPlayerCreationEvent;
-import com.projectkorra.projectkorra.event.EntityBendingDeathEvent;
-import com.projectkorra.projectkorra.event.PlayerBindChangeEvent;
-import com.projectkorra.projectkorra.event.PlayerChangeElementEvent;
-import com.projectkorra.projectkorra.event.PlayerChangeElementEvent.Result;
-import com.projectkorra.projectkorra.util.ActionBar;
-import com.projectkorra.rpg.ability.AbilityScroll;
-import com.projectkorra.rpg.ability.AbilityTiers.AbilityTier;
-import com.projectkorra.rpg.configuration.ConfigManager;
-import com.projectkorra.rpg.events.RPGPlayerGainXPEvent;
-import com.projectkorra.rpg.events.RPGPlayerLevelUpEvent;
-import com.projectkorra.rpg.events.SunRiseEvent;
-import com.projectkorra.rpg.events.SunSetEvent;
-import com.projectkorra.rpg.events.WorldEventEndEvent;
-import com.projectkorra.rpg.events.WorldEventStartEvent;
-import com.projectkorra.rpg.player.ChakraStats.Chakra;
-import com.projectkorra.rpg.player.RPGPlayer;
-import com.projectkorra.rpg.worldevent.WorldEvent;
-import com.projectkorra.rpg.worldevent.WorldEventInstance;
-import com.projectkorra.rpg.worldevent.util.Time;
 
 public class RPGListener implements Listener {
 
@@ -143,15 +145,23 @@ public class RPGListener implements Listener {
 				event.setCancelled(true);
 				return;
 			}
+
+			List<String> attributes = RPGMethods.getAttributes(ability);
+
+			if (attributes.contains(Attribute.DAMAGE)) {
+				ability.addAttributeModifier(Attribute.DAMAGE, player.getStats().getPercent(Chakra.FIRE), AttributeModifier.MULTIPLICATION);
+			}
+
+			if (attributes.contains(Attribute.COOLDOWN)) {
+				ability.addAttributeModifier(Attribute.COOLDOWN, player.getStats().getPercent(Chakra.WATER), AttributeModifier.MULTIPLICATION);
+			}
+
+			if (attributes.contains(Attribute.RANGE)) {
+				ability.addAttributeModifier(Attribute.RANGE, player.getStats().getPercent(Chakra.AIR), AttributeModifier.MULTIPLICATION);
+			}
 			
-			for (String attr : RPGMethods.getAttributes(ability)) {	
-				if (attr.equals(Attribute.DAMAGE)) {
-					ability.addAttributeModifier(Attribute.DAMAGE, player.getStats().getPercent(Chakra.FIRE), AttributeModifier.MULTIPLICATION);
-				} else if (attr.equals(Attribute.COOLDOWN)) {
-					ability.addAttributeModifier(Attribute.COOLDOWN, player.getStats().getPercent(Chakra.WATER), AttributeModifier.MULTIPLICATION);
-				} else if (attr.equals(Attribute.RANGE)) {
-					ability.addAttributeModifier(Attribute.RANGE, player.getStats().getPercent(Chakra.AIR), AttributeModifier.MULTIPLICATION);
-				} else if (RPGMethods.isLightChakraAttribute(attr)) {
+			for (String attr : RPGMethods.getLightChakraAttributes()) {	
+				if (attributes.contains(attr)) {
 					ability.addAttributeModifier(attr, player.getStats().getPercent(Chakra.LIGHT), RPGMethods.getLightChakraAttributeModifier(attr));
 				}
 			}
@@ -216,7 +226,7 @@ public class RPGListener implements Listener {
 		} else if (player.getCurrentTier() != AbilityTier.MASTER) {
 			event.setResult(null);
 			return;
-		} else if (ProjectKorraRPG.getAbilityTiers().getAbilityTier(ability) == AbilityTier.DEFAULT) {
+		} else if (AbilityTiers.getAbilityTier(ability) == AbilityTier.DEFAULT) {
 			event.setResult(null);
 			return;
 		}
@@ -284,7 +294,7 @@ public class RPGListener implements Listener {
 			return;
 		}
 		
-		if (!ProjectKorraRPG.getAbilityTiers().canLearnAbility(player, ability)) {
+		if (!AbilityTiers.canLearnAbility(player, ability)) {
 			ActionBar.sendActionBar(ChatColor.RED + "!> You are not a high enough level to learn that <!", event.getPlayer());
 			return;
 		}
@@ -371,6 +381,7 @@ public class RPGListener implements Listener {
 		
 		if (event.isBinding() && !player.hasUnlocked(ability)) {
 			event.setCancelled(true);
+			event.getPlayer().sendMessage(ChatColor.RED + "Have not learned that ability yet!");
 		}
 	}
 

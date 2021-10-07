@@ -14,13 +14,6 @@ import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
 
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.OfflinePlayer;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
-
 import com.projectkorra.projectkorra.BendingPlayer;
 import com.projectkorra.projectkorra.Element;
 import com.projectkorra.projectkorra.Element.ElementType;
@@ -31,13 +24,23 @@ import com.projectkorra.projectkorra.attribute.Attribute;
 import com.projectkorra.projectkorra.attribute.AttributeModifier;
 import com.projectkorra.projectkorra.storage.DBConnection;
 import com.projectkorra.rpg.ability.AbilityScroll;
-import com.projectkorra.rpg.ability.AbilityTiers.AbilityTier;
+import com.projectkorra.rpg.ability.AbilityTier;
+import com.projectkorra.rpg.ability.AbilityTiers;
 import com.projectkorra.rpg.configuration.ConfigManager;
 import com.projectkorra.rpg.player.RPGPlayer;
 import com.projectkorra.rpg.util.AvatarCycle;
 import com.projectkorra.rpg.util.PreviousAvatar;
 
-public class RPGMethods {
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
+
+public final class RPGMethods {
+
+	private RPGMethods() {}
 
 	private static LinkedList<Element> avatarCycle = new LinkedList<>();
 	private static Map<String, AttributeModifier> lightAttributes;
@@ -100,7 +103,7 @@ public class RPGMethods {
 
 					}.runTaskLater(ProjectKorraRPG.getPlugin(), ConfigManager.getConfig().getLong("Avatar.AutoCycle.Interval"));
 
-					ProjectKorraRPG.getLog().info("Avatar cycle not viable, checking again in 30 mins!");
+					ProjectKorraRPG.getLog().info("Avatar cycle not viable, checking again later!");
 					return;
 				}
 			} else {
@@ -116,6 +119,10 @@ public class RPGMethods {
 			} else if (!hasBeenAvatar(player.getUniqueId()) && bPlayer.hasElement(avatarCycle.peek())) {
 				eligible.add(player);
 			}
+		}
+
+		if (eligible.isEmpty()) {
+			return;
 		}
 
 		Player chosen = eligible.get(new Random().nextInt(eligible.size()));
@@ -374,6 +381,10 @@ public class RPGMethods {
 		return true;
 	}
 
+	public static List<String> getLightChakraAttributes() {
+		return new ArrayList<>(lightAttributes.keySet());
+	}
+
 	public static boolean isLightChakraAttribute(String attr) {
 		return lightAttributes.containsKey(attr);
 	}
@@ -399,7 +410,7 @@ public class RPGMethods {
 	}
 	
 	public static boolean hasEnoughScrolls(Player player, CoreAbility ability) {
-		AbilityTier tier = ProjectKorraRPG.getAbilityTiers().getAbilityTier(ability);
+		AbilityTier tier = AbilityTiers.getAbilityTier(ability);
 		AbilityScroll scroll = new AbilityScroll(ability);
 		
 		return player.getInventory().containsAtLeast(scroll, tier.getRequiredScrolls());
@@ -412,7 +423,7 @@ public class RPGMethods {
 			return false;
 		}
 		
-		AbilityTier tier = ProjectKorraRPG.getAbilityTiers().getAbilityTier(ability);
+		AbilityTier tier = AbilityTiers.getAbilityTier(ability);
 		AbilityScroll scroll = new AbilityScroll(ability);
 		
 		scroll.setAmount(tier.getRequiredScrolls());
@@ -427,7 +438,7 @@ public class RPGMethods {
 	}
 	
 	public static AbilityScroll getRandomScroll(AbilityTier...tiers) {
-		List<CoreAbility> selection = new ArrayList<>(ProjectKorraRPG.getAbilityTiers().getAbilitiesFromTiers(tiers));
+		List<CoreAbility> selection = new ArrayList<>(AbilityTiers.getAbilitiesFromTiers(tiers));
 		
 		if (selection.isEmpty()) {
 			return null;

@@ -8,15 +8,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.bukkit.ChatColor;
-import org.bukkit.configuration.file.FileConfiguration;
-
 import com.projectkorra.projectkorra.ability.CoreAbility;
 import com.projectkorra.projectkorra.ability.PassiveAbility;
 import com.projectkorra.rpg.ProjectKorraRPG;
 import com.projectkorra.rpg.configuration.Config;
-import com.projectkorra.rpg.configuration.ConfigManager;
 import com.projectkorra.rpg.player.RPGPlayer;
+
+import org.bukkit.configuration.file.FileConfiguration;
 
 public class AbilityTiers {
 	
@@ -26,77 +24,22 @@ public class AbilityTiers {
 	static {
 		loadConfig();
 	}
-
-	public static enum AbilityTier {
-		DEFAULT(0, "Bender"), NOVICE(10, "Novice"), INTERMEDIATE(20, "Intermediate"), ADVANCED(30, "Advanced"), MASTER(40, "Master");
-		
-		private int level;
-		private String display;
-		
-		private AbilityTier(int level, String display) {
-			this.level = level;
-			this.display = display;
-		}
-		
-		public int getLevel() {
-			return level;
-		}
-		
-		public String getDisplay() {
-			return getColor() + display;
-		}
-		
-		public boolean aboveOrSame(AbilityTier other) {
-			return this.level >= other.level;
-		}
-		
-		public int getRequiredScrolls() {
-			return level / 10;
-		}
-		
-		public ChatColor getColor() {
-			ChatColor color = ChatColor.valueOf(ConfigManager.getConfig().getString("ChatColors." + this.toString()));
-			
-			if (color == null) {
-				color = ChatColor.WHITE;
-			}
-			
-			return color;
-		}
-		
-		public static AbilityTier fromLevel(int level) {
-			if (level < 10) {
-				return DEFAULT;
-			} else if (level < 20) {
-				return NOVICE;
-			} else if (level < 30) {
-				return INTERMEDIATE;
-			} else if (level < 40) {
-				return ADVANCED;
-			} else {
-				return MASTER;
-			}
-		}
-	}
 	
-	private Map<AbilityTier, Set<String>> tiers;
-	private Map<String, AbilityTier> abilities;
+	private static final Map<AbilityTier, Set<String>> TIERS = new HashMap<>();
+	private static final Map<String, AbilityTier> ABILITIES = new HashMap<>();
 	
-	public AbilityTiers() {
-		this.tiers = new HashMap<>();
-		this.abilities = new HashMap<>();
-		
-		this.tiers.put(null, new HashSet<>());
+	public static void init() {
+		TIERS.put(null, new HashSet<>());
 		
 		for (AbilityTier tier : AbilityTier.values()) {
-			Set<String> abilities = new HashSet<>();
+			Set<String> abils = new HashSet<>();
 			
 			for (String s : config.getStringList(tier.toString())) {
-					this.abilities.put(s.toLowerCase(), tier);
-					abilities.add(s.toLowerCase());
+					ABILITIES.put(s.toLowerCase(), tier);
+					abils.add(s.toLowerCase());
 			}
 			
-			tiers.put(tier, abilities);
+			TIERS.put(tier, abils);
 		}
 		
 		for (CoreAbility ability : CoreAbility.getAbilities()) {
@@ -104,12 +47,12 @@ public class AbilityTiers {
 		}
 	}
 	
-	public Set<CoreAbility> getAbilitiesFromTiers(AbilityTier...tiers) {
+	public static Set<CoreAbility> getAbilitiesFromTiers(AbilityTier...tiers) {
 		Set<CoreAbility> abils = new HashSet<>();
 		
 		for (AbilityTier tier : tiers) {
 			if (tier != null) {
-				for (String s : this.tiers.get(tier)) {
+				for (String s : TIERS.get(tier)) {
 					CoreAbility ability = CoreAbility.getAbility(s);
 					
 					if (ability != null) {
@@ -122,40 +65,40 @@ public class AbilityTiers {
 		return abils;
 	}
 	
-	public Set<String> getAbilityNamesFromTiers(AbilityTier...tiers) {
+	public static Set<String> getAbilityNamesFromTiers(AbilityTier...tiers) {
 		Set<String> abils = new HashSet<>();
 		
 		for (AbilityTier tier : tiers) {
 			if (tier != null) {
-				abils.addAll(this.tiers.get(tier));
+				abils.addAll(TIERS.get(tier));
 			}
 		}
 		
 		return abils;
 	}
 	
-	public AbilityTier getAbilityTier(CoreAbility ability) {
+	public static AbilityTier getAbilityTier(CoreAbility ability) {
 		if (ability == null) {
 			return null;
 		}
 		
 		String name = ability.getName().toLowerCase();
 		
-		if (!abilities.containsKey(name)) {
+		if (!ABILITIES.containsKey(name)) {
 			AbilityTier tier = AbilityTier.MASTER;
 			if (ability instanceof PassiveAbility || ability.isHiddenAbility()) {
 				tier = AbilityTier.DEFAULT;
 			}
 			
-			abilities.put(name, tier);
-			tiers.get(tier).add(name);
+			ABILITIES.put(name, tier);
+			TIERS.get(tier).add(name);
 			return tier;
 		}
 		
-		return abilities.get(ability.getName().toLowerCase());
+		return ABILITIES.get(name);
 	}
 	
-	public boolean canLearnAbility(RPGPlayer player, CoreAbility ability) {
+	public static boolean canLearnAbility(RPGPlayer player, CoreAbility ability) {
 		return player.getCurrentTier().aboveOrSame(getAbilityTier(ability));
 	}
 	

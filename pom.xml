@@ -18,14 +18,14 @@
   	<dependency>
 	  <groupId>org.spigotmc</groupId>
 	  <artifactId>spigot-api</artifactId>
-	  <version>1.14.3-R0.1-SNAPSHOT</version>
+	  <version>1.16.1-R0.1-SNAPSHOT</version>
 	  <scope>provided</scope>
 	</dependency>
 	
 	<dependency>
 	  <groupId>com.projectkorra</groupId>
 	  <artifactId>projectkorra</artifactId>
-	  <version>1.8.8</version>
+	  <version>1.9.2</version>
 	  <scope>provided</scope>
 	</dependency>
   </dependencies>

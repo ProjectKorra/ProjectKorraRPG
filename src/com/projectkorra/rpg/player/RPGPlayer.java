@@ -8,20 +8,20 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
-
 import com.projectkorra.projectkorra.BendingPlayer;
 import com.projectkorra.projectkorra.Element;
 import com.projectkorra.projectkorra.ability.CoreAbility;
 import com.projectkorra.projectkorra.storage.DBConnection;
-import com.projectkorra.rpg.ProjectKorraRPG;
 import com.projectkorra.rpg.RPGMethods;
-import com.projectkorra.rpg.ability.AbilityTiers.AbilityTier;
+import com.projectkorra.rpg.ability.AbilityTier;
+import com.projectkorra.rpg.ability.AbilityTiers;
 import com.projectkorra.rpg.events.RPGPlayerGainXPEvent;
 import com.projectkorra.rpg.events.RPGPlayerLevelUpEvent;
 import com.projectkorra.rpg.player.ChakraStats.Chakra;
 import com.projectkorra.rpg.util.XPControl;
+
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 
 public class RPGPlayer {
 	
@@ -39,7 +39,7 @@ public class RPGPlayer {
 	private int xp;
 	
 	private RPGPlayer(int id, BendingPlayer bPlayer) {
-		this(id, bPlayer, new ChakraStats(), 0, ProjectKorraRPG.getAbilityTiers().getAbilityNamesFromTiers(AbilityTier.DEFAULT));
+		this(id, bPlayer, new ChakraStats(), 0, AbilityTiers.getAbilityNamesFromTiers(AbilityTier.DEFAULT));
 	}
 	
 	private RPGPlayer(int id, BendingPlayer bPlayer, ChakraStats stats, int xp, Collection<String> unlocked) {
@@ -119,7 +119,11 @@ public class RPGPlayer {
 	
 	public void setXP(int xp) {
 		this.xp = xp;
+		int prev = level;
 		this.level = XPControl.calculateLevel(xp);
+		if (level < prev) {
+			this.stats.clearAll();
+		}
 		this.tier = AbilityTier.fromLevel(level);
 		this.bar.update();
 	}
@@ -203,9 +207,9 @@ public class RPGPlayer {
 				int id = r.getInt("id");
 				int xp = r.getInt("xp");
 				
-				Map<Chakra, Integer> points = new HashMap<>();
+				int[] points = new int[Chakra.values().length];
 				for (Chakra chakra : Chakra.values()) {
-					points.put(chakra, r.getInt(chakra.toString().toLowerCase()));
+					points[chakra.ordinal()] = r.getInt(chakra.toString().toLowerCase());
 				}
 				ChakraStats stats = new ChakraStats(points);
 				
@@ -216,7 +220,7 @@ public class RPGPlayer {
 					abilities.add(r2.getString("name").toLowerCase());
 				}
 				
-				abilities.addAll(ProjectKorraRPG.getAbilityTiers().getAbilityNamesFromTiers(AbilityTier.DEFAULT));
+				abilities.addAll(AbilityTiers.getAbilityNamesFromTiers(AbilityTier.DEFAULT));
 				
 				return new RPGPlayer(id, bPlayer, stats, xp, abilities);
 			}
@@ -230,7 +234,7 @@ public class RPGPlayer {
 		this.setXP(0);
 		this.stats.clearAll();
 		this.unlocked.clear();
-		this.unlocked.addAll(ProjectKorraRPG.getAbilityTiers().getAbilityNamesFromTiers(AbilityTier.DEFAULT));
+		this.unlocked.addAll(AbilityTiers.getAbilityNamesFromTiers(AbilityTier.DEFAULT));
 		this.bar.update();
 	}
 	

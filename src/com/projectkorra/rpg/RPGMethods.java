@@ -111,6 +111,9 @@ public class RPGMethods {
 		}
 
 		assignElement(bPlayer, assign);
+		if(assign.getName().equals("LightSpirit") || assign.getName().equals("DarkSpirit")){
+			assignElement(bPlayer, new Element("Spirit"));
+		}
 		if (ConfigManager.getConfig().getBoolean("SubElementAssign.Enabled")) {
 			RPGMethods.randomAssignSubElements(bPlayer, assign);
 		}

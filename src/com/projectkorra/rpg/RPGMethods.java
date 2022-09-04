@@ -167,7 +167,7 @@ public class RPGMethods {
 	 * @param chiblocker if the player is becoming a chiblocker
 	 */
 	private static void assignElement(BendingPlayer bPlayer, Element e) {
-		bPlayer.setElement(e);
+		bPlayer.addElement(e);
 		bPlayer.saveElements();
 		Bukkit.getPlayer(bPlayer.getUUID()).sendMessage(ChatColor.YELLOW + "Вы родились магом " + (e.getType() == ElementType.BENDING ? "" : "") + e.getColor() + e.getName() + e.getType().getBender() + ChatColor.YELLOW + "!");
 	}

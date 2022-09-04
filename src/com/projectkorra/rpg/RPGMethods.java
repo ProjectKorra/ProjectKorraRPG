@@ -94,18 +94,20 @@ public class RPGMethods {
 	 */
 	public static void randomAssignElement(BendingPlayer bPlayer) {
 		double rand = Math.random();
-		double chance = 0;
+		double chanceRight = 0;
+		double chanceLeft = 0;
 		Element assign = null;
 		for (Element e : Element.getAllElements()) {
 			if (!ConfigManager.getConfig().contains("ElementAssign.Percentages." + e.getName())) {
 				continue;
 			}
 
-			chance += ConfigManager.getConfig().getDouble("ElementAssign.Percentages." + e.getName());
-			if (rand < chance) {
+			chanceRight += ConfigManager.getConfig().getDouble("ElementAssign.Percentages." + e.getName());
+			if (rand <= chanceRight && rand >= chanceLeft) {
 				assign = e;
 				break;
 			}
+			chanceLeft = chanceRight;
 		}
 
 		assignElement(bPlayer, assign);
@@ -120,7 +122,7 @@ public class RPGMethods {
 		}
 
 		double chance = 0;
-		StringBuilder sb = new StringBuilder(ChatColor.YELLOW + "You have an affinity for ");
+		StringBuilder sb = new StringBuilder(ChatColor.YELLOW + "У вас есть предрасположенность к следующим подэлементам: ");
 		ArrayList<String> sublist = new ArrayList<>();
 
 		for (SubElement sub : Element.getSubElements(element)) {
@@ -133,9 +135,9 @@ public class RPGMethods {
 			}
 		}
 
-		GeneralMethods.saveSubElements(bPlayer);
+		bPlayer.saveSubElements();
 		int size = sublist.size();
-		ChatColor color = Element.getSubElements(element)[0].getColor();
+		net.md_5.bungee.api.ChatColor color = Element.getSubElements(element)[0].getColor();
 
 		if (size >= 1) {
 			for (String sub : sublist) {
@@ -143,11 +145,11 @@ public class RPGMethods {
 				if (size == 0) {
 					sb.append(color + sub + ChatColor.YELLOW + ".");
 				} else {
-					sb.append(color + sub + ChatColor.YELLOW + ", and ");
+					sb.append(color + sub + ChatColor.YELLOW + ", и ");
 				}
 			}
 		} else {
-			sb = new StringBuilder(ChatColor.RED + "Unfortunately, you don't have any extra affinity for your element.");
+			sb = new StringBuilder(ChatColor.RED + "К сожелению, у вас нет предрасположенности к подэлементам.");
 		}
 
 		Bukkit.getPlayer(bPlayer.getUUID()).sendMessage(sb.toString());
@@ -162,9 +164,12 @@ public class RPGMethods {
 	 * @param chiblocker if the player is becoming a chiblocker
 	 */
 	private static void assignElement(BendingPlayer bPlayer, Element e) {
-		bPlayer.setElement(e);
-		GeneralMethods.saveElements(bPlayer);
-		Bukkit.getPlayer(bPlayer.getUUID()).sendMessage(ChatColor.YELLOW + "You have been born as " + (e.getType() == ElementType.BENDING ? "an " : "a ") + e.getColor() + e.getName() + e.getType().getBender() + ChatColor.YELLOW + "!");
+		if(e.getName().equals("LightSpirit") || e.getName().equals("DarkSpirit")){
+			bPlayer.addElement(new Element("Spirit"));
+		}
+		bPlayer.addElement(e);
+		bPlayer.saveElements();
+		Bukkit.getPlayer(bPlayer.getUUID()).sendMessage(ChatColor.YELLOW + "Вы родились магом " + (e.getType() == ElementType.BENDING ? "" : "") + e.getColor() + e.getName() + e.getType().getBender() + ChatColor.YELLOW + "!");
 	}
 
 	/**

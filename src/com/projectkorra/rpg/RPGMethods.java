@@ -111,9 +111,6 @@ public class RPGMethods {
 		}
 
 		assignElement(bPlayer, assign);
-		if(assign.getName().equals("LightSpirit") || assign.getName().equals("DarkSpirit")){
-			assignElement(bPlayer, new Element("Spirit"));
-		}
 		if (ConfigManager.getConfig().getBoolean("SubElementAssign.Enabled")) {
 			RPGMethods.randomAssignSubElements(bPlayer, assign);
 		}
@@ -167,6 +164,9 @@ public class RPGMethods {
 	 * @param chiblocker if the player is becoming a chiblocker
 	 */
 	private static void assignElement(BendingPlayer bPlayer, Element e) {
+		if(e.getName().equals("LightSpirit") || e.getName().equals("DarkSpirit")){
+			bPlayer.addElement(new Element("Spirit"));
+		}
 		bPlayer.addElement(e);
 		bPlayer.saveElements();
 		Bukkit.getPlayer(bPlayer.getUUID()).sendMessage(ChatColor.YELLOW + "Вы родились магом " + (e.getType() == ElementType.BENDING ? "" : "") + e.getColor() + e.getName() + e.getType().getBender() + ChatColor.YELLOW + "!");

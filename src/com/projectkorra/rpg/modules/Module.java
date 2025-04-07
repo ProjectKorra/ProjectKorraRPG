@@ -1,4 +1,23 @@
 package com.projectkorra.rpg.modules;
 
-public class Module {
+import com.projectkorra.rpg.configuration.ConfigManager;
+
+public abstract class Module {
+	private final String name;
+
+	public Module(String name) {
+		this.name = name;
+	}
+
+	public abstract void enable();
+
+	public abstract void disable();
+
+	public String getName() {
+		return this.name;
+	}
+
+	public boolean isEnabled() {
+		return ConfigManager.getConfig().getBoolean("Configuration.Modules." + getName() + ".Enabled");
+	}
 }

@@ -15,10 +15,10 @@ public abstract class RPGCommand implements SubCommand {
 
 	public static HashMap<String, RPGCommand> instances = new HashMap<>();
 
-	private String name;
-	private String properUse;
-	private String description;
-	private String[] aliases;
+	private final String name;
+	private final String properUse;
+	private final String description;
+	private final String[] aliases;
 
 	public RPGCommand(String name, String properUse, String description, String[] aliases) {
 		this.name = name;

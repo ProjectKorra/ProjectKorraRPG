@@ -18,14 +18,14 @@ public class RPGCommandBase extends PKCommand {
 
 	@Override
 	public void execute(CommandSender sender, List<String> args) {
-		if (args.size() == 0) {
+		if (args.isEmpty()) {
 			sender.sendMessage(ChatColor.RED + "/bending rpg avatar <player> " + ChatColor.YELLOW + "Create an Avatar.");
 			sender.sendMessage(ChatColor.RED + "/bending rpg help <command/worldevent> " + ChatColor.YELLOW + "Display help.");
 			sender.sendMessage(ChatColor.RED + "/bending rpg worldevent <argument> [worldevent] " + ChatColor.YELLOW + "Manipulate events.");
 			return;
 		}
 		for (RPGCommand command : RPGCommand.instances.values()) {
-			if (Arrays.asList(command.getAliases()).contains(args.get(0).toLowerCase())) {
+			if (Arrays.asList(command.getAliases()).contains(args.getFirst().toLowerCase())) {
 				command.execute(sender, args.subList(1, args.size()));
 			}
 		}
@@ -33,8 +33,8 @@ public class RPGCommandBase extends PKCommand {
 
 	@Override
 	protected List<String> getTabCompletion(CommandSender sender, List<String> args) {
-		if (args.size() == 0) {
-			List<String> l = new ArrayList<String>();
+		if (args.isEmpty()) {
+			List<String> l = new ArrayList<>();
 			for (RPGCommand cmd : RPGCommand.instances.values()) {
 				l.add(cmd.getName());
 			}
@@ -42,10 +42,10 @@ public class RPGCommandBase extends PKCommand {
 			return l;
 		} else
 			for (RPGCommand cmd : RPGCommand.instances.values()) {
-				if (Arrays.asList(cmd.getAliases()).contains(args.get(0).toLowerCase()) && sender.hasPermission("bending.command.rpg." + cmd.getName())) {
-					List<String> newargs = new ArrayList<String>();
+				if (Arrays.asList(cmd.getAliases()).contains(args.getFirst().toLowerCase()) && sender.hasPermission("bending.command.rpg." + cmd.getName())) {
+					List<String> newargs = new ArrayList<>();
 					for (int i = 1; i < args.size(); i++) {
-						if (!(args.get(i).equals("") || args.get(i).equals(" ")) && args.size() >= 1)
+						if (!(args.get(i).isEmpty() || args.get(i).equals(" ")))
 							newargs.add(args.get(i));
 					}
 					return cmd.getTabCompletion(sender, newargs);

@@ -8,24 +8,50 @@ import com.projectkorra.rpg.configuration.ConfigManager;
 import com.projectkorra.rpg.event.EventManager;
 import com.projectkorra.projectkorra.storage.DBConnection;
 
+import net.luckperms.api.node.Node;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
+
+import static com.projectkorra.rpg.ProjectKorraRPG.api;
 
 public class RPGMethods {
 
+	/**
+	 * @author CrashCringle
+	 *
+	 * @Description This method is a simplified way of removing
+	 * Permissions to players via LuckPerms
+	 *
+	 * @param player Player who will lose permission
+	 * @param permission Permission to remove from the player as a string
+	 */
+	public static void removePermission(Player player, String permission) {
+		api.getUserManager().getUser(player.getUniqueId()).data()
+				.remove(Node.builder(permission).build());
+		api.getUserManager().saveUser(api.getUserManager().getUser(player.getUniqueId()));
+
+	}
+	/**
+	 * @author CrashCringle
+	 *
+	 * @Description This method is a simplified way of adding
+	 * Permissions to players via LuckPerms
+	 *
+	 * @param player Player who will receive permission
+	 * @param permission Permission to give to the player as a string
+	 */
+	public static void addPermission(Player player, String permission) {
+		api.getUserManager().getUser(player.getUniqueId()).data()
+				.add(Node.builder(permission).build());
+		api.getUserManager().saveUser(api.getUserManager().getUser(player.getUniqueId()));
+
+	}
 	/**
 	 * Checks every event interval for an event
 	 * 
@@ -44,18 +70,30 @@ public class RPGMethods {
 		return false;
 	}
 	
-	public static void cycleAvatar(BendingPlayer bPlayer) {
+	public static void cycleAvatar(BendingPlayer oldBPlayer) {
 		if (Bukkit.getOnlinePlayers().size() <= 1) return; //Don't bother with 1 person or less on...
-		revokeAvatar(bPlayer.getUUID());
-		Player avatar = Bukkit.getPlayer(bPlayer.getUUID());
-		Random rand = new Random();
-		int i = rand.nextInt(Bukkit.getOnlinePlayers().size());
-		Player p = (Player) Bukkit.getOnlinePlayers().toArray()[i];
-		while (p == avatar) {	
-			i = rand.nextInt(Bukkit.getOnlinePlayers().size());
-			p = (Player) Bukkit.getOnlinePlayers().toArray()[i];
+		revokeAvatar(oldBPlayer.getUUID());
+		attemptCycle();
+	}
+
+	public static void attemptCycle() {
+		// Choose a random player of the onlineplayers
+		if (Bukkit.getOnlinePlayers().size() < 1) return; //Don't bother with 1 person or less on...
+		// Shuffle the list of online players and attempt to cycle the avatar
+		List<Player> players = new ArrayList<>(Bukkit.getOnlinePlayers());
+		Collections.shuffle(players);
+		for (Player p : players) {
+			BendingPlayer bPlayer = BendingPlayer.getBendingPlayer(p);
+			if (bPlayer == null) continue;
+			if (isCurrentAvatar(bPlayer.getUUID()) && !hasBeenAvatar(bPlayer.getUUID())) {
+				setAvatar(p.getUniqueId());
+				return;
+			}
 		}
-		setAvatar(p.getUniqueId());
+		// If we get there then set AvatarChosen to false.
+		ConfigManager.avatarConfig.get().set("Avatar.Current", "");
+		ConfigManager.avatarConfig.get().set("Avatar.AvatarChosen", false);
+		ConfigManager.avatarConfig.save();
 	}
 
 	/**
@@ -205,140 +243,8 @@ public class RPGMethods {
 		return ConfigManager.rpgConfig.get().getDouble("WorldEvents." + we + ".Factor");
 	}
 
-	/**
-	 * Randomly assigns an element to the param player if enabled in the config
-	 * 
-	 * @param player BendingPlayer being assigned an element to
-	 */
-	public static void randomAssign(BendingPlayer player) {
-		Element newElement = null;
-
-		if (ConfigManager.rpgConfig.get().getBoolean("ElementAssign.Enabled")) {
-			double rand = Math.random();
-			double earthchance = ConfigManager.rpgConfig.get().getDouble("ElementAssign.Percentages.Earth");
-			double firechance = ConfigManager.rpgConfig.get().getDouble("ElementAssign.Percentages.Fire");
-			double airchance = ConfigManager.rpgConfig.get().getDouble("ElementAssign.Percentages.Air");
-			double waterchance = ConfigManager.rpgConfig.get().getDouble("ElementAssign.Percentages.Water");
-			double chichance = ConfigManager.rpgConfig.get().getDouble("ElementAssign.Percentages.Chi");
-
-			if (rand < earthchance) {
-				newElement = Element.EARTH;
-			}
-			else if (rand < waterchance + earthchance) {
-				assignElement(player, Element.WATER);
-			}
-			else if (rand < airchance + waterchance + earthchance) {
-				assignElement(player, Element.AIR);
-			}
-			else if (rand < firechance + airchance + waterchance + earthchance) {
-				assignElement(player, Element.FIRE);
-			}
-			else if (rand < chichance + firechance + airchance + waterchance + earthchance) {
-				assignElement(player, Element.CHI);
-			}
-		} else {
-			String defaultElement = ConfigManager.rpgConfig.get().getString("ElementAssign.Default");
-
-			if (defaultElement.equalsIgnoreCase("chi")) {
-				newElement = Element.CHI;
-			}
-			else if (defaultElement.equalsIgnoreCase("water")) {
-				newElement = Element.WATER;
-			}
-			else if (defaultElement.equalsIgnoreCase("earth")) {
-				newElement = Element.EARTH;
-			}
-			else if (defaultElement.equalsIgnoreCase("fire")) {
-				newElement = Element.FIRE;
-			}
-			else if (defaultElement.equalsIgnoreCase("air")) {
-				newElement = Element.AIR;
-			}
-		}
-		
-		if (newElement != null) {
-			assignElement(player, newElement);
-		}
-	}
-	
-	public static void randomAssignSubElements(BendingPlayer bPlayer) {
-		if (bPlayer.hasElement(Element.CHI)) return;
-                
-		double chance = 0;
-		// String[] subs = {"Blood", "Combustion", "Flight", "Healing", "Ice", "Lava", "Lightning", "Metal", "Plant", "Sand", "SpiritualProjection"};
-		SubElement[] subs = SubElement.getAllSubElements();
-		StringBuilder sb = new StringBuilder(ChatColor.YELLOW + "You have an affinity for ");
-		ArrayList<SubElement> sublist = new ArrayList<>();
-		boolean checkConflicts = ConfigManager.rpgConfig.get().getBoolean("SubElementAssign.CheckConflicts", true);
-		int maxSubElements = ConfigManager.rpgConfig.get().getInt("SubElementAssign.MaxSubElements", -1);
-		
-		for (SubElement sub : subs) {
-			if (maxSubElements == 0) {
-				break;
-			}
-			double rand = Math.random();
-			String name = sub.getName();
-			Element e = sub.getParentElement();
-			chance = ConfigManager.rpgConfig.get().getDouble("SubElementAssign.Percentages." + name);
-
-			if (!bPlayer.hasElement(e) || chance <= 0) {
-				continue;
-			}
-
-			if (checkConflicts) {
-				if (sub == SubElement.METAL && sublist.contains(SubElement.LAVA)) continue;
-				if (sub == SubElement.LAVA && sublist.contains(SubElement.METAL)) continue;
-				if (sub== SubElement.LIGHTNING && sublist.contains(SubElement.COMBUSTION)) continue;
-				if (sub== SubElement.COMBUSTION && sublist.contains(SubElement.LIGHTNING)) continue;
-			}
-
-			if (rand < chance) {
-				sublist.add(sub);
-				bPlayer.addSubElement(sub);
-				GeneralMethods.saveSubElements(bPlayer);
-				maxSubElements--;
-			}
-		}
-		int size = sublist.size();
-		if (size >= 1) {
-			for (SubElement sub : sublist) {
-				String name = sub.getName();
-				sb.append(Element.getElement(name).getColor()).append(name);
-				size--;
-				if (size == 0) {
-					sb.append(ChatColor.YELLOW).append(".");
-				}
-				else if (size == 1) {
-					sb.append(ChatColor.YELLOW).append(" and ");
-				}
-				else {
-					sb.append(ChatColor.YELLOW).append(", ");
-				}
-			}
-		} else {
-			sb = new StringBuilder(ChatColor.RED + "You sadly don't have any extra affinity for your element.");
-		}
-		
-		Player p = Bukkit.getPlayer(bPlayer.getUUID());
-		if (p != null) {
-			p.sendMessage(sb.toString());
-		}
-	}
-
-	/**
-	 * Sets the player's element as param e, sending a message on what they
-	 * became.
-	 * 
-	 * @param bPlayer BendingPlayer which the element is being added to
-	 * @param e Element being added to the player
-	 */
-	private static void assignElement(BendingPlayer bPlayer, Element e) {
-		bPlayer.setElement(e);
-		GeneralMethods.saveElements(bPlayer);
-		Bukkit.getPlayer(bPlayer.getUUID()).sendMessage(ChatColor.YELLOW + "You have been born as an " + e.getColor() + e.getName() + e.getType().getBender() + ChatColor.YELLOW +  "!");
-	}
         
-        /**
+	/**
 	 * Returns if there is an avatar, if he/she has already been choosen or not.
 	 */
 	public static boolean isAvatarChoosen() {
@@ -357,6 +263,9 @@ public class RPGMethods {
 	 */
 	public static void setAvatar(UUID uuid) {
 		if (!isAvatarChoosen()) {
+			if (ConfigManager.avatarConfig.get().getString("Avatar.Current") == null) {
+				ConfigManager.avatarConfig.get().set("Avatar.Current", uuid.toString());
+			}
 			UUID curr = UUID.fromString(ConfigManager.avatarConfig.get().getString("Avatar.Current"));
 			revokeAvatar(curr);
 		}
@@ -376,7 +285,7 @@ public class RPGMethods {
 			}
 			i += 1;
 		}
-                DBConnection.sql.modifyQuery("DELETE FROM pk_avatars WHERE uuid = '" + uuid.toString() + "'");
+        DBConnection.sql.modifyQuery("DELETE FROM pk_avatars WHERE uuid = '" + uuid.toString() + "'");
 		DBConnection.sql.modifyQuery("INSERT INTO pk_avatars (uuid, player, elements) VALUES ('" + uuid.toString() + "', '" + player.getName() + "', '" + sb.toString() + "')");
 		/*
 		 * Gives them the elements
@@ -389,6 +298,31 @@ public class RPGMethods {
 		bPlayer.getElements().addAll(shouldBeAdded);
 		GeneralMethods.saveElements(bPlayer);
 		ConfigManager.avatarConfig.save();
+
+		List<String> avatars = new ArrayList<>();
+		ResultSet rs = DBConnection.sql.readQuery("SELECT player FROM pk_avatars");
+		try {
+			while (rs.next()) {
+				if (avatars.contains(rs.getString(1))) continue;
+				avatars.add(rs.getString(1));
+			}
+			Statement stmt = rs.getStatement();
+			rs.close();
+			stmt.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return;
+		}
+		player.sendMessage("Avatar Past Lives:");
+		for (String s : avatars) {
+			player.sendMessage(s);
+		}
+		addPermission(bPlayer.getPlayer(), "bending.avatar");
+		addPermission(bPlayer.getPlayer(), "bending.ability.avatarstate");
+		addPermission(bPlayer.getPlayer(), "bending.ability.elementsphere");
+		addPermission(bPlayer.getPlayer(), "bending.ability.spiritbeam");
+		addPermission(bPlayer.getPlayer(), "bending.ability.flight");
+		addPermission(bPlayer.getPlayer(), "bending.air.flight");
 	}
 
 	/**
@@ -469,11 +403,20 @@ public class RPGMethods {
 		for (String s : elements2.split(":")) {
 			elements.add(Element.fromString(s));
 		}
-                
+		bPlayer.getPlayer().sendMessage("You feel the power of the Avatar leaving you.");
 		bPlayer.getElements().clear();
 		bPlayer.getElements().addAll(elements);
 		GeneralMethods.saveElements(bPlayer);
 		ConfigManager.avatarConfig.get().set("Avatar.Current", "");
-                ConfigManager.avatarConfig.save();
+        ConfigManager.avatarConfig.save();
+		removePermission(bPlayer.getPlayer(), "bending.avatar");
+		removePermission(bPlayer.getPlayer(), "bending.ability.avatarstate");
+		removePermission(bPlayer.getPlayer(), "bending.ability.elementsphere");
+		removePermission(bPlayer.getPlayer(), "bending.ability.spiritbeam");
+		removePermission(bPlayer.getPlayer(), "bending.ability.flight");
+		removePermission(bPlayer.getPlayer(), "bending.air.flight");
 	}
+
+
+
 }

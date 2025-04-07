@@ -1,4 +1,6 @@
 package com.projectkorra.rpg;
+import com.projectkorra.rpg.modules.manager.ModuleManager;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import com.projectkorra.projectkorra.Element;
 import com.projectkorra.rpg.modules.randomavatar.AvatarManager;
@@ -33,12 +35,14 @@ public class ProjectKorraRPG extends JavaPlugin {
 	private AssignmentManager assignmentManager;
 	private AvatarManager avatarManager;
 	public Set<OfflinePlayer> recentPlayers = new HashSet<>();
+	private ModuleManager moduleManager;
 
 
 	@Override
 	public void onEnable() {
 		ProjectKorraRPG.log = this.getLogger();
 		plugin = this;
+		moduleManager = new ModuleManager();
 		RegisteredServiceProvider<LuckPerms> provider = Bukkit.getServicesManager().getRegistration(LuckPerms.class);
 		if (provider != null) {
 			luckPermsAPI = provider.getProvider();
@@ -49,6 +53,7 @@ public class ProjectKorraRPG extends JavaPlugin {
 		assignmentManager = new AssignmentManager();
 		avatarManager = new AvatarManager();
 		new RPGMethods();
+		moduleManager.enableModules();
 		new RPGCommandBase();
 		new AvatarCommand();
 		new EventCommand();
@@ -89,8 +94,15 @@ public class ProjectKorraRPG extends JavaPlugin {
 
 	@Override
 	public void onDisable() {
-		// Might do something later
+		plugin.getLogger().info("Disabling " + plugin.getName() + "...");
 	}
+	public ModuleManager getModuleManager() {
+		return moduleManager;
+	}
+	public static ProjectKorraRPG getPlugin() {
+		return plugin;
+	}
+
 
 	public Map<String, Element> getElementMap() {
 		return elementMap;

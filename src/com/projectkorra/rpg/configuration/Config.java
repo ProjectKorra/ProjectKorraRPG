@@ -9,10 +9,10 @@ import java.io.File;
 
 public class Config {
 
-	private ProjectKorraRPG plugin;
+	private final ProjectKorraRPG plugin;
 
-	private File file;
-	private FileConfiguration config;
+	private final File file;
+	private final FileConfiguration config;
 
 	/**
 	 * Creates a new {@link Config} with the file being the configuration file.
@@ -34,12 +34,12 @@ public class Config {
 	public void create() {
 		if (!file.getParentFile().exists()) {
 			try {
-				file.getParentFile().mkdir();
-				plugin.getLogger().info("Generating new directory for " + file.getName() + "!");
+				if (file.getParentFile().mkdir()) {
+					plugin.getLogger().info("Generating new directory for " + file.getName() + "!");
+				}
 			}
 			catch (Exception e) {
-				plugin.getLogger().info("Failed to generate directory!");
-				e.printStackTrace();
+				plugin.getLogger().severe("Failed to generate directory!" + e.getMessage());
 			}
 		}
 

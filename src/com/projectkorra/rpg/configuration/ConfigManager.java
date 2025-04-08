@@ -62,7 +62,21 @@ public class ConfigManager {
             config.addDefault("WorldEvents.SozinsComet.Message", "Sozin's Comet is passing overhead! Firebending is now at its most powerful.");
             config.addDefault("WorldEvents.SozinsComet.EndMessage", "Sozin's Comet has passed.");
 
-            config.addDefault("Abilities.AvatarStateOnFinalBlow", true);
+            config.addDefault("Avatar.Randomization.Enabled", true);
+            config.addDefault("Avatar.Randomization.MaxAvatars", 1);
+            config.addDefault("Avatar.Randomization.TimeSinceLoginRequired", 12);
+            config.addDefault("Avatar.Randomization.RepeatSelectionCooldown", 168);
+            config.addDefault("Avatar.Randomization.Broadcast.Enabled", true);
+            config.addDefault("Avatar.Randomization.Broadcast.Public", false);
+            config.addDefault("Avatar.Randomization.AvatarDuration", 168);
+            config.addDefault("Avatar.Randomization.LoseAvatarOnDeath", true);
+            config.addDefault("Avatar.Randomization.OnlyLoseAvatarOnAvatarStateDeath", true);
+            config.addDefault("Avatar.Randomization.ClearOnSelection", true);
+            config.addDefault("Avatar.Randomization.Elements", List.of("air", "water", "earth", "fire", "avatar"));
+            config.addDefault("Avatar.Randomization.IncludeAllSubElements", true);
+            config.addDefault("Avatar.Randomization.SubElementBlacklist", List.of("blood"));
+
+
 
             config.addDefault("ElementAssign.Enabled", true);
             config.addDefault("ElementAssign.Default", "None");
@@ -72,7 +86,7 @@ public class ConfigManager {
             config.addDefault("ElementAssign.ChangeOnDeath.Bypass", false); // Allow bypassing cooldowns for changing
             // elements on death (if true, will ignore
             // cooldowns)
-            config.addDefault("ElementAssign.ChangeOnDeath.Permission", "projectkorrarpg.elementassign.bypass");
+            config.addDefault("ElementAssign.ChangeOnDeath.Permission", "projectkorra.rpg.elementassign.bypass");
             // Empty Set
             Set<String> elementNames = new HashSet<>();
 
@@ -199,18 +213,8 @@ public class ConfigManager {
                         "" // Permission Group to assign
                 );
             });
-
-            config.addDefault("Storage.engine", "sqlite");
-
-            config.addDefault("Storage.MySQL.host", "localhost");
-            config.addDefault("Storage.MySQL.port", 3306);
-            config.addDefault("Storage.MySQL.pass", "");
-            config.addDefault("Storage.MySQL.db", "minecraft");
-            config.addDefault("Storage.MySQL.user", "root");
             config.options().copyDefaults(true);
             rpgConfig.save();
-        } else if (type == AVATARS) {
-            // Nothing needs to be set in the avatars.yml yet
         }
     }
 }

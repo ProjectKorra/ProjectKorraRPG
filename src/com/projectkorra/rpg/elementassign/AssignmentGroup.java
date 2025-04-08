@@ -1,4 +1,4 @@
-package elementassign;
+package com.projectkorra.rpg.elementassign;
 
 import com.projectkorra.projectkorra.Element;
 

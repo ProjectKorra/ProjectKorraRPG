@@ -1,5 +1,7 @@
 package com.projectkorra.rpg.commands;
 
+import com.projectkorra.projectkorra.BendingPlayer;
+import com.projectkorra.rpg.ProjectKorraRPG;
 import com.projectkorra.rpg.RPGMethods;
 import com.projectkorra.projectkorra.storage.DBConnection;
 
@@ -24,24 +26,18 @@ public class AvatarCommand extends RPGCommand{
 	public void execute(CommandSender sender, List<String> args) {
 		if (!correctLength(sender, args.size(), 1, 1))
 			return;
-		if (!hasPermission(sender))
+		if (ProjectKorraRPG.plugin.getAvatarManager() == null || !ProjectKorraRPG.plugin.getAvatarManager().isEnabled()) {
+			sender.sendMessage(ChatColor.RED + "Avatar system is not enabled!");
 			return;
-		if (args.get(0).equalsIgnoreCase("list")) {
-			List<String> avatars = new ArrayList<>();
-			ResultSet rs = DBConnection.sql.readQuery("SELECT player FROM pk_avatars");
-			try {
-				while (rs.next()) {
-					if (avatars.contains(rs.getString(1))) continue;
-					avatars.add(rs.getString(1));
-				}
-				Statement stmt = rs.getStatement();
-				rs.close();
-				stmt.close();
-			} catch (SQLException e) {
-				e.printStackTrace();
+		}
+		if (sender instanceof Player) {
+			if (!hasPermission(sender))
 				return;
-			}
-			sender.sendMessage("Avatar Past Lives:");
+		}
+
+		if (args.get(0).equalsIgnoreCase("list")) {
+			List<String> avatars =  ProjectKorraRPG.plugin.getAvatarManager().getPastLives();
+			sender.sendMessage(ChatColor.BOLD + "Avatar Past Lives:");
 			for (String s : avatars) {
 				sender.sendMessage(s);
 			}
@@ -51,12 +47,16 @@ public class AvatarCommand extends RPGCommand{
 		if (target == null) {
 			sender.sendMessage(ChatColor.RED + "Player not found!");
 			return;
-		} else if (RPGMethods.hasBeenAvatar(target.getUniqueId())) {
-			sender.sendMessage(ChatColor.RED + "Player has already been the avatar!");
-			return;
+		} else {
+			BendingPlayer bPlayer = BendingPlayer.getBendingPlayer(target);
+			boolean succesful = ProjectKorraRPG.plugin.getAvatarManager().makeAvatar(target.getUniqueId());
+			if (!succesful) {
+				sender.sendMessage(ChatColor.RED + "Failed to declare avatar!");
+				return;
+			} else {
+				sender.sendMessage(ChatColor.DARK_PURPLE + target.getName() + " has been declared the Avatar!");
+			}
 		} 
-		RPGMethods.setAvatar(target.getUniqueId());
-		Bukkit.broadcastMessage(ChatColor.WHITE + target.getName() + ChatColor.DARK_PURPLE + " has been declared avatar!");
 	}
 	
 	@Override

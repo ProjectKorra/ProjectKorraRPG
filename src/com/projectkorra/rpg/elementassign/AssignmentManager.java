@@ -1,4 +1,4 @@
-package elementassign;
+package com.projectkorra.rpg.elementassign;
 
 import com.projectkorra.projectkorra.BendingPlayer;
 import com.projectkorra.projectkorra.Element;
@@ -6,6 +6,7 @@ import com.projectkorra.projectkorra.ProjectKorra;
 import com.projectkorra.rpg.ProjectKorraRPG;
 import com.projectkorra.rpg.configuration.ConfigManager;
 import net.luckperms.api.node.Node;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
@@ -15,13 +16,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static com.projectkorra.projectkorra.object.Preset.config;
 import static com.projectkorra.rpg.ProjectKorraRPG.api;
 
 public class AssignmentManager {
     // Map every Group to a weight
     private List<AssignmentGroup> groups = new ArrayList<>();
     private double totalWeight = 0;
+    private boolean enabled = false;
     double chance = 0.2;
     boolean changeOnDeathEnabled = true; // Allow changing element on death
     boolean changeOnDeathBypass = false; // Allow bypassing cooldowns for changing elements on death (if true, will ignore cooldowns)
@@ -32,6 +33,7 @@ public class AssignmentManager {
     public AssignmentManager() {
 
         if (ConfigManager.rpgConfig.get().getBoolean("ElementAssign.Enabled")) {
+            setEnabled(true);
             // Get the default group from the configuration
             defaultElement = ConfigManager.rpgConfig.get().getString("ElementAssign.Default");
             changeOnDeathEnabled = ConfigManager.rpgConfig.get().getBoolean("ElementAssign.ChangeOnDeath.Enabled");
@@ -57,9 +59,11 @@ public class AssignmentManager {
                     ProjectKorraRPG.plugin.getLogger().info("ElementAssign: " + groupKey + " is enabled with weight: " + weight);
                 }
             }
+            Bukkit.getServer().getPluginManager().registerEvents(new AssignmentListener(), ProjectKorraRPG.plugin);
 
         } else {
             ProjectKorraRPG.plugin.getLogger().info("ElementAssign is disabled in the config.yml. Please enable it to use this feature.");
+            setEnabled(false);
         }
     }
     public AssignmentGroup getRandomGroup() {
@@ -155,5 +159,13 @@ public class AssignmentManager {
 
     public void setTotalWeight(double totalWeight) {
         this.totalWeight = totalWeight;
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 }

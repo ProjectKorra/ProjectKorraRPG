@@ -1,11 +1,12 @@
 package com.projectkorra.rpg;
 
 import com.projectkorra.projectkorra.Element;
+import com.projectkorra.rpg.avatar.AvatarManager;
 import com.projectkorra.rpg.commands.AvatarCommand;
 import com.projectkorra.rpg.commands.EventCommand;
 import com.projectkorra.rpg.commands.HelpCommand;
 import com.projectkorra.rpg.commands.RPGCommandBase;
-import elementassign.AssignmentManager;
+import com.projectkorra.rpg.elementassign.AssignmentManager;
 import com.projectkorra.rpg.configuration.ConfigManager;
 import com.projectkorra.rpg.event.EventManager;
 import com.projectkorra.rpg.util.MetricsLite;
@@ -27,6 +28,7 @@ public class ProjectKorraRPG extends JavaPlugin {
 	public static LuckPerms api;
 	private Map<String, Element> elementMap;
 	private AssignmentManager assignmentManager;
+	private AvatarManager avatarManager;
 
 	@Override
 	public void onEnable() {
@@ -40,6 +42,7 @@ public class ProjectKorraRPG extends JavaPlugin {
 		setElementMap(grabElements());
 		new ConfigManager();
 		assignmentManager = new AssignmentManager();
+		avatarManager = new AvatarManager();
 		new RPGMethods();
 		new RPGCommandBase();
 		new AvatarCommand();
@@ -98,5 +101,13 @@ public class ProjectKorraRPG extends JavaPlugin {
 
 	public void setAssignmentManager(AssignmentManager assignmentManager) {
 		this.assignmentManager = assignmentManager;
+	}
+
+	public AvatarManager getAvatarManager() {
+		return avatarManager;
+	}
+
+	public void setAvatarManager(AvatarManager avatarManager) {
+		this.avatarManager = avatarManager;
 	}
 }

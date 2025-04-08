@@ -1,6 +1,8 @@
 package com.projectkorra.rpg;
 
-import com.projectkorra.rpg.modules.manager.ModuleManager;
+import com.projectkorra.projectkorra.ProjectKorra;
+import com.projectkorra.rpg.modules.ModuleManager;
+import com.projectkorra.rpg.storage.Storage;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.projectkorra.rpg.commands.RPGCommandBase;
@@ -14,6 +16,7 @@ public class ProjectKorraRPG extends JavaPlugin {
 	@Override
 	public void onEnable() {
 		plugin = this;
+		Storage.init();
 		moduleManager = new ModuleManager();
 
 		new ConfigManager();
@@ -24,7 +27,7 @@ public class ProjectKorraRPG extends JavaPlugin {
 
 	@Override
 	public void onDisable() {
-		plugin.getLogger().info("Disabling " + plugin.getName() + "...");
+		moduleManager.disableModules();
 	}
 
 	public static ProjectKorraRPG getPlugin() {

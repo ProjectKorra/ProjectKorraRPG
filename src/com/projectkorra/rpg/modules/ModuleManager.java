@@ -1,6 +1,5 @@
-package com.projectkorra.rpg.modules.manager;
+package com.projectkorra.rpg.modules;
 
-import com.projectkorra.rpg.modules.Module;
 import com.projectkorra.rpg.modules.events.WorldEvents;
 import com.projectkorra.rpg.modules.leveling.RPGLeveling;
 import com.projectkorra.rpg.modules.randomavatar.RandomAvatar;

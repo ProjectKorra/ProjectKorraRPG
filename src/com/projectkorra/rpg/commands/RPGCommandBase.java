@@ -25,9 +25,9 @@ public class RPGCommandBase extends PKCommand {
 			return;
 		}
 		for (RPGCommand command : RPGCommand.instances.values()) {
-			if (Arrays.asList(command.getAliases()).contains(args.getFirst().toLowerCase())) {
-				command.execute(sender, args.subList(1, args.size()));
-			}
+//			if (Arrays.asList(command.getAliases()).contains(args.getFirst().toLowerCase())) {
+//				command.execute(sender, args.subList(1, args.size()));
+//			}
 		}
 	}
 
@@ -42,7 +42,7 @@ public class RPGCommandBase extends PKCommand {
 			return l;
 		} else
 			for (RPGCommand cmd : RPGCommand.instances.values()) {
-				if (Arrays.asList(cmd.getAliases()).contains(args.getFirst().toLowerCase()) && sender.hasPermission("bending.command.rpg." + cmd.getName())) {
+				if (Arrays.asList(cmd.getAliases()).contains(sender.hasPermission("bending.command.rpg." + cmd.getName()))) {
 					List<String> newargs = new ArrayList<>();
 					for (int i = 1; i < args.size(); i++) {
 						if (!(args.get(i).isEmpty() || args.get(i).equals(" ")))

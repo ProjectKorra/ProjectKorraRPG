@@ -123,6 +123,6 @@ public abstract class RPGCommand implements SubCommand {
 
 	/** Gets a list of valid arguments that can be used in tabbing. */
 	protected List<String> getTabCompletion(CommandSender sender, List<String> args) {
-		return new ArrayList<String>();
+		return new ArrayList<>();
 	}
 }

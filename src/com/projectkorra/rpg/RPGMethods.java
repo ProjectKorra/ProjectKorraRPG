@@ -1,25 +1,14 @@
 package com.projectkorra.rpg;
 
-import com.projectkorra.projectkorra.BendingPlayer;
-import com.projectkorra.projectkorra.Element;
-import com.projectkorra.projectkorra.Element.SubElement;
-import com.projectkorra.projectkorra.GeneralMethods;
 import com.projectkorra.rpg.configuration.ConfigManager;
 import com.projectkorra.rpg.event.EventManager;
-import com.projectkorra.projectkorra.storage.DBConnection;
 
 import net.luckperms.api.node.Node;
-import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.*;
 
-import static com.projectkorra.rpg.ProjectKorraRPG.api;
-
+import static com.projectkorra.rpg.ProjectKorraRPG.luckPermsAPI;
 public class RPGMethods {
 
 	/**
@@ -32,9 +21,11 @@ public class RPGMethods {
 	 * @param permission Permission to remove from the player as a string
 	 */
 	public static void removePermission(Player player, String permission) {
-		api.getUserManager().getUser(player.getUniqueId()).data()
+		if (luckPermsAPI == null)
+			return;
+		luckPermsAPI.getUserManager().getUser(player.getUniqueId()).data()
 				.remove(Node.builder(permission).build());
-		api.getUserManager().saveUser(api.getUserManager().getUser(player.getUniqueId()));
+		luckPermsAPI.getUserManager().saveUser(luckPermsAPI.getUserManager().getUser(player.getUniqueId()));
 
 	}
 	/**
@@ -47,9 +38,11 @@ public class RPGMethods {
 	 * @param permission Permission to give to the player as a string
 	 */
 	public static void addPermission(Player player, String permission) {
-		api.getUserManager().getUser(player.getUniqueId()).data()
+		if (luckPermsAPI == null)
+			return;
+		luckPermsAPI.getUserManager().getUser(player.getUniqueId()).data()
 				.add(Node.builder(permission).build());
-		api.getUserManager().saveUser(api.getUserManager().getUser(player.getUniqueId()));
+		luckPermsAPI.getUserManager().saveUser(luckPermsAPI.getUserManager().getUser(player.getUniqueId()));
 
 	}
 	/**

@@ -4,8 +4,8 @@ import com.projectkorra.projectkorra.BendingPlayer;
 import com.projectkorra.projectkorra.Element;
 import com.projectkorra.projectkorra.ProjectKorra;
 import com.projectkorra.rpg.ProjectKorraRPG;
+import com.projectkorra.rpg.RPGMethods;
 import com.projectkorra.rpg.configuration.ConfigManager;
-import net.luckperms.api.node.Node;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
@@ -15,8 +15,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import static com.projectkorra.rpg.ProjectKorraRPG.api;
 
 public class AssignmentManager {
     // Map every Group to a weight
@@ -111,12 +109,11 @@ public class AssignmentManager {
             for (String group : permissionGroups) {
                 if (!group.equalsIgnoreCase(assignmentGroup.getPermissionGroup()) && player.hasPermission("group." + group)) {
                     // Remove the old group permission
-                    api.getUserManager().getUser(player.getUniqueId()).data().remove(Node.builder("group." + group).build());
+                    RPGMethods.removePermission(player, "group." + group);
                 }
             }
             // Add the new group permission
-            api.getUserManager().getUser(player.getUniqueId()).data().add(Node.builder("group." + assignmentGroup.getPermissionGroup()).build());
-            api.getUserManager().saveUser(api.getUserManager().getUser(player.getUniqueId()));
+            RPGMethods.addPermission(player, "group." + assignmentGroup.getPermissionGroup());
         }
 
         if (bp.isOnline()) {

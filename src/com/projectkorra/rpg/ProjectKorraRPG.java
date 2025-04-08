@@ -25,7 +25,7 @@ public class ProjectKorraRPG extends JavaPlugin {
 	
 	public static ProjectKorraRPG plugin;
 	public static Logger log;
-	public static LuckPerms api;
+	public static LuckPerms luckPermsAPI;
 	private Map<String, Element> elementMap;
 	private AssignmentManager assignmentManager;
 	private AvatarManager avatarManager;
@@ -36,8 +36,7 @@ public class ProjectKorraRPG extends JavaPlugin {
 		plugin = this;
 		RegisteredServiceProvider<LuckPerms> provider = Bukkit.getServicesManager().getRegistration(LuckPerms.class);
 		if (provider != null) {
-			api = provider.getProvider();
-
+			luckPermsAPI = provider.getProvider();
 		}
 		setElementMap(grabElements());
 		new ConfigManager();

@@ -5,6 +5,7 @@ import com.projectkorra.projectkorra.Element;
 import com.projectkorra.projectkorra.event.BendingPlayerLoadEvent;
 import com.projectkorra.rpg.configuration.ConfigManager;
 import com.projectkorra.rpg.modules.randomelements.methods.RandomElementMethods;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -22,15 +23,26 @@ public class RandomElementsListener implements Listener {
 
 		Player player = bPlayer.getPlayer();
 
-		boolean hybrid = ConfigManager.getConfig().getBoolean("Configuration.Modules.RandomElements.Element.Hybrid", true);
+		boolean hybrid = ConfigManager.getFileConfig().getBoolean("Configuration.Modules.RandomElements.Element.Hybrid", true);
 		List<Element> chosenElements = RandomElementMethods.getRandomizedElements(hybrid);
+		List<Element.SubElement> chosenSubElements = RandomElementMethods.getRandomizedSubElements(chosenElements.get(0));
 
-		StringBuilder message = new StringBuilder("You were born as a ");
+		StringBuilder message = new StringBuilder(ChatColor.YELLOW + "You were born as a ");
 		for (Element element : chosenElements) {
 			bPlayer.addElement(element);
-			message.append(element.getName()).append(" ");
+			message.append(element.getColor()).append(element.getName()).append(" ");
 		}
-		message.append("bender!");
+
+		message.append(ChatColor.YELLOW).append("bender! ");
+
+		if (!chosenSubElements.isEmpty()) {
+			message.append(ChatColor.GOLD).append("You were born lucky and also received: ");
+			for (Element.SubElement subElement : chosenSubElements) {
+				bPlayer.addSubElement(subElement);
+				message.append(subElement.getSubColor()).append(subElement.getName()).append(" ");
+			}
+			message.append(ChatColor.GOLD).append("Sub elements!");
+		}
 		player.sendMessage(message.toString().trim());
 	}
 }

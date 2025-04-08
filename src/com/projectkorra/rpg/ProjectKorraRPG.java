@@ -1,6 +1,6 @@
 package com.projectkorra.rpg;
 
-import com.projectkorra.projectkorra.ProjectKorra;
+import com.projectkorra.rpg.listeners.RPGListeners;
 import com.projectkorra.rpg.modules.ModuleManager;
 import com.projectkorra.rpg.storage.Storage;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -21,6 +21,8 @@ public class ProjectKorraRPG extends JavaPlugin {
 
 		new ConfigManager();
 		new RPGCommandBase();
+
+		getServer().getPluginManager().registerEvents(new RPGListeners(), this);
 
 		moduleManager.enableModules();
 	}

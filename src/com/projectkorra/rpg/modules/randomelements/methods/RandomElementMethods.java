@@ -9,7 +9,7 @@ import com.projectkorra.rpg.configuration.ConfigManager;
 import org.bukkit.configuration.file.FileConfiguration;
 
 public class RandomElementMethods {
-	private static final FileConfiguration config = ConfigManager.getConfig();
+	private static final FileConfiguration config = ConfigManager.getFileConfig();
 
 	/**
 	 * Randomly selects element(s) based on configuration.
@@ -35,18 +35,18 @@ public class RandomElementMethods {
 		if (hybrid) {
 			double totalMainChance = waterChance + earthChance + fireChance + airChance;
 			double roll = random.nextDouble() * totalMainChance;
-			Element mainElement;
+			Element chosen;
 
 			if (roll < waterChance) {
-				mainElement = Element.WATER;
+				chosen = Element.WATER;
 			} else if ((roll -= waterChance) < earthChance) {
-				mainElement = Element.EARTH;
+				chosen = Element.EARTH;
 			} else if (roll - earthChance < fireChance) {
-				mainElement = Element.FIRE;
+				chosen = Element.FIRE;
 			} else {
-				mainElement = Element.AIR;
+				chosen = Element.AIR;
 			}
-			elements.add(mainElement);
+			elements.add(chosen);
 
 			if (random.nextDouble() * 100 < chiChance) {
 				elements.add(Element.CHI);
@@ -88,6 +88,66 @@ public class RandomElementMethods {
 	 * @return a list of sub-elements that have passed the random chance check.
 	 */
 	public static List<Element.SubElement> getRandomizedSubElements(Element element) {
-		return null;
+		Random random = new Random(System.nanoTime());
+		List<Element.SubElement> subElements = new ArrayList<>();
+
+		if (element == Element.WATER) {
+			double bloodChance = config.getDouble("Configuration.Modules.RandomElements.Element.Water.Blood.Chance", 1);
+			double iceChance = config.getDouble("Configuration.Modules.RandomElements.Element.Water.Ice.Chance", 75);
+			double healingChance = config.getDouble("Configuration.Modules.RandomElements.Element.Water.Healing.Chance", 50);
+			double plantChance = config.getDouble("Configuration.Modules.RandomElements.Element.Water.Plant.Chance", 50);
+
+			if (random.nextDouble() * 100 < bloodChance) {
+				subElements.add(Element.SubElement.BLOOD);
+			}
+			if (random.nextDouble() * 100 < iceChance) {
+				subElements.add(Element.SubElement.ICE);
+			}
+			if (random.nextDouble() * 100 < healingChance) {
+				subElements.add(Element.SubElement.HEALING);
+			}
+			if (random.nextDouble() * 100 < plantChance) {
+				subElements.add(Element.SubElement.PLANT);
+			}
+		} else if (element == Element.EARTH) {
+			double lavaChance = config.getDouble("Configuration.Modules.RandomElements.Element.Earth.Lava.Chance", 5);
+			double metalChance = config.getDouble("Configuration.Modules.RandomElements.Element.Earth.Metal.Chance", 35);
+			double sandChance = config.getDouble("Configuration.Modules.RandomElements.Element.Earth.Sand.Chance", 85);
+
+			if (random.nextDouble() * 100 < lavaChance) {
+				subElements.add(Element.SubElement.LAVA);
+			}
+			if (random.nextDouble() * 100 < metalChance) {
+				subElements.add(Element.SubElement.METAL);
+			}
+			if (random.nextDouble() * 100 < sandChance) {
+				subElements.add(Element.SubElement.SAND);
+			}
+		} else if (element == Element.FIRE) {
+			double lightningChance = config.getDouble("Configuration.Modules.RandomElements.Element.Fire.Lightning.Chance", 25);
+			double combustionChance = config.getDouble("Configuration.Modules.RandomElements.Element.Fire.Combustion.Chance", 5);
+			double blueFireChance = config.getDouble("Configuration.Modules.RandomElements.Element.Fire.BlueFire.Chance", 5);
+
+			if (random.nextDouble() * 100 < lightningChance) {
+				subElements.add(Element.SubElement.LIGHTNING);
+			}
+			if (random.nextDouble() * 100 < combustionChance) {
+				subElements.add(Element.SubElement.COMBUSTION);
+			}
+			if (random.nextDouble() * 100 < blueFireChance) {
+				subElements.add(Element.SubElement.BLUE_FIRE);
+			}
+		} else {
+			double flightChance = config.getDouble("Configuration.Modules.RandomElements.Element.Air.Flight.Chance", 1);
+			double spiritChance = config.getDouble("Configuration.Modules.RandomElements.Element.Air.Spiritual.Chance", 50);
+
+			if (random.nextDouble() * 100 < flightChance) {
+				subElements.add(Element.SubElement.FLIGHT);
+			}
+			if (random.nextDouble() * 100 < spiritChance) {
+				subElements.add(Element.SubElement.SPIRITUAL);
+			}
+		}
+		return subElements;
 	}
 }

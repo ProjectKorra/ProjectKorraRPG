@@ -104,11 +104,11 @@ public class ConfigManager {
 		}
 	}
 
-	public static FileConfiguration getConfig() {
+	public static FileConfiguration getFileConfig() {
 		return config.get();
 	}
 
-	public static void saveConfig() {
-		config.save();
+	public static Config getConfig() {
+		return config;
 	}
 }

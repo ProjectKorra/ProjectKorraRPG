@@ -1,30 +1,29 @@
 /*
  * Copyright 2011-2013 Tyler Blair. All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
+ * Redistribution and use in source and binary forms, with or without modification, are
+ * permitted provided that the following conditions are met:
  *
- * 1. Redistributions of source code must retain the above copyright notice,
- * this list of conditions and the following disclaimer.
+ * 1. Redistributions of source code must retain the above copyright notice, this list of
+ * conditions and the following disclaimer.
  *
- * 2. Redistributions in binary form must reproduce the above copyright notice,
- * this list of conditions and the following disclaimer in the documentation
- * and/or other materials provided with the distribution.
+ * 2. Redistributions in binary form must reproduce the above copyright notice, this list
+ * of conditions and the following disclaimer in the documentation and/or other materials
+ * provided with the distribution.
  *
  * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ''AS IS'' AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
- * EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA,
- * OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
- * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
- * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+ * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHOR OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+ * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+ * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * The views and conclusions contained in the software and documentation are
- * those of the authors and contributors and should not be interpreted as
- * representing official policies, either expressed or implied, of anybody else.
+ * The views and conclusions contained in the software and documentation are those of the
+ * authors and contributors and should not be interpreted as representing official policies,
+ * either expressed or implied, of anybody else.
  */
 
 package com.projectkorra.rpg.util;
@@ -96,7 +95,6 @@ public class MetricsLite {
 	 * Id of the scheduled task
 	 */
 	private volatile BukkitTask task = null;
-
 	public MetricsLite(Plugin plugin) throws IOException {
 		if (plugin == null) {
 			throw new IllegalArgumentException("Plugin cannot be null");
@@ -118,12 +116,10 @@ public class MetricsLite {
 		guid = configuration.getString("guid");
 		debug = configuration.getBoolean("debug", false);
 	}
-
 	/**
-	 * Start measuring statistics. This will immediately create an async
-	 * repeating task as the plugin and send the initial data to the metrics
-	 * backend, and then after that it will post in increments of PING_INTERVAL
-	 * * 1200 ticks.
+	 * Start measuring statistics. This will immediately create an async repeating task as the plugin and send
+	 * the initial data to the metrics backend, and then after that it will post in increments of
+	 * PING_INTERVAL * 1200 ticks.
 	 *
 	 * @return True if statistics measuring is running, otherwise false.
 	 */
@@ -140,7 +136,6 @@ public class MetricsLite {
 			// Begin hitting the server with glorious data
 			task = plugin.getServer().getScheduler().runTaskTimerAsynchronously(plugin, new Runnable() {
 				private boolean firstPost = true;
-
 				@Override
 				public void run() {
 					try {
@@ -159,8 +154,7 @@ public class MetricsLite {
 						// After the first post we set firstPost to false
 						// Each post thereafter will be a ping
 						firstPost = false;
-					}
-					catch (IOException e) {
+					} catch (IOException e) {
 						if (debug) {
 							Bukkit.getLogger().log(Level.INFO, "[Metrics] " + e.getMessage());
 						}
@@ -170,7 +164,6 @@ public class MetricsLite {
 			return true;
 		}
 	}
-
 	/**
 	 * Has the server owner denied plugin metrics?
 	 *
@@ -181,14 +174,12 @@ public class MetricsLite {
 			try {
 				// Reload the metrics file
 				configuration.load(getConfigFile());
-			}
-			catch (IOException ex) {
+			} catch (IOException ex) {
 				if (debug) {
 					Bukkit.getLogger().log(Level.INFO, "[Metrics] " + ex.getMessage());
 				}
 				return true;
-			}
-			catch (InvalidConfigurationException ex) {
+			} catch (InvalidConfigurationException ex) {
 				if (debug) {
 					Bukkit.getLogger().log(Level.INFO, "[Metrics] " + ex.getMessage());
 				}
@@ -197,10 +188,8 @@ public class MetricsLite {
 			return configuration.getBoolean("opt-out", false);
 		}
 	}
-
 	/**
-	 * Enables metrics for the server by setting "opt-out" to false in the
-	 * config file and starting the metrics task.
+	 * Enables metrics for the server by setting "opt-out" to false in the config file and starting the metrics task.
 	 *
 	 * @throws java.io.IOException
 	 */
@@ -218,10 +207,8 @@ public class MetricsLite {
 			}
 		}
 	}
-
 	/**
-	 * Disables metrics for the server by setting "opt-out" to true in the
-	 * config file and canceling the metrics task.
+	 * Disables metrics for the server by setting "opt-out" to true in the config file and canceling the metrics task.
 	 *
 	 * @throws java.io.IOException
 	 */
@@ -240,10 +227,8 @@ public class MetricsLite {
 			}
 		}
 	}
-
 	/**
-	 * Gets the File object of the config file that should be used to store data
-	 * such as the GUID and opt-out status
+	 * Gets the File object of the config file that should be used to store data such as the GUID and opt-out status
 	 *
 	 * @return the File object for the config file
 	 */
@@ -257,7 +242,6 @@ public class MetricsLite {
 		// return => base/plugins/PluginMetrics/config.yml
 		return new File(new File(pluginsFolder, "PluginMetrics"), "config.yml");
 	}
-
 	/**
 	 * Generic method that posts a plugin to the metrics website
 	 */
@@ -343,7 +327,6 @@ public class MetricsLite {
 			throw new IOException(response);
 		}
 	}
-
 	/**
 	 * GZip compress a string of bytes
 	 *
@@ -356,24 +339,18 @@ public class MetricsLite {
 		try {
 			gzos = new GZIPOutputStream(baos);
 			gzos.write(input.getBytes("UTF-8"));
-		}
-		catch (IOException e) {
+		} catch (IOException e) {
 			e.printStackTrace();
-		}
-		finally {
-			if (gzos != null)
-				try {
-					gzos.close();
-				}
-				catch (IOException ignore) {
-				}
+		} finally {
+			if (gzos != null) try {
+				gzos.close();
+			} catch (IOException ignore) {
+			}
 		}
 		return baos.toByteArray();
 	}
-
 	/**
-	 * Check if mineshafter is present. If it is, we need to bypass it to send
-	 * POST requests
+	 * Check if mineshafter is present. If it is, we need to bypass it to send POST requests
 	 *
 	 * @return true if mineshafter is installed on the server
 	 */
@@ -381,12 +358,10 @@ public class MetricsLite {
 		try {
 			Class.forName("mineshafter.MineServer");
 			return true;
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			return false;
 		}
 	}
-
 	/**
 	 * Appends a json encoded key/value pair to the given string builder.
 	 *
@@ -402,8 +377,7 @@ public class MetricsLite {
 				Double.parseDouble(value);
 				isValueNumeric = true;
 			}
-		}
-		catch (NumberFormatException e) {
+		} catch (NumberFormatException e) {
 			isValueNumeric = false;
 		}
 		if (json.charAt(json.length() - 1) != '{') {
@@ -417,7 +391,6 @@ public class MetricsLite {
 			json.append(escapeJSON(value));
 		}
 	}
-
 	/**
 	 * Escape a string to create a valid JSON string
 	 *
@@ -430,37 +403,36 @@ public class MetricsLite {
 		for (int index = 0; index < text.length(); index++) {
 			char chr = text.charAt(index);
 			switch (chr) {
-				case '"':
-				case '\\':
-					builder.append('\\');
+			case '"':
+			case '\\':
+				builder.append('\\');
+				builder.append(chr);
+				break;
+			case '\b':
+				builder.append("\\b");
+				break;
+			case '\t':
+				builder.append("\\t");
+				break;
+			case '\n':
+				builder.append("\\n");
+				break;
+			case '\r':
+				builder.append("\\r");
+				break;
+			default:
+				if (chr < ' ') {
+					String t = "000" + Integer.toHexString(chr);
+					builder.append("\\u" + t.substring(t.length() - 4));
+				} else {
 					builder.append(chr);
-					break;
-				case '\b':
-					builder.append("\\b");
-					break;
-				case '\t':
-					builder.append("\\t");
-					break;
-				case '\n':
-					builder.append("\\n");
-					break;
-				case '\r':
-					builder.append("\\r");
-					break;
-				default:
-					if (chr < ' ') {
-						String t = "000" + Integer.toHexString(chr);
-						builder.append("\\u" + t.substring(t.length() - 4));
-					} else {
-						builder.append(chr);
-					}
-					break;
+				}
+				break;
 			}
 		}
 		builder.append('"');
 		return builder.toString();
 	}
-
 	/**
 	 * Encode text as UTF-8
 	 *

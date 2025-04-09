@@ -72,7 +72,7 @@ public class ConfigManager {
             config.addDefault("Avatar.Randomization.LoseAvatarOnDeath", true);
             config.addDefault("Avatar.Randomization.OnlyLoseAvatarOnAvatarStateDeath", true);
             config.addDefault("Avatar.Randomization.ClearOnSelection", true);
-            config.addDefault("Avatar.Randomization.Elements", List.of("air", "water", "earth", "fire", "avatar"));
+            config.addDefault("Avatar.Randomization.Elements", List.of( "avatar"));
             config.addDefault("Avatar.Randomization.IncludeAllSubElements", true);
             config.addDefault("Avatar.Randomization.SubElementBlacklist", List.of("blood"));
             config.setComments("Avatar.Randomization.Enabled", List.of("Whether to enable the Avatar randomization system", "This gives every player a chance to become Avatar"));

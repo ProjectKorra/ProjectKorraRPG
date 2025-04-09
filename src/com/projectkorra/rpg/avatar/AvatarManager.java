@@ -313,7 +313,7 @@ public class AvatarManager {
                 Timestamp startTime = rs.getTimestamp("startTime");
                 // Calculate remaining time so we can add temp elements if needed
                 long remainingTime = (long) (avatarDuration * 3600000 - (Instant.now().toEpochMilli() - startTime.getTime()));
-                OfflineBendingPlayer bPlayer = BendingPlayer.getOfflineBendingPlayer(playerName);
+                BendingPlayer bPlayer = BendingPlayer.getBendingPlayer(Bukkit.getOfflinePlayer(avatarUUID));
                 for (Element element : getAvatarElements()) {
                     if (!bPlayer.hasElement(element)) {
                         // Add it for remaining time
@@ -402,8 +402,7 @@ public class AvatarManager {
             ProjectKorraRPG.plugin.getLogger().info("Avatar selection: Player is already the current avatar.");
             return false;
         }
-        String playerName = Bukkit.getOfflinePlayer(uuid).getName();
-        OfflineBendingPlayer bPlayer = BendingPlayer.getOfflineBendingPlayer(playerName);
+        BendingPlayer bPlayer = BendingPlayer.getBendingPlayer(Bukkit.getOfflinePlayer(uuid));
         if (bPlayer == null) {
             ProjectKorraRPG.plugin.getLogger().info("Avatar selection: BendingPlayer not found for player.");
             return false;
@@ -427,7 +426,8 @@ public class AvatarManager {
     private void addRPGAvatar(UUID uuid) {
         Bukkit.getScheduler().runTaskLater(ProjectKorra.plugin, () -> {
             String playerName = Bukkit.getOfflinePlayer(uuid).getName();
-            OfflineBendingPlayer bPlayer = BendingPlayer.getOfflineBendingPlayer(playerName);
+            BendingPlayer bPlayer = BendingPlayer.getBendingPlayer(Bukkit.getOfflinePlayer(uuid));
+
             Timestamp timestamp = Timestamp.from(Instant.now());
             DBConnection.sql.modifyQuery("INSERT INTO pk_rpg_avatars (uuid, player, startTime, elements) VALUES ('" + uuid.toString() + "', '" + playerName + "', '" + timestamp + "', '" + String.join(",", bPlayer.getElements().stream().map(Element::getName).toArray(String[]::new)) + "')", false);
             if (isClearOnSelect())
@@ -441,7 +441,7 @@ public class AvatarManager {
                 }
             }
             setCurrentAvatars(getCurrentAvatars() + 1);
-            getAvatars().add(Bukkit.getOfflinePlayer(uuid));
+            getAvatars().add(bPlayer.getPlayer());
             Player player = Bukkit.getPlayer(uuid);
             if (player != null) {
                 player.sendMessage(ChatColor.DARK_PURPLE + "You feel the power of the Avatar.");
@@ -541,7 +541,7 @@ public class AvatarManager {
         if (getCurrentAvatars() >= getMaxAvatars())
             return false;
         String playerName = Bukkit.getOfflinePlayer(uuid).getName();
-        OfflineBendingPlayer bPlayer = BendingPlayer.getOfflineBendingPlayer(playerName);
+        BendingPlayer bPlayer =BendingPlayer.getBendingPlayer(Bukkit.getOfflinePlayer(uuid));
         if (bPlayer == null)
             return false;
         // Check if they have played in the last timeSinceLogonRequired hours
@@ -587,8 +587,8 @@ public class AvatarManager {
             ProjectKorraRPG.plugin.getLogger().info("Avatar revocation: Player is not the current avatar.");
             return;
         }
-        String playerName = Bukkit.getOfflinePlayer(uuid).getName();
-        OfflineBendingPlayer bPlayer = BendingPlayer.getOfflineBendingPlayer(playerName);
+        OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(uuid);
+        BendingPlayer bPlayer = BendingPlayer.getBendingPlayer(offlinePlayer);
         if (bPlayer == null) {
             ProjectKorraRPG.plugin.getLogger().info("Avatar revocation: BendingPlayer not found for player.");
             return;
@@ -606,10 +606,9 @@ public class AvatarManager {
             throw new RuntimeException(e);
         }
 
-        Player player = Bukkit.getPlayer(uuid);
         // Send message if they're online
-        if (player != null) {
-            player.sendMessage("You feel the power of the Avatar leaving you.");
+        if (offlinePlayer.isOnline()) {
+            offlinePlayer.getPlayer().sendMessage("You feel the power of the Avatar leaving you.");
         }
 
         for (Element element : avatarElements) {
@@ -618,7 +617,7 @@ public class AvatarManager {
 
         DBConnection.sql.modifyQuery("DELETE FROM pk_rpg_avatars WHERE uuid = '" + uuid + "'");
 
-        ProjectKorraRPG.plugin.getLogger().info("ProjectKorraRPG: " + playerName + " removed from avatar DB.");
+        ProjectKorraRPG.plugin.getLogger().info("ProjectKorraRPG: " + offlinePlayer.getName() + " removed from avatar DB.");
         currentAvatars--;
         avatars.removeIf(p -> p.getUniqueId().equals(uuid));
         avatarsToRemove.add(uuid);
@@ -627,7 +626,7 @@ public class AvatarManager {
         String endTime = Timestamp.from(Instant.now()).toString();
         String endReason = reason == null ? "Unknown" : reason.toString();
 
-        DBConnection.sql.modifyQuery("INSERT INTO pk_rpg_pastlives (uuid, startTime, player, endTime, elements, endReason) VALUES ('" + uuid.toString() + "', '" + startTime + "', '" + playerName + "', '" + endTime + "', '" + String.join(",", bPlayer.getElements().stream().map(Element::getName).toArray(String[]::new)) + "', '" + endReason + "')", false);
+        DBConnection.sql.modifyQuery("INSERT INTO pk_rpg_pastlives (uuid, startTime, player, endTime, elements, endReason) VALUES ('" + uuid.toString() + "', '" + startTime + "', '" + offlinePlayer.getName() + "', '" + endTime + "', '" + String.join(",", bPlayer.getElements().stream().map(Element::getName).toArray(String[]::new)) + "', '" + endReason + "')", false);
 
         if (reason != RemovalReason.EXPIRED) {
             checkAvatars();

@@ -13,12 +13,15 @@ import com.projectkorra.rpg.util.MetricsLite;
 
 import net.luckperms.api.LuckPerms;
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
 
 public class ProjectKorraRPG extends JavaPlugin {
@@ -29,6 +32,8 @@ public class ProjectKorraRPG extends JavaPlugin {
 	private Map<String, Element> elementMap;
 	private AssignmentManager assignmentManager;
 	private AvatarManager avatarManager;
+	public Set<OfflinePlayer> recentPlayers = new HashSet<>();
+
 
 	@Override
 	public void onEnable() {
@@ -38,6 +43,7 @@ public class ProjectKorraRPG extends JavaPlugin {
 		if (provider != null) {
 			luckPermsAPI = provider.getProvider();
 		}
+
 		setElementMap(grabElements());
 		new ConfigManager();
 		assignmentManager = new AssignmentManager();

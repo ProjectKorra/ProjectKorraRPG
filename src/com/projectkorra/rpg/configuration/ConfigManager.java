@@ -75,7 +75,20 @@ public class ConfigManager {
             config.addDefault("Avatar.Randomization.Elements", List.of("air", "water", "earth", "fire", "avatar"));
             config.addDefault("Avatar.Randomization.IncludeAllSubElements", true);
             config.addDefault("Avatar.Randomization.SubElementBlacklist", List.of("blood"));
+            config.setComments("Avatar.Randomization.Enabled", List.of("Whether to enable the Avatar randomization system", "This gives every player a chance to become Avatar"));
 
+            config.setComments("Avatar.Randomization.MaxAvatars", List.of("Maximum number of RPG Avatars that can exist at once"));
+            config.setComments("Avatar.Randomization.TimeSinceLoginRequired", List.of("A player must have logged in within this time frame (past x hours) to be eligible for Avatar selection.", "By default we only consider players that have logged in within the last 12 hours."));
+            config.setComments("Avatar.Randomization.RepeatSelectionCooldown", List.of("Amount of time that must pass before a player can become Avatar again (hours)"));
+            config.setComments("Avatar.Randomization.Broadcast.Enabled", List.of("Should we broadcast when a player becomes Avatar?"));
+            config.setComments("Avatar.Randomization.Broadcast.Public", List.of("Should we include the Avatar's name in the broadcast?"));
+            config.setComments("Avatar.Randomization.AvatarDuration", List.of("Maximum amount of time a player can be an RPG Avatar in hours", "After this time, the player will lose Avatar and have their previous elements restored"));
+            config.setComments("Avatar.Randomization.LoseAvatarOnDeath", List.of("Whether or not an Avatar should lose Avatar on death"));
+            config.setComments("Avatar.Randomization.OnlyLoseAvatarOnAvatarStateDeath", List.of("This only has an effect if LoseAvatarOnDeath is true", "If true, an Avatar will only lose Avatar from dying in the Avatar State."));
+            config.setComments("Avatar.Randomization.ClearOnSelection", List.of("Whether the player should have their elements scrubbed when becoming Avatar", "Setting to true guarantees the player will only have the Elements listed below"));
+            config.setComments("Avatar.Randomization.Elements", List.of("Elements that the Avatar will always have"));
+            config.setComments("Avatar.Randomization.IncludeAllSubElements", List.of("Whether or not each element's sub-elements should be added to the avatar", "If disabled, you'll need to manually specify subelements in the Elements list"));
+            config.setComments("Avatar.Randomization.SubElementBlacklist", List.of("Subelements that will not be given to the Avatar"));
 
 
             config.addDefault("ElementAssign.Enabled", true);

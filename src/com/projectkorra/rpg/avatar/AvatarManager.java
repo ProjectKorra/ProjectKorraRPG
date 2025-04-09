@@ -179,20 +179,49 @@ public class AvatarManager {
         COMMAND,
         EXPIRED
     }
-
+    public static long periodStringToHours(String period) {
+        // Can be in the formats like: 1s, 1m, 1h, 1d, 2d1h10s etc etc.
+        long totalHours = 0;
+        if (period == null || period.isEmpty()) {
+            return totalHours;
+        }
+        String[] parts = period.split("(?<=\\D)(?=\\d)");
+        for (String part : parts) {
+            String unit = part.replaceAll("\\d", "");
+            long value = Long.parseLong(part.replaceAll("\\D", ""));
+            switch (unit) {
+                case "w":
+                    totalHours += value * 168;
+                    break;
+                case "d":
+                    totalHours += value * 24;
+                    break;
+                case "h":
+                    totalHours += value;
+                    break;
+                case "m":
+                    totalHours += (long) (value / 60.0);
+                    break;
+                case "s":
+                    totalHours += (long) (value / 3600.0);
+                    break;
+            }
+        }
+        return totalHours;
+    }
     public AvatarManager() {
 
         recentPlayers = new HashSet<>();
         if (ConfigManager.rpgConfig.get().getBoolean("Avatar.Randomization.Enabled")) {
             setEnabled(true);
             setMaxAvatars(ConfigManager.rpgConfig.get().getInt("Avatar.Randomization.MaxAvatars"));
-            setAvatarDuration(ConfigManager.rpgConfig.get().getDouble("Avatar.Randomization.AvatarDuration"));
+            setAvatarDuration(periodStringToHours(ConfigManager.rpgConfig.get().getString("Avatar.Randomization.AvatarDuration")));
             setLoseAvatarOnDeath(ConfigManager.rpgConfig.get().getBoolean("Avatar.Randomization.LoseAvatarOnDeath"));
             setLoseAvatarOnAvatarStateDeath(ConfigManager.rpgConfig.get().getBoolean("Avatar.Randomization.OnlyLoseAvatarOnAvatarStateDeath"));
             setIncludeAllSubElements(ConfigManager.rpgConfig.get().getBoolean("Avatar.Randomization.IncludeAllSubElements"));
             setClearOnSelect(ConfigManager.rpgConfig.get().getBoolean("Avatar.Randomization.ClearOnSelection"));
-            setTimeSinceLogonRequired(ConfigManager.rpgConfig.get().getDouble("Avatar.Randomization.TimeSinceLogonRequired"));
-            setRepeatSelectionCooldown(ConfigManager.rpgConfig.get().getDouble("Avatar.Randomization.RepeatSelectionCooldown"));
+            setTimeSinceLogonRequired(periodStringToHours(ConfigManager.rpgConfig.get().getString("Avatar.Randomization.TimeSinceLogonRequired")));
+            setRepeatSelectionCooldown(periodStringToHours(ConfigManager.rpgConfig.get().getString("Avatar.Randomization.RepeatSelectionCooldown")));
             setBroadcastAvatarSelection(ConfigManager.rpgConfig.get().getBoolean("Avatar.Randomization.Broadcast.Enabled"));
             setPublicBroadcast(ConfigManager.rpgConfig.get().getBoolean("Avatar.Randomization.Broadcast.Public"));
             setSubElementBlacklist(new HashSet<>());
@@ -216,12 +245,14 @@ public class AvatarManager {
                     }
                 }
             }
-            for (OfflinePlayer p : Bukkit.getOfflinePlayers()) {
-                // Check if they've played in the last timeSinceLogonRequired (hours)
-                if (p.isOnline() || (p.getLastPlayed() > System.currentTimeMillis() - (getTimeSinceLogonRequired() * 3600000))) {
-                    recentPlayers.add(p);
+            Bukkit.getScheduler().runTaskAsynchronously(ProjectKorraRPG.plugin, () -> {
+                for (OfflinePlayer p : Bukkit.getOfflinePlayers()) {
+                    // Check if they've played in the last timeSinceLogonRequired (hours)
+                    if (p.isOnline() || (p.getLastPlayed() > System.currentTimeMillis() - (getTimeSinceLogonRequired() * 3600000))) {
+                        recentPlayers.add(p);
+                    }
                 }
-            }
+            });
             setAvatars(new HashSet<>());
             createRPGTables();
             checkAvatars();

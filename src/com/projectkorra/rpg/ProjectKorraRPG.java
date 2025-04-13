@@ -1,12 +1,12 @@
 package com.projectkorra.rpg;
 
 import com.projectkorra.projectkorra.Element;
-import com.projectkorra.rpg.avatar.AvatarManager;
+import com.projectkorra.rpg.modules.randomavatar.AvatarManager;
 import com.projectkorra.rpg.commands.AvatarCommand;
 import com.projectkorra.rpg.commands.EventCommand;
 import com.projectkorra.rpg.commands.HelpCommand;
 import com.projectkorra.rpg.commands.RPGCommandBase;
-import com.projectkorra.rpg.elementassign.AssignmentManager;
+import com.projectkorra.rpg.modules.randomelements.AssignmentManager;
 import com.projectkorra.rpg.configuration.ConfigManager;
 import com.projectkorra.rpg.event.EventManager;
 import com.projectkorra.rpg.util.MetricsLite;

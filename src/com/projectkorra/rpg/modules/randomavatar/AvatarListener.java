@@ -1,4 +1,4 @@
-package com.projectkorra.rpg.avatar;
+package com.projectkorra.rpg.modules.randomavatar;
 
 import com.projectkorra.projectkorra.BendingPlayer;
 import com.projectkorra.rpg.ProjectKorraRPG;

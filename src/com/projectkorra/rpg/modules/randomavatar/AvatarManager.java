@@ -1,11 +1,10 @@
-package com.projectkorra.rpg.avatar;
+package com.projectkorra.rpg.modules.randomavatar;
 
 import com.projectkorra.projectkorra.*;
 import com.projectkorra.projectkorra.storage.DBConnection;
 import com.projectkorra.projectkorra.storage.MySQL;
 import com.projectkorra.rpg.ProjectKorraRPG;
 import com.projectkorra.rpg.configuration.ConfigManager;
-import com.projectkorra.rpg.elementassign.AssignmentListener;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;

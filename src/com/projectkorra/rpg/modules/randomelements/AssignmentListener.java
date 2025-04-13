@@ -1,4 +1,4 @@
-package com.projectkorra.rpg.elementassign;
+package com.projectkorra.rpg.modules.randomelements;
 
 import com.projectkorra.projectkorra.BendingPlayer;
 import com.projectkorra.projectkorra.event.BendingPlayerLoadEvent;

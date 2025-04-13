@@ -1,6 +1,8 @@
 package com.projectkorra.rpg.modules.randomavatar;
 
+import com.projectkorra.rpg.ProjectKorraRPG;
 import com.projectkorra.rpg.modules.Module;
+import com.projectkorra.rpg.modules.randomelements.AssignmentManager;
 
 public class RandomAvatar extends Module {
 	public RandomAvatar() {
@@ -9,7 +11,7 @@ public class RandomAvatar extends Module {
 
 	@Override
 	public void enable() {
-
+		ProjectKorraRPG.plugin.setAvatarManager(new AvatarManager());
 	}
 
 	@Override

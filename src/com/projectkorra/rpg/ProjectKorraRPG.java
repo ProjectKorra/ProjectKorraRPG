@@ -50,8 +50,6 @@ public class ProjectKorraRPG extends JavaPlugin {
 
 		setElementMap(grabElements());
 		new ConfigManager();
-		assignmentManager = new AssignmentManager();
-		avatarManager = new AvatarManager();
 		new RPGMethods();
 		moduleManager.enableModules();
 		new RPGCommandBase();

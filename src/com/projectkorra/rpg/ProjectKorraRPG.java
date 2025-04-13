@@ -1,18 +1,15 @@
 package com.projectkorra.rpg;
-import com.projectkorra.rpg.modules.manager.ModuleManager;
-import org.bukkit.plugin.java.JavaPlugin;
 
 import com.projectkorra.projectkorra.Element;
-import com.projectkorra.rpg.modules.randomavatar.AvatarManager;
 import com.projectkorra.rpg.commands.AvatarCommand;
-import com.projectkorra.rpg.commands.EventCommand;
 import com.projectkorra.rpg.commands.HelpCommand;
 import com.projectkorra.rpg.commands.RPGCommandBase;
-import com.projectkorra.rpg.modules.randomelements.AssignmentManager;
+import com.projectkorra.rpg.commands.WorldEventCommand;
 import com.projectkorra.rpg.configuration.ConfigManager;
-import com.projectkorra.rpg.event.EventManager;
+import com.projectkorra.rpg.modules.elementassignments.AssignmentManager;
+import com.projectkorra.rpg.modules.manager.ModuleManager;
+import com.projectkorra.rpg.modules.randomavatar.AvatarManager;
 import com.projectkorra.rpg.util.MetricsLite;
-
 import net.luckperms.api.LuckPerms;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -50,15 +47,14 @@ public class ProjectKorraRPG extends JavaPlugin {
 
 		setElementMap(grabElements());
 		new ConfigManager();
-		new RPGMethods();
 		moduleManager.enableModules();
 		new RPGCommandBase();
 		new AvatarCommand();
-		new EventCommand();
 		new HelpCommand();
+		new WorldEventCommand();
 		
 		Bukkit.getServer().getPluginManager().registerEvents(new RPGListener(), this);
-		Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, new EventManager(), 0L, 1L);
+
 		try {
 	        MetricsLite metrics = new MetricsLite(this);
 	        metrics.start();
@@ -116,6 +112,8 @@ public class ProjectKorraRPG extends JavaPlugin {
 
 	public void setAssignmentManager(AssignmentManager assignmentManager) {
 		this.assignmentManager = assignmentManager;
+		ProjectKorraRPG.log.info(assignmentManager.isEnabled() ? "AssignmentManager enabled" : "AssignmentManager disabled");
+		ProjectKorraRPG.log.info("AssignmentManager set");
 	}
 
 	public AvatarManager getAvatarManager() {
@@ -123,6 +121,7 @@ public class ProjectKorraRPG extends JavaPlugin {
 	}
 
 	public void setAvatarManager(AvatarManager avatarManager) {
+		ProjectKorraRPG.log.info(avatarManager.isEnabled() ? "AvatarManager enabled" : "AvatarManager disabled");
 		this.avatarManager = avatarManager;
 	}
 }

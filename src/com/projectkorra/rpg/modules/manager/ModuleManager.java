@@ -4,7 +4,7 @@ import com.projectkorra.rpg.modules.Module;
 import com.projectkorra.rpg.modules.events.WorldEvents;
 import com.projectkorra.rpg.modules.leveling.RPGLeveling;
 import com.projectkorra.rpg.modules.randomavatar.RandomAvatar;
-import com.projectkorra.rpg.modules.randomelements.RandomElements;
+import com.projectkorra.rpg.modules.elementassignments.ElementAssignments;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +16,7 @@ public class ModuleManager {
 		modules.add(new WorldEvents());
 		modules.add(new RPGLeveling());
 		modules.add(new RandomAvatar());
-		modules.add(new RandomElements());
+		modules.add(new ElementAssignments());
 	}
 
 	public void enableModules() {

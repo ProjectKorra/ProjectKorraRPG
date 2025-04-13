@@ -211,26 +211,26 @@ public class AvatarManager {
     public AvatarManager() {
 
         recentPlayers = new HashSet<>();
-        if (ConfigManager.rpgConfig.get().getBoolean("Avatar.Randomization.Enabled")) {
+        if (ConfigManager.config.get().getBoolean("Modules.RandomAvatar.Enabled")) {
             setEnabled(true);
-            setMaxAvatars(ConfigManager.rpgConfig.get().getInt("Avatar.Randomization.MaxAvatars"));
-            setAvatarDuration(periodStringToHours(ConfigManager.rpgConfig.get().getString("Avatar.Randomization.AvatarDuration")));
-            setLoseAvatarOnDeath(ConfigManager.rpgConfig.get().getBoolean("Avatar.Randomization.LoseAvatarOnDeath"));
-            setLoseAvatarOnAvatarStateDeath(ConfigManager.rpgConfig.get().getBoolean("Avatar.Randomization.OnlyLoseAvatarOnAvatarStateDeath"));
-            setIncludeAllSubElements(ConfigManager.rpgConfig.get().getBoolean("Avatar.Randomization.IncludeAllSubElements"));
-            setClearOnSelect(ConfigManager.rpgConfig.get().getBoolean("Avatar.Randomization.ClearOnSelection"));
-            setTimeSinceLogonRequired(periodStringToHours(ConfigManager.rpgConfig.get().getString("Avatar.Randomization.TimeSinceLogonRequired")));
-            setRepeatSelectionCooldown(periodStringToHours(ConfigManager.rpgConfig.get().getString("Avatar.Randomization.RepeatSelectionCooldown")));
-            setBroadcastAvatarSelection(ConfigManager.rpgConfig.get().getBoolean("Avatar.Randomization.Broadcast.Enabled"));
-            setPublicBroadcast(ConfigManager.rpgConfig.get().getBoolean("Avatar.Randomization.Broadcast.Public"));
+            setMaxAvatars(ConfigManager.config.get().getInt("Modules.RandomAvatar.MaxAvatars"));
+            setAvatarDuration(periodStringToHours(ConfigManager.config.get().getString("Modules.RandomAvatar.AvatarDuration")));
+            setLoseAvatarOnDeath(ConfigManager.config.get().getBoolean("Modules.RandomAvatar.LoseAvatarOnDeath"));
+            setLoseAvatarOnAvatarStateDeath(ConfigManager.config.get().getBoolean("Modules.RandomAvatar.OnlyLoseAvatarOnAvatarStateDeath"));
+            setIncludeAllSubElements(ConfigManager.config.get().getBoolean("Modules.RandomAvatar.IncludeAllSubElements"));
+            setClearOnSelect(ConfigManager.config.get().getBoolean("Modules.RandomAvatar.ClearOnSelection"));
+            setTimeSinceLogonRequired(periodStringToHours(ConfigManager.config.get().getString("Modules.RandomAvatar.TimeSinceLogonRequired")));
+            setRepeatSelectionCooldown(periodStringToHours(ConfigManager.config.get().getString("Modules.RandomAvatar.RepeatSelectionCooldown")));
+            setBroadcastAvatarSelection(ConfigManager.config.get().getBoolean("Modules.RandomAvatar.Broadcast.Enabled"));
+            setPublicBroadcast(ConfigManager.config.get().getBoolean("Modules.RandomAvatar.Broadcast.Public"));
             setSubElementBlacklist(new HashSet<>());
-            for (String subElementName : ConfigManager.rpgConfig.get().getStringList("Avatar.Randomization.SubElementBlacklist")) {
+            for (String subElementName : ConfigManager.config.get().getStringList("Modules.RandomAvatar.SubElementBlacklist")) {
                 if (Element.getElement(subElementName) != null && Element.getElement(subElementName) instanceof Element.SubElement subElement) {
                     getSubElementBlacklist().add(subElement);
                 }
             }
             setAvatarElements(new HashSet<>());
-            for (String elementName : ConfigManager.rpgConfig.get().getStringList("Avatar.Randomization.Elements")) {
+            for (String elementName : ConfigManager.config.get().getStringList("Modules.RandomAvatar.Elements")) {
                 Element element = Element.getElement(elementName);
                 if (element != null) {
                     getAvatarElements().add(element);

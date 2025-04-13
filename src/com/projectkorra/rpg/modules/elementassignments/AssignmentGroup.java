@@ -1,4 +1,4 @@
-package com.projectkorra.rpg.modules.randomelements;
+package com.projectkorra.rpg.modules.elementassignments;
 
 import com.projectkorra.projectkorra.Element;
 

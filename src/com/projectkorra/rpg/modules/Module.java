@@ -18,6 +18,6 @@ public abstract class Module {
 	}
 
 	public boolean isEnabled() {
-		return ConfigManager.getConfig().getBoolean("Configuration.Modules." + getName() + ".Enabled");
+		return ConfigManager.getFileConfig().getBoolean("Modules." + getName() + ".Enabled");
 	}
 }

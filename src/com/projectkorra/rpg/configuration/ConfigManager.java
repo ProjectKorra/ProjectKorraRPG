@@ -5,101 +5,86 @@ import com.projectkorra.projectkorra.configuration.ConfigType;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.io.File;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class ConfigManager {
 
-    public static final ConfigType AVATARS = new ConfigType("RPG_Avatars");
-    public static final ConfigType RPG_DEFAULT = new ConfigType("RPG_Default");
-    public static Config rpgConfig;
-    public static Config avatarConfig;
+    private static final ConfigType DEFAULT = new ConfigType("Default");
+    private static final ConfigType LANGUAGE = new ConfigType("Language");
+    private static final ConfigType WORLDEVENTS = new ConfigType("WorldEvents");
+
+    public static Config config;
+    public static Config language;
+    public static Config sozinsComet;
 
     public ConfigManager() {
-        rpgConfig = new Config(new File("RPG_config.yml"));
-        avatarConfig = new Config(new File("RPG_avatars.yml"));
+        config = new Config(new File("config.yml"));
+        language = new Config(new File("language.yml"));
+        sozinsComet = new Config(new File("WorldEvents/sozinscomet.yml"));
 
-        configCheck(RPG_DEFAULT);
-        configCheck(AVATARS);
+        configCheck(DEFAULT);
+        configCheck(LANGUAGE);
+        configCheck(WORLDEVENTS);
     }
 
     private static void addDefaultElementAssignGroup(String groupName, boolean enabled, List<String> elements, double weight, String prefix, List<String> commands, String permissionGroup) {
-        if (rpgConfig == null) {
+        if (config == null) {
             return; // Ensure rpgConfig is initialized
         }
-        FileConfiguration config = rpgConfig.get();
+        FileConfiguration config = ConfigManager.config.get();
 
-        config.addDefault("ElementAssign.Groups." + groupName + ".Enabled", enabled);
-        config.addDefault("ElementAssign.Groups." + groupName + ".Elements", elements);
-        config.addDefault("ElementAssign.Groups." + groupName + ".Weight", weight);
-        config.addDefault("ElementAssign.Groups." + groupName + ".Prefix", prefix);
-        config.addDefault("ElementAssign.Groups." + groupName + ".Commands", commands);
-        config.addDefault("ElementAssign.Groups." + groupName + ".PermissionGroup", permissionGroup);
+        config.addDefault("Modules.ElementAssignments.Groups." + groupName + ".Enabled", enabled);
+        config.addDefault("Modules.ElementAssignments.Groups." + groupName + ".Elements", elements);
+        config.addDefault("Modules.ElementAssignments.Groups." + groupName + ".Weight", weight);
+        config.addDefault("Modules.ElementAssignments.Groups." + groupName + ".Prefix", prefix);
+        config.addDefault("Modules.ElementAssignments.Groups." + groupName + ".Commands", commands);
+        config.addDefault("Modules.ElementAssignments.Groups." + groupName + ".PermissionGroup", permissionGroup);
     }
 
     public void configCheck(ConfigType type) {
         FileConfiguration config;
-        if (type == RPG_DEFAULT) {
-            config = rpgConfig.get();
+        if (type == DEFAULT) {
+            config = ConfigManager.config.get();
+            // -------------------------------- Randomized Avatar  ---------------------------------
 
-            config.addDefault("WorldEvents.FullMoon.Enabled", true);
-            config.addDefault("WorldEvents.FullMoon.Factor", 3.0);
-            config.addDefault("WorldEvents.FullMoon.Message", "A full moon is rising, empowering waterbending like never before.");
+            config.addDefault("Modules.RandomAvatar.Enabled", true);
+            config.addDefault("Modules.RandomAvatar.MaxAvatars", 1);
+            config.addDefault("Modules.RandomAvatar.TimeSinceLoginRequired", "12h");
+            config.addDefault("Modules.RandomAvatar.RepeatSelectionCooldown", "7d");
+            config.addDefault("Modules.RandomAvatar.Broadcast.Enabled", true);
+            config.addDefault("Modules.RandomAvatar.Broadcast.Public", false);
+            config.addDefault("Modules.RandomAvatar.AvatarDuration", "7d");
+            config.addDefault("Modules.RandomAvatar.LoseAvatarOnDeath", true);
+            config.addDefault("Modules.RandomAvatar.OnlyLoseAvatarOnAvatarStateDeath", true);
+            config.addDefault("Modules.RandomAvatar.ClearOnSelection", true);
+            config.addDefault("Modules.RandomAvatar.Elements", List.of( "earth", "water", "fire", "air", "avatar"));
+            config.addDefault("Modules.RandomAvatar.IncludeAllSubElements", true);
+            config.addDefault("Modules.RandomAvatar.SubElementBlacklist", List.of("blood"));
+            config.setComments("Modules.RandomAvatar.Enabled", List.of("Whether to enable the Avatar randomization system", "This gives every player a chance to become Avatar"));
 
-            config.addDefault("WorldEvents.LunarEclipse.Enabled", true);
-            config.addDefault("WorldEvents.LunarEclipse.Frequency", 40);
-            config.addDefault("WorldEvents.LunarEclipse.Message", "A lunar eclipse is out! Waterbenders are temporarily powerless.");
+            config.setComments("Modules.RandomAvatar.MaxAvatars", List.of("Maximum number of RPG Avatars that can exist at once"));
+            config.setComments("Modules.RandomAvatar.TimeSinceLoginRequired", List.of("A player must have logged in within this time frame to be eligible for Avatar selection.", "By default we only consider players that have logged in within the last 12 hours. Can be formatted like 3d2h5m"));
+            config.setComments("Modules.RandomAvatar.RepeatSelectionCooldown", List.of("Amount of time that must pass before a player can become Avatar again"));
+            config.setComments("Modules.RandomAvatar.Broadcast.Enabled", List.of("Should we broadcast when a player becomes Avatar?"));
+            config.setComments("Modules.RandomAvatar.Broadcast.Public", List.of("Should we include the Avatar's name in the broadcast?"));
+            config.setComments("Modules.RandomAvatar.AvatarDuration", List.of("Maximum amount of time a player can be an RPG Avatar. ", "After this time, the player will lose Avatar and have their previous elements restored"));
+            config.setComments("Modules.RandomAvatar.LoseAvatarOnDeath", List.of("Whether or not an Avatar should lose Avatar on death"));
+            config.setComments("Modules.RandomAvatar.OnlyLoseAvatarOnAvatarStateDeath", List.of("This only has an effect if LoseAvatarOnDeath is true", "If true, an Avatar will only lose Avatar from dying in the Avatar State."));
+            config.setComments("Modules.RandomAvatar.ClearOnSelection", List.of("Whether the player should have their elements scrubbed when becoming Avatar", "Setting to true guarantees the player will only have the Elements listed below"));
+            config.setComments("Modules.RandomAvatar.Elements", List.of("Elements that the Avatar will always have"));
+            config.setComments("Modules.RandomAvatar.IncludeAllSubElements", List.of("Whether or not each element's sub-elements should be added to the avatar", "If disabled, you'll need to manually specify subelements in the Elements list"));
+            config.setComments("Modules.RandomAvatar.SubElementBlacklist", List.of("Subelements that will not be given to the Avatar"));
 
-            config.addDefault("WorldEvents.SolarEclipse.Enabled", true);
-            config.addDefault("WorldEvents.SolarEclipse.Frequency", 20);
-            config.addDefault("WorldEvents.SolarEclipse.Message", "A solar eclipse is out! Firebenders are temporarily powerless.");
-
-            config.addDefault("WorldEvents.SozinsComet.Enabled", true);
-            config.addDefault("WorldEvents.SozinsComet.Frequency", 100);
-            config.addDefault("WorldEvents.SozinsComet.Factor", 5.0);
-            config.addDefault("WorldEvents.SozinsComet.Message", "Sozin's Comet is passing overhead! Firebending is now at its most powerful.");
-            config.addDefault("WorldEvents.SozinsComet.EndMessage", "Sozin's Comet has passed.");
-
-            config.addDefault("Avatar.Randomization.Enabled", true);
-            config.addDefault("Avatar.Randomization.MaxAvatars", 1);
-            config.addDefault("Avatar.Randomization.TimeSinceLoginRequired", "12h");
-            config.addDefault("Avatar.Randomization.RepeatSelectionCooldown", "7d");
-            config.addDefault("Avatar.Randomization.Broadcast.Enabled", true);
-            config.addDefault("Avatar.Randomization.Broadcast.Public", false);
-            config.addDefault("Avatar.Randomization.AvatarDuration", "7d");
-            config.addDefault("Avatar.Randomization.LoseAvatarOnDeath", true);
-            config.addDefault("Avatar.Randomization.OnlyLoseAvatarOnAvatarStateDeath", true);
-            config.addDefault("Avatar.Randomization.ClearOnSelection", true);
-            config.addDefault("Avatar.Randomization.Elements", List.of( "avatar"));
-            config.addDefault("Avatar.Randomization.IncludeAllSubElements", true);
-            config.addDefault("Avatar.Randomization.SubElementBlacklist", List.of("blood"));
-            config.setComments("Avatar.Randomization.Enabled", List.of("Whether to enable the Avatar randomization system", "This gives every player a chance to become Avatar"));
-
-            config.setComments("Avatar.Randomization.MaxAvatars", List.of("Maximum number of RPG Avatars that can exist at once"));
-            config.setComments("Avatar.Randomization.TimeSinceLoginRequired", List.of("A player must have logged in within this time frame to be eligible for Avatar selection.", "By default we only consider players that have logged in within the last 12 hours. Can be formatted like 3d2h5m"));
-            config.setComments("Avatar.Randomization.RepeatSelectionCooldown", List.of("Amount of time that must pass before a player can become Avatar again"));
-            config.setComments("Avatar.Randomization.Broadcast.Enabled", List.of("Should we broadcast when a player becomes Avatar?"));
-            config.setComments("Avatar.Randomization.Broadcast.Public", List.of("Should we include the Avatar's name in the broadcast?"));
-            config.setComments("Avatar.Randomization.AvatarDuration", List.of("Maximum amount of time a player can be an RPG Avatar. ", "After this time, the player will lose Avatar and have their previous elements restored"));
-            config.setComments("Avatar.Randomization.LoseAvatarOnDeath", List.of("Whether or not an Avatar should lose Avatar on death"));
-            config.setComments("Avatar.Randomization.OnlyLoseAvatarOnAvatarStateDeath", List.of("This only has an effect if LoseAvatarOnDeath is true", "If true, an Avatar will only lose Avatar from dying in the Avatar State."));
-            config.setComments("Avatar.Randomization.ClearOnSelection", List.of("Whether the player should have their elements scrubbed when becoming Avatar", "Setting to true guarantees the player will only have the Elements listed below"));
-            config.setComments("Avatar.Randomization.Elements", List.of("Elements that the Avatar will always have"));
-            config.setComments("Avatar.Randomization.IncludeAllSubElements", List.of("Whether or not each element's sub-elements should be added to the avatar", "If disabled, you'll need to manually specify subelements in the Elements list"));
-            config.setComments("Avatar.Randomization.SubElementBlacklist", List.of("Subelements that will not be given to the Avatar"));
-
-
-            config.addDefault("ElementAssign.Enabled", true);
-            config.addDefault("ElementAssign.Default", "None");
-            config.addDefault("ElementAssign.ChangeOnDeath.Enabled", true); // Allow changing element on death
-            config.addDefault("ElementAssign.ChangeOnDeath.Chance", 0.2); // 20% chance to change element on death if
+            // -------------------------------- Element Assignments  ---------------------------------
+            config.addDefault("Modules.ElementAssignments.Enabled", true);
+            config.addDefault("Modules.ElementAssignments.Default", "None");
+            config.addDefault("Modules.ElementAssignments.ChangeOnDeath.Enabled", true); // Allow changing element on death
+            config.addDefault("Modules.ElementAssignments.ChangeOnDeath.Chance", 0.2); // 20% chance to change element on death if
             // enabled
-            config.addDefault("ElementAssign.ChangeOnDeath.Bypass", false); // Allow bypassing cooldowns for changing
+            config.addDefault("Modules.ElementAssignments.ChangeOnDeath.Bypass", false); // Allow bypassing cooldowns for changing
             // elements on death (if true, will ignore
             // cooldowns)
-            config.addDefault("ElementAssign.ChangeOnDeath.Permission", "projectkorra.rpg.elementassign.bypass");
+            config.addDefault("Modules.ElementAssignments.ChangeOnDeath.Permission", "projectkorra.rpg.elementassign.bypass");
             // Empty Set
             Set<String> elementNames = new HashSet<>();
 
@@ -228,7 +213,36 @@ public class ConfigManager {
             });
             config.options().copyDefaults(true);
             config.options().parseComments(true);
-            rpgConfig.save();
+            ConfigManager.config.save();
+
+        } else if (type == LANGUAGE) {
+            config = language.get();
+
+            config.options().copyDefaults(true);
+            language.save();
+        } else if (type == WORLDEVENTS) {
+            config = sozinsComet.get();
+
+            config.addDefault("Title", "&cSozins Comet");
+            config.addDefault("Duration", 5000);
+            config.addDefault("Color", "RED");
+
+            config.options().copyDefaults(true);
+            sozinsComet.save();
         }
+    }
+    public static FileConfiguration getFileConfig() {
+        return config.get();
+    }
+
+    public static Config getConfig() {
+        return config;
+    }
+    public static List<Config> getAllConfigs() {
+        List<Config> configs = new ArrayList<>();
+        configs.add(config);
+        configs.add(language);
+        configs.add(sozinsComet);
+        return configs;
     }
 }

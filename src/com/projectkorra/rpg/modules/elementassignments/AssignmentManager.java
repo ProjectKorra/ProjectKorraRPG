@@ -1,4 +1,4 @@
-package com.projectkorra.rpg.modules.randomelements;
+package com.projectkorra.rpg.modules.elementassignments;
 
 import com.projectkorra.projectkorra.BendingPlayer;
 import com.projectkorra.projectkorra.Element;
@@ -30,37 +30,38 @@ public class AssignmentManager {
 
     public AssignmentManager() {
 
-        if (ConfigManager.rpgConfig.get().getBoolean("ElementAssign.Enabled")) {
+        if (ConfigManager.config.get().getBoolean("Modules.ElementAssignments.Enabled")) {
+            ProjectKorraRPG.log.info("ElementAssignments is enabled in the config.yml.");
             setEnabled(true);
             // Get the default group from the configuration
-            defaultElement = ConfigManager.rpgConfig.get().getString("ElementAssign.Default");
-            changeOnDeathEnabled = ConfigManager.rpgConfig.get().getBoolean("ElementAssign.ChangeOnDeath.Enabled");
-            changeOnDeathBypass = ConfigManager.rpgConfig.get().getBoolean("ElementAssign.ChangeOnDeath.Bypass");
-            changeOnDeathPermission = ConfigManager.rpgConfig.get().getString("ElementAssign.ChangeOnDeath.Permission");
-            chance = ConfigManager.rpgConfig.get().getDouble("ElementAssign.ChangeOnDeath.Chance");
+            defaultElement = ConfigManager.config.get().getString("Modules.ElementAssignments.Default");
+            changeOnDeathEnabled = ConfigManager.config.get().getBoolean("Modules.ElementAssignments.ChangeOnDeath.Enabled");
+            changeOnDeathBypass = ConfigManager.config.get().getBoolean("Modules.ElementAssignments.ChangeOnDeath.Bypass");
+            changeOnDeathPermission = ConfigManager.config.get().getString("Modules.ElementAssignments.ChangeOnDeath.Permission");
+            chance = ConfigManager.config.get().getDouble("Modules.ElementAssignments.ChangeOnDeath.Chance");
 
             // Create a list to hold enabled groups with their weights
-            ConfigurationSection groupsSection = ConfigManager.rpgConfig.get().getConfigurationSection("ElementAssign.Groups");
+            ConfigurationSection groupsSection = ConfigManager.config.get().getConfigurationSection("Modules.ElementAssignments.Groups");
             // Loop through each group in the configuration
             for (String groupKey : groupsSection.getKeys(false)) {
-                boolean groupEnabled = ConfigManager.rpgConfig.get().getBoolean("ElementAssign.Groups." + groupKey + ".Enabled");
+                boolean groupEnabled = ConfigManager.config.get().getBoolean("Modules.ElementAssignments.Groups." + groupKey + ".Enabled");
                 if (groupEnabled) {
-                    double weight = ConfigManager.rpgConfig.get().getDouble("ElementAssign.Groups." + groupKey + ".Weight");
-                    List<String> elements = ConfigManager.rpgConfig.get().getStringList("ElementAssign.Groups." + groupKey + ".Elements");
-                    String prefix = ConfigManager.rpgConfig.get().getString("ElementAssign.Groups." + groupKey + ".Prefix");
-                    List<String> commandsToRun = ConfigManager.rpgConfig.get().getStringList("ElementAssign.Groups." + groupKey + ".Commands");
-                    String permissionGroup = ConfigManager.rpgConfig.get().getString("ElementAssign.Groups." + groupKey + ".PermissionGroup");
+                    double weight = ConfigManager.config.get().getDouble("Modules.ElementAssignments.Groups." + groupKey + ".Weight");
+                    List<String> elements = ConfigManager.config.get().getStringList("Modules.ElementAssignments.Groups." + groupKey + ".Elements");
+                    String prefix = ConfigManager.config.get().getString("Modules.ElementAssignments.Groups." + groupKey + ".Prefix");
+                    List<String> commandsToRun = ConfigManager.config.get().getStringList("Modules.ElementAssignments.Groups." + groupKey + ".Commands");
+                    String permissionGroup = ConfigManager.config.get().getString("Modules.ElementAssignments.Groups." + groupKey + ".PermissionGroup");
                     permissionGroups.add(permissionGroup);
                     totalWeight = totalWeight + weight;
                     AssignmentGroup group = new AssignmentGroup(groupKey, elements, weight, groupEnabled, prefix, commandsToRun, permissionGroup);
                     groups.add(group);
-                    ProjectKorraRPG.plugin.getLogger().info("ElementAssign: " + groupKey + " is enabled with weight: " + weight);
+                    ProjectKorraRPG.plugin.getLogger().info("ElementAssignments: " + groupKey + " is enabled with weight: " + weight);
                 }
             }
             Bukkit.getServer().getPluginManager().registerEvents(new AssignmentListener(), ProjectKorraRPG.plugin);
 
         } else {
-            ProjectKorraRPG.plugin.getLogger().info("ElementAssign is disabled in the config.yml. Please enable it to use this feature.");
+            ProjectKorraRPG.plugin.getLogger().info("ElementAssignments is disabled in the config.yml. Please enable it to use this feature.");
             setEnabled(false);
         }
     }

@@ -86,6 +86,7 @@ public class Config {
 	public void save() {
 		try {
 			config.options().copyDefaults(true);
+			config.options().parseComments(true);
 			config.save(file);
 		}
 		catch (Exception e) {

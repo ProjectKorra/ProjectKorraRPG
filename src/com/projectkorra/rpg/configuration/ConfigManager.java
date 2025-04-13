@@ -227,6 +227,7 @@ public class ConfigManager {
                 );
             });
             config.options().copyDefaults(true);
+            config.options().parseComments(true);
             rpgConfig.save();
         }
     }

@@ -12,7 +12,6 @@ import java.util.HashMap;
 import java.util.List;
 
 public abstract class RPGCommand implements SubCommand {
-
 	public static HashMap<String, RPGCommand> instances = new HashMap<>();
 
 	private final String name;
@@ -25,6 +24,7 @@ public abstract class RPGCommand implements SubCommand {
 		this.properUse = properUse;
 		this.description = description;
 		this.aliases = aliases;
+
 		instances.put(name, this);
 	}
 

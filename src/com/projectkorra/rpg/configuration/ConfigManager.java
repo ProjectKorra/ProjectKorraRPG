@@ -7,21 +7,30 @@ import com.projectkorra.rpg.modules.Module;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ConfigManager {
-
 	private static Config config;
 	private static Config language;
+	private static Config sozinsComet;
 
 	private static final ConfigType DEFAULT = new ConfigType("Default");
 	private static final ConfigType LANGUAGE = new ConfigType("Language");
+	private static ConfigType WORLDEVENTS = new ConfigType("WorldEvents");
 
 	public ConfigManager() {
+		init();
+	}
+
+	private void init() {
 		config = new Config(new File("config.yml"));
 		language = new Config(new File("language.yml"));
+		sozinsComet = new Config(new File("WorldEvents/sozinscomet.yml"));
 
 		configCheck(DEFAULT);
 		configCheck(LANGUAGE);
+		configCheck(WORLDEVENTS);
 	}
 
 	public static void configCheck(ConfigType type) {
@@ -101,6 +110,15 @@ public class ConfigManager {
 
 			config.options().copyDefaults(true);
 			language.save();
+		} else if (type == WORLDEVENTS) {
+			config = sozinsComet.get();
+
+			config.addDefault("Title", "&cSozins Comet");
+			config.addDefault("Duration", 5000);
+			config.addDefault("Color", "RED");
+
+			config.options().copyDefaults(true);
+			sozinsComet.save();
 		}
 	}
 
@@ -110,5 +128,13 @@ public class ConfigManager {
 
 	public static Config getConfig() {
 		return config;
+	}
+
+	public static List<Config> getAllConfigs() {
+		List<Config> configs = new ArrayList<>();
+		configs.add(config);
+		configs.add(language);
+		configs.add(sozinsComet);
+		return configs;
 	}
 }

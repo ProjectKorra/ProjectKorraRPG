@@ -7,23 +7,21 @@ import org.bukkit.ChatColor;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class RPGCommandBase extends PKCommand {
 
 	public RPGCommandBase() {
-		super("rpg", "/bending rpg", "Basisbefehl für das RPG-Plugin", new String[]{"rpg"});
-
-		new WorldEventCommand();
+		super("rpg", "/bending rpg", "Base command for the RPG side plugin", new String[] {"rpg"});
 	}
 
 	@Override
 	public void execute(CommandSender sender, List<String> args) {
-		if (args.isEmpty()) {
-			sender.sendMessage(ChatColor.RED + "/bending rpg <subcommand> <args>");
-			sender.sendMessage(ChatColor.RED + "Beispiele:");
-			sender.sendMessage(ChatColor.RED + " /bending rpg avatar <player> " + ChatColor.YELLOW + "Erstellt einen Avatar.");
-			sender.sendMessage(ChatColor.RED + " /bending rpg event start <Event> " + ChatColor.YELLOW + "Startet ein WorldEvent.");
+		if (args.size() == 0) {
+			sender.sendMessage(ChatColor.RED + "/bending rpg avatar <Player> " + ChatColor.YELLOW + "Create an Avatar.");
+			sender.sendMessage(ChatColor.RED + "/bending rpg help <Command/Event> " + ChatColor.YELLOW + "Display help.");
+			sender.sendMessage(ChatColor.RED + "/bending rpg worldevent <Argument> [Event] " + ChatColor.YELLOW + "Manipulate events.");
 			return;
 		}
 
@@ -37,7 +35,7 @@ public class RPGCommandBase extends PKCommand {
 		}
 		sender.sendMessage(ChatColor.RED + "Unbekanntes Subcommand. Nutze '/bending rpg help' für Hilfe.");
 	}
-
+	
 	@Override
 	protected List<String> getTabCompletion(CommandSender sender, List<String> args) {
 		if (args.isEmpty()) {
@@ -45,22 +43,20 @@ public class RPGCommandBase extends PKCommand {
 			for (RPGCommand cmd : RPGCommand.instances.values()) {
 				l.add(cmd.getName());
 			}
-			Collections.sort(l);
+			Collections.sort(l, Comparator.nullsLast(Comparator.naturalOrder()));
 			return l;
-		} else {
-			String sub = args.getFirst().toLowerCase();
-			for (RPGCommand cmd : RPGCommand.instances.values()) {
-				if (Arrays.asList(cmd.getAliases()).contains(sub) && sender.hasPermission("bending.command.rpg." + cmd.getName())) {
-					List<String> newArgs = new ArrayList<>();
-					for (int i = 1; i < args.size(); i++) {
-						if (!args.get(i).trim().isEmpty()) {
-							newArgs.add(args.get(i));
-						}
-					}
-					return cmd.getTabCompletion(sender, newArgs);
+		}
+		else
+		for (RPGCommand cmd : RPGCommand.instances.values()) {
+			if (Arrays.asList(cmd.getAliases()).contains(args.get(0).toLowerCase()) && sender.hasPermission("bending.command.rpg." + cmd.getName())) {
+				List<String> newargs = new ArrayList<String>();
+				for (int i = 1; i < args.size(); i++) {
+					if (!(args.get(i).equals("") || args.get(i).equals(" ")) && args.size() >= 1)
+					newargs.add(args.get(i));
 				}
+				return cmd.getTabCompletion(sender, newargs);
 			}
 		}
-		return new ArrayList<>();
+		return new ArrayList<String>();
 	}
 }

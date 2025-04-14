@@ -11,14 +11,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public abstract class RPGCommand implements SubCommand {
+public abstract class RPGCommand implements SubCommand{
+	
 	public static HashMap<String, RPGCommand> instances = new HashMap<>();
 
-	private final String name;
-	private final String properUse;
-	private final String description;
-	private final String[] aliases;
-
+	private String name;
+	private String properUse;
+	private String description;
+	private String[] aliases;
+	
 	public RPGCommand(String name, String properUse, String description, String[] aliases) {
 		this.name = name;
 		this.properUse = properUse;
@@ -27,22 +28,23 @@ public abstract class RPGCommand implements SubCommand {
 
 		instances.put(name, this);
 	}
-
+	
 	public String getName() {
 		return name;
 	}
-
+	
 	public String getProperUse() {
 		return properUse;
 	}
-
+	
 	public String getDescription() {
 		return description;
 	}
-
+	
 	public String[] getAliases() {
 		return aliases;
 	}
+	
 
 	public void help(CommandSender sender, boolean description) {
 		sender.sendMessage(ChatColor.GOLD + "Proper Usage: " + ChatColor.DARK_AQUA + properUse);
@@ -120,9 +122,10 @@ public abstract class RPGCommand implements SubCommand {
 			return false;
 		}
 	}
-
-	/** Gets a list of valid arguments that can be used in tabbing. */
-	protected List<String> getTabCompletion(CommandSender sender, List<String> args) {
-		return new ArrayList<>();
+	
+	/**Gets a list of valid arguments that can be used in tabbing.*/
+	protected List<String> getTabCompletion(CommandSender sender, List<String> args)
+	{
+		return new ArrayList<String>();
 	}
 }

@@ -1,8 +1,15 @@
 package com.projectkorra.rpg.commands;
 
+import com.projectkorra.projectkorra.Element;
+import com.projectkorra.projectkorra.ability.Ability;
+import com.projectkorra.projectkorra.attribute.Attribute;
 import com.projectkorra.rpg.ProjectKorraRPG;
 import com.projectkorra.rpg.modules.worldevents.WorldEvent;
-import org.bukkit.Color;
+import com.projectkorra.rpg.util.attribute.AttributeParser;
+import org.bukkit.Bukkit;
+import org.bukkit.World;
+import org.bukkit.boss.BarColor;
+import org.bukkit.boss.BarStyle;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -40,11 +47,78 @@ public class WorldEventCommand extends RPGCommand {
 
 			String title = config.getString("Title");
 			long duration = config.getLong("Duration", 5000L);
-			String colorStr = config.getString("Color", "RED");
 
-			Color color = convertStringToColor(colorStr);
+			List<String> displayMethodStringList = config.getStringList("DisplayMethod");
 
-			new WorldEvent(title, duration, color).startEvent();
+			List<WorldEvent.DISPLAY_METHOD> displayMethods = new ArrayList<>();
+
+			for (String methodStr : displayMethodStringList) {
+				try {
+					displayMethods.add(WorldEvent.DISPLAY_METHOD.valueOf(methodStr.toUpperCase()));
+				} catch (IllegalArgumentException ignored) {}
+			}
+
+			BarColor barColor = null;
+			BarStyle barStyle = null;
+			boolean smoothBossBar = true;
+
+			if (displayMethods.contains(WorldEvent.DISPLAY_METHOD.BOSSBAR)) {
+				barColor = convertStringToColor(config.getString("BossBarColor", "RED"));
+				barStyle = convertStringToStyle(config.getString("BossBarStyle", "SOLID"));
+
+				smoothBossBar = config.getBoolean("SmoothBossBar");
+			}
+
+			String startMessage = null;
+			String stopMessage = null;
+
+			if (displayMethods.contains(WorldEvent.DISPLAY_METHOD.CHAT)) {
+				startMessage = config.getString("EventStartMessage");
+				stopMessage = config.getString("EventStopMessage");
+			}
+
+			List<String> blackListedWorldsStringList = config.getStringList("BlackListedWorlds");
+			List<World> blackListedWorlds = new ArrayList<>();
+
+			if (!blackListedWorldsStringList.isEmpty()) {
+				for (String worldName : blackListedWorldsStringList) {
+					blackListedWorlds.add(Bukkit.getWorld(worldName));
+				}
+			}
+
+			List<String> affectedElementsStringList = config.getStringList("AffectedElements");
+			List<Element> affectedElements = new ArrayList<>();
+
+			if (!affectedElementsStringList.isEmpty()) {
+				for (String elementString : affectedElementsStringList) {
+					affectedElements.add(Element.fromString(elementString.toUpperCase()));
+				}
+			}
+
+			List<String> affectedAttributesStringList = config.getStringList("AffectedAttributes");
+			List<Attribute> affectedAttributes = new ArrayList<>();
+
+			if (!affectedAttributesStringList.isEmpty()) {
+				for (String attributeStr : affectedAttributesStringList) {
+					Attribute parsedAttribute = AttributeParser.parseAttribute(attributeStr);
+					if (parsedAttribute != null) {
+						affectedAttributes.add(parsedAttribute);
+					} else {
+						ProjectKorraRPG.getPlugin().getLogger().warning("Unknown attribute in config: " + attributeStr);
+					}
+				}
+			}
+
+			List<Ability> affectedAbilities = new ArrayList<>();
+
+			WorldEvent worldEvent = new WorldEvent(title, duration, barColor, barStyle, startMessage, stopMessage, blackListedWorlds, affectedElements, affectedAttributes, affectedAbilities, displayMethods);
+
+			if (displayMethods.contains(WorldEvent.DISPLAY_METHOD.BOSSBAR)) {
+				worldEvent.setSmoothBossBar(smoothBossBar);
+			}
+
+			worldEvent.startEvent();
+
 		} else {
 			help(sender, true);
 		}
@@ -87,17 +161,32 @@ public class WorldEventCommand extends RPGCommand {
 	 * Converts a string to a Bukkit Color. Supported colors are RED, GREEN, BLUE, YELLOW,
 	 * PINK, PURPLE, and WHITE. Defaults to RED for unrecognized names.
 	 */
-	private Color convertStringToColor(String colorStr) {
+	private BarColor convertStringToColor(String colorStr) {
 		if (colorStr == null) {
-			return Color.RED;
+			return BarColor.RED;
 		}
 		return switch (colorStr.toUpperCase()) {
-			case "GREEN" -> Color.GREEN;
-			case "BLUE" -> Color.BLUE;
-			case "YELLOW" -> Color.YELLOW;
-			case "PURPLE" -> Color.PURPLE;
-			case "WHITE" -> Color.WHITE;
-			default -> Color.RED;
+			case "GREEN" -> BarColor.GREEN;
+			case "BLUE" -> BarColor.BLUE;
+			case "YELLOW" -> BarColor.YELLOW;
+			case "PURPLE" -> BarColor.PURPLE;
+			case "WHITE" -> BarColor.WHITE;
+			case "PINK" -> BarColor.PINK;
+			default -> BarColor.RED;
+		};
+	}
+
+	private BarStyle convertStringToStyle(String colorStr) {
+		if (colorStr == null) {
+			return BarStyle.SOLID;
+		}
+
+		return switch (colorStr.toUpperCase()) {
+			case "SEGMENTED_6" -> BarStyle.SEGMENTED_6;
+			case "SEGMENTED_10" -> BarStyle.SEGMENTED_10;
+			case "SEGMENTED_12" -> BarStyle.SEGMENTED_12;
+			case "SEGMENTED_20" -> BarStyle.SEGMENTED_20;
+			default -> BarStyle.SOLID;
 		};
 	}
 }

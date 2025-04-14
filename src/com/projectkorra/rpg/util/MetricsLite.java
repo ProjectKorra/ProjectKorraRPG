@@ -174,12 +174,7 @@ public class MetricsLite {
 			try {
 				// Reload the metrics file
 				configuration.load(getConfigFile());
-			} catch (IOException ex) {
-				if (debug) {
-					Bukkit.getLogger().log(Level.INFO, "[Metrics] " + ex.getMessage());
-				}
-				return true;
-			} catch (InvalidConfigurationException ex) {
+			} catch (IOException | InvalidConfigurationException ex) {
 				if (debug) {
 					Bukkit.getLogger().log(Level.INFO, "[Metrics] " + ex.getMessage());
 				}
@@ -194,7 +189,7 @@ public class MetricsLite {
 	 * @throws java.io.IOException
 	 */
 	public void enable() throws IOException {
-		// This has to be synchronized or it can collide with the check in the task.
+		// This has to be synchronized, or it can collide with the check in the task.
 		synchronized (optOutLock) {
 			// Check if the server owner has already set opt-out, if not, set it.
 			if (isOptOut()) {
@@ -213,7 +208,7 @@ public class MetricsLite {
 	 * @throws java.io.IOException
 	 */
 	public void disable() throws IOException {
-		// This has to be synchronized or it can collide with the check in the task.
+		// This has to be synchronized, or it can collide with the check in the task.
 		synchronized (optOutLock) {
 			// Check if the server owner has already set opt-out, if not, set it.
 			if (!isOptOut()) {
@@ -257,7 +252,7 @@ public class MetricsLite {
 		// Construct the post data
 		StringBuilder json = new StringBuilder(1024);
 		json.append('{');
-		// The plugin's description file containg all of the plugin data such as name, version, author, etc
+		// The plugin's description file containg all the plugin data such as name, version, author, etc
 		appendJSONPair(json, "guid", guid);
 		appendJSONPair(json, "plugin_version", pluginVersion);
 		appendJSONPair(json, "server_version", serverVersion);
@@ -423,7 +418,7 @@ public class MetricsLite {
 			default:
 				if (chr < ' ') {
 					String t = "000" + Integer.toHexString(chr);
-					builder.append("\\u" + t.substring(t.length() - 4));
+					builder.append("\\u").append(t.substring(t.length() - 4));
 				} else {
 					builder.append(chr);
 				}

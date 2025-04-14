@@ -1,6 +1,11 @@
 package com.projectkorra.rpg.listeners;
 
+import com.projectkorra.projectkorra.command.PKCommand;
 import com.projectkorra.projectkorra.event.BendingReloadEvent;
+import com.projectkorra.rpg.commands.AvatarCommand;
+import com.projectkorra.rpg.commands.HelpCommand;
+import com.projectkorra.rpg.commands.RPGCommandBase;
+import com.projectkorra.rpg.commands.WorldEventCommand;
 import com.projectkorra.rpg.configuration.Config;
 import com.projectkorra.rpg.configuration.ConfigManager;
 import org.bukkit.event.EventHandler;
@@ -12,5 +17,16 @@ public class RPGListeners implements Listener {
 		for (Config config : ConfigManager.getAllConfigs()) {
 			config.reload();
 		}
+
+		initCommands();
+
+		PKCommand.reloadCommands();
+	}
+
+	void initCommands() {
+		new RPGCommandBase();
+		new AvatarCommand();
+		new HelpCommand();
+		new WorldEventCommand();
 	}
 }

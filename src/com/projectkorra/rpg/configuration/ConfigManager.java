@@ -19,7 +19,7 @@ public class ConfigManager {
     public ConfigManager() {
         config = new Config(new File("config.yml"));
         language = new Config(new File("language.yml"));
-        sozinsComet = new Config(new File("WorldEvents/sozinscomet.yml"));
+        sozinsComet = new Config(new File("WorldEvents/SozinsComet.yml"));
 
         configCheck(DEFAULT);
         configCheck(LANGUAGE);
@@ -217,9 +217,26 @@ public class ConfigManager {
         } else if (type == WORLDEVENTS) {
             config = sozinsComet.get();
 
+            List<String> displayMethods = new ArrayList<>();
+            displayMethods.add("CHAT");
+            displayMethods.add("BOSSBAR");
+
+            List<String> blackListedWorlds = new ArrayList<>();
+            blackListedWorlds.add("none");
+
+            List<String> affectedElements = new ArrayList<>();
+            affectedElements.add(Element.FIRE.getName());
+
             config.addDefault("Title", "&cSozins Comet");
             config.addDefault("Duration", 5000);
-            config.addDefault("Color", "RED");
+            config.addDefault("DisplayMethod", displayMethods);
+            config.addDefault("BossBarColor", "RED");
+            config.addDefault("BossBarStyle", "SOLID");
+            config.addDefault("SmoothBossBar", true);
+            config.addDefault("EventStartMessage", "&cSozins Comet has entered the world's atmosphere. Firebenders bending has been extremely hightened");
+            config.addDefault("EventStopMessage", "&cSozins Comet has left the world's atmosphere. Firebenders bending has been normalized");
+            config.addDefault("BlackListedWorlds", blackListedWorlds);
+            config.addDefault("AffectedElements", affectedElements);
 
             config.options().copyDefaults(true);
             sozinsComet.save();

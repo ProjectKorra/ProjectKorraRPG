@@ -1,122 +1,172 @@
 package com.projectkorra.rpg.modules.worldevents;
 
+import com.projectkorra.projectkorra.BendingPlayer;
 import com.projectkorra.projectkorra.Element;
+import com.projectkorra.projectkorra.ability.Ability;
 import com.projectkorra.projectkorra.attribute.Attribute;
-import com.projectkorra.projectkorra.util.ChatUtil;
-import com.projectkorra.rpg.modules.worldevents.util.WorldEventBossBar;
+import com.projectkorra.rpg.modules.worldevents.util.display.IWorldEventDisplay;
+import com.projectkorra.rpg.modules.worldevents.util.display.bossbar.BossBarDisplay;
+import com.projectkorra.rpg.modules.worldevents.util.display.bossbar.WorldEventBossBar;
 import com.projectkorra.rpg.modules.worldevents.util.WorldEventScheduler;
+import com.projectkorra.rpg.modules.worldevents.util.display.chat.ChatDisplay;
+import com.projectkorra.rpg.modules.worldevents.util.display.none.NoDisplay;
+import com.projectkorra.rpg.modules.worldevents.util.display.scoreboard.ScoreboardDisplay;
 import org.bukkit.Bukkit;
-import org.bukkit.Color;
 import org.bukkit.World;
 import org.bukkit.boss.BarColor;
+import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import javax.annotation.Nullable;
+import java.util.*;
 
 public class WorldEvent {
 	private static HashMap<Integer, WorldEvent> ACTIVE_EVENTS = new HashMap<>();
+	private static Set<BendingPlayer> AFFECTED_PLAYERS = new HashSet<>();
+
+	private List<IWorldEventDisplay> displayStrategies;
 
 	private String name;
 	private long duration;
-	private Color color;
+	private BarColor barColor;
+	private BarStyle barStyle;
+	private boolean smoothBossBar;
 
 	private String eventStartMessage;
 	private String eventStopMessage;
 	private List<World> blacklistedWorlds;
 
-	private List<Attribute> affectedAttributes;
 	private List<Element> affectedElements;
+	private List<Attribute> affectedAttributes;
+	private List<Ability> affectedAbilities;
 
 	private WorldEventBossBar worldEventBossBar;
 
-	public WorldEvent(String name, long duration, Color color) {
+	private DISPLAY_METHOD displayMethods;
+
+	public WorldEvent(
+			String name,
+			long duration,
+			@Nullable BarColor barColor,
+			@Nullable BarStyle barStyle,
+			@Nullable String eventStartMessage,
+			@Nullable String eventStopMessage,
+			@Nullable List<World> blacklistedWorlds,
+			@Nullable List<Element> affectedElements,
+			@Nullable List<Attribute> affectedAttributes,
+			@Nullable List<Ability> affectedAbilities,
+			List<DISPLAY_METHOD> displayMethods
+	)
+	{
 		this.name = name;
 		this.duration = duration;
-		this.color = color;
+		this.barColor = barColor;
+		this.barStyle = barStyle;
+		this.eventStartMessage = eventStartMessage;
+		this.eventStopMessage = eventStopMessage;
+		this.blacklistedWorlds = blacklistedWorlds;
+		this.affectedElements = affectedElements;
+		this.affectedAttributes = affectedAttributes;
+		this.affectedAbilities = affectedAbilities;
 
-		this.blacklistedWorlds = new ArrayList<>();
-		this.affectedAttributes = new ArrayList<>();
-		this.affectedElements = new ArrayList<>();
+		this.displayStrategies = new ArrayList<>();
 
-		this.worldEventBossBar = new WorldEventBossBar(ChatUtil.color(getName()), parseColor(getColor()));
+		for (DISPLAY_METHOD method : displayMethods) {
+			switch (method) {
+				case BOSSBAR -> this.displayStrategies.add(new BossBarDisplay());
+				case SCOREBOARD -> this.displayStrategies.add(new ScoreboardDisplay());
+				case CHAT -> this.displayStrategies.add(new ChatDisplay());
+				case NONE -> this.displayStrategies.add(new NoDisplay());
+			}
+		}
 	}
 
 	public void startEvent() {
-		WorldEventScheduler.startWorldEventSchedule(this);
+		ACTIVE_EVENTS.put(0, this);
 
-		if (!getBlacklistedWorlds().isEmpty()) {
-			for (Player allPlayers : Bukkit.getOnlinePlayers()) {
-				for (World world : getBlacklistedWorlds()) {
-					if (!allPlayers.getWorld().getName().equals(world.getName())) {
-						ChatUtil.sendBrandingMessage(allPlayers, getEventStartMessage());
-						getWorldEventBossBar().getBossBar().addPlayer(allPlayers);
-					}
+		Set<String> blacklistedNames = new HashSet<>();
+		if (blacklistedWorlds != null) {
+			for (World w : blacklistedWorlds) {
+				if (w != null) {
+					blacklistedNames.add(w.getName());
 				}
 			}
-		} else {
-			for (Player allPlayers : Bukkit.getOnlinePlayers()) {
-				ChatUtil.sendBrandingMessage(allPlayers, getEventStartMessage());
-				getWorldEventBossBar().getBossBar().addPlayer(allPlayers);
+		}
+
+		// Add all online players whose worlds are not in the blacklist.
+		for (Player player : Bukkit.getOnlinePlayers()) {
+			if (!blacklistedNames.contains(player.getWorld().getName())) {
+				AFFECTED_PLAYERS.add(BendingPlayer.getBendingPlayer(player));
+			}
+		}
+
+		// Start the display for the event
+		for (IWorldEventDisplay display : this.displayStrategies) {
+			display.startDisplay(this);
+		}
+
+		WorldEventScheduler.startWorldEventSchedule(this);
+	}
+
+	public void updateDisplay(double progress) {
+		Set<String> blacklistedNames = new HashSet<>();
+		if (blacklistedWorlds != null) {
+			for (World w : blacklistedWorlds) {
+				if (w != null) {
+					blacklistedNames.add(w.getName());
+				}
+			}
+		}
+
+		// Update display only for players not in a blacklisted world.
+		for (Player player : Bukkit.getOnlinePlayers()) {
+			if (!blacklistedNames.contains(player.getWorld().getName())) {
+				for (IWorldEventDisplay display : this.displayStrategies) {
+					display.updateDisplay(this, progress);
+				}
 			}
 		}
 	}
 
 	public void stopEvent() {
-		WorldEventScheduler.stopWorldEventSchedule(this);
+		ACTIVE_EVENTS.remove(0);
 
-		if (!getBlacklistedWorlds().isEmpty()) {
-			for (Player allPlayers : Bukkit.getOnlinePlayers()) {
-				for (World world : getBlacklistedWorlds()) {
-					if (!allPlayers.getWorld().getName().equals(world.getName())) {
-						ChatUtil.sendBrandingMessage(allPlayers, getEventStopMessage());
-						getWorldEventBossBar().getBossBar().removeAll();
-					}
+		Set<String> blacklistedNames = new HashSet<>();
+		if (blacklistedWorlds != null) {
+			for (World w : blacklistedWorlds) {
+				if (w != null) {
+					blacklistedNames.add(w.getName());
 				}
 			}
-		} else {
-			for (Player allPlayers : Bukkit.getOnlinePlayers()) {
-				ChatUtil.sendBrandingMessage(allPlayers, getEventStopMessage());
-				getWorldEventBossBar().getBossBar().removeAll();
+		}
+
+		// Stop display for players not in a blacklisted world.
+		for (Player player : Bukkit.getOnlinePlayers()) {
+			if (!blacklistedNames.contains(player.getWorld().getName())) {
+				for (IWorldEventDisplay display : this.displayStrategies) {
+					display.stopDisplay(this);
+				}
 			}
 		}
 	}
 
-	private BarColor parseColor(Color color) {
-		Map<BarColor, Color> targetColors = new HashMap<>();
-		targetColors.put(BarColor.RED, Color.fromRGB(255, 0, 0));
-		targetColors.put(BarColor.GREEN, Color.fromRGB(0, 255, 0));
-		targetColors.put(BarColor.BLUE, Color.fromRGB(0, 0, 255));
-		targetColors.put(BarColor.YELLOW, Color.fromRGB(255, 255, 0));
-		targetColors.put(BarColor.PURPLE, Color.fromRGB(128, 0, 128));
-		targetColors.put(BarColor.PINK, Color.fromRGB(255, 105, 180));
-		targetColors.put(BarColor.WHITE, Color.fromRGB(255, 255, 255));
-
-		double minDistance = Double.MAX_VALUE;
-		BarColor closest = BarColor.WHITE; // default
-
-		for (Map.Entry<BarColor, Color> entry : targetColors.entrySet()) {
-			double distance = colorDistance(color, entry.getValue());
-			if (distance < minDistance) {
-				minDistance = distance;
-				closest = entry.getKey();
-			}
-		}
-		return closest;
-	}
-
-	// Helper method to calculate the Euclidean distance between two colors
-	private double colorDistance(Color c1, Color c2) {
-		int redDiff = c1.getRed() - c2.getRed();
-		int greenDiff = c1.getGreen() - c2.getGreen();
-		int blueDiff = c1.getBlue() - c2.getBlue();
-		return Math.sqrt(redDiff * redDiff + greenDiff * greenDiff + blueDiff * blueDiff);
+	public enum DISPLAY_METHOD {
+		BOSSBAR,
+		SCOREBOARD,
+		CHAT,
+		NONE;
 	}
 
 	public static HashMap<Integer, WorldEvent> getActiveEvents() {
 		return ACTIVE_EVENTS;
+	}
+
+	public static Set<BendingPlayer> getAffectedPlayers() {
+		return AFFECTED_PLAYERS;
+	}
+
+	public List<IWorldEventDisplay> getDisplayStrategies() {
+		return displayStrategies;
 	}
 
 	public String getName() {
@@ -127,8 +177,16 @@ public class WorldEvent {
 		return this.duration;
 	}
 
-	public Color getColor() {
-		return this.color;
+	public BarColor getBarColor() {
+		return this.barColor;
+	}
+
+	public BarStyle getBarStyle() {
+		return barStyle;
+	}
+
+	public boolean isSmoothBossBar() {
+		return smoothBossBar;
 	}
 
 	public String getEventStartMessage() {
@@ -143,20 +201,36 @@ public class WorldEvent {
 		return blacklistedWorlds;
 	}
 
+	public List<Element> getAffectedElements() {
+		return affectedElements;
+	}
+
 	public List<Attribute> getAffectedAttributes() {
 		return affectedAttributes;
 	}
 
-	public List<Element> getAffectedElements() {
-		return affectedElements;
+	public List<Ability> getAffectedAbilities() {
+		return affectedAbilities;
 	}
 
 	public WorldEventBossBar getWorldEventBossBar() {
 		return worldEventBossBar;
 	}
 
+	public DISPLAY_METHOD getDisplayMethods() {
+		return displayMethods;
+	}
+
 	public static void setActiveEvents(HashMap<Integer, WorldEvent> activeEvents) {
 		ACTIVE_EVENTS = activeEvents;
+	}
+
+	public static void setAffectedPlayers(Set<BendingPlayer> affectedPlayers) {
+		AFFECTED_PLAYERS = affectedPlayers;
+	}
+
+	public void setDisplayStrategies(List<IWorldEventDisplay> displayStrategies) {
+		this.displayStrategies = displayStrategies;
 	}
 
 	public void setName(String name) {
@@ -167,8 +241,16 @@ public class WorldEvent {
 		this.duration = duration;
 	}
 
-	public void setColor(Color color) {
-		this.color = color;
+	public void setBarColor(BarColor barColor) {
+		this.barColor = barColor;
+	}
+
+	public void setBarStyle(BarStyle barStyle) {
+		this.barStyle = barStyle;
+	}
+
+	public void setSmoothBossBar(boolean smoothBossBar) {
+		this.smoothBossBar = smoothBossBar;
 	}
 
 	public void setEventStartMessage(String eventStartMessage) {
@@ -183,15 +265,23 @@ public class WorldEvent {
 		this.blacklistedWorlds = blacklistedWorlds;
 	}
 
-	public void setAffectedAttributes(List<Attribute> affectedAttributes) {
-		this.affectedAttributes = affectedAttributes;
-	}
-
 	public void setAffectedElements(List<Element> affectedElements) {
 		this.affectedElements = affectedElements;
 	}
 
+	public void setAffectedAttributes(List<Attribute> affectedAttributes) {
+		this.affectedAttributes = affectedAttributes;
+	}
+
+	public void setAffectedAbilities(List<Ability> affectedAbilities) {
+		this.affectedAbilities = affectedAbilities;
+	}
+
 	public void setWorldEventBossBar(WorldEventBossBar worldEventBossBar) {
 		this.worldEventBossBar = worldEventBossBar;
+	}
+
+	public void setDisplayMethods(DISPLAY_METHOD displayMethods) {
+		this.displayMethods = displayMethods;
 	}
 }

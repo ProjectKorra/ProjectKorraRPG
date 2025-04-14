@@ -1,4 +1,4 @@
-package com.projectkorra.rpg.modules.events;
+package com.projectkorra.rpg.modules.worldevents;
 
 import com.projectkorra.rpg.modules.Module;
 

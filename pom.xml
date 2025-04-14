@@ -7,7 +7,11 @@
     <version>2.0.0</version>
     <packaging>jar</packaging>
     <name>ProjectKorraRPG</name>
-  
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
     <repositories>
         <repository>
             <id>spigot-repo</id>
@@ -26,13 +30,14 @@
             <version>1.20.4-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/com.projectkorra/projectkorra -->
+        <!-- ProjectKorra Core -->
         <dependency>
             <groupId>com.projectkorra</groupId>
             <artifactId>projectkorra</artifactId>
             <version>1.12.0</version>
             <scope>provided</scope>
         </dependency>
+        <!-- Luckperms API -->
         <dependency>
             <groupId>net.luckperms</groupId>
             <artifactId>api</artifactId>
@@ -75,12 +80,7 @@
 			            </goals>
 		            </execution>
 		        </executions>
-	            <configuration/>
 	        </plugin>
         </plugins>
     </build>
-
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
 </project>

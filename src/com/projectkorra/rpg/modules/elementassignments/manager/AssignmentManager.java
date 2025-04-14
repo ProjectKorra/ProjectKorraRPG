@@ -1,4 +1,4 @@
-package com.projectkorra.rpg.modules.elementassignments;
+package com.projectkorra.rpg.modules.elementassignments.manager;
 
 import com.projectkorra.projectkorra.BendingPlayer;
 import com.projectkorra.projectkorra.Element;
@@ -6,6 +6,8 @@ import com.projectkorra.projectkorra.ProjectKorra;
 import com.projectkorra.rpg.ProjectKorraRPG;
 import com.projectkorra.rpg.RPGMethods;
 import com.projectkorra.rpg.configuration.ConfigManager;
+import com.projectkorra.rpg.modules.elementassignments.listeners.AssignmentListener;
+import com.projectkorra.rpg.modules.elementassignments.util.AssignmentGroup;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;

@@ -1,7 +1,7 @@
-package com.projectkorra.rpg.modules.events.util;
+package com.projectkorra.rpg.modules.worldevents.util;
 
 import com.projectkorra.rpg.ProjectKorraRPG;
-import com.projectkorra.rpg.modules.events.WorldEvent;
+import com.projectkorra.rpg.modules.worldevents.WorldEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class WorldEventScheduler {
@@ -18,6 +18,7 @@ public class WorldEventScheduler {
 				double progress = 1.0 - (elapsed / (double) duration);
 
 				if (progress <= 0.0) {
+					// TODO: Bossbar only when enabled
 					worldEvent.getWorldEventBossBar().getBossBar().setProgress(0.0);
 					worldEvent.stopEvent();
 					this.cancel();

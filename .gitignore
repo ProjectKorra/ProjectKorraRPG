@@ -2,6 +2,9 @@
 # Default excludes
 #
 
+/shelf/
+/workspace.xml
+
 # BlueJ files
 *.ctxt
 
@@ -71,13 +74,6 @@ $RECYCLE.BIN/
 
 bin/
 
-# Thumbnails
-._*
-
-# Files that might appear on external disk
-.Spotlight-V100
-.Trashes
-
 # Directories potentially created on remote AFP share
 .AppleDB
 .AppleDesktop
@@ -94,6 +90,9 @@ target/
 *.ipr
 
 .idea/
+
+# VSCode project files
+.vscode/
 
 # eclipse project file
 .settings/
@@ -125,4 +124,3 @@ pom.xml.tag
 *.mf
 build.xml
 /target/
-.idea/

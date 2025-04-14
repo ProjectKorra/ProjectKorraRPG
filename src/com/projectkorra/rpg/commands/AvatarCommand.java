@@ -1,18 +1,12 @@
 package com.projectkorra.rpg.commands;
 
-import com.projectkorra.projectkorra.BendingPlayer;
 import com.projectkorra.rpg.ProjectKorraRPG;
-import com.projectkorra.rpg.RPGMethods;
-import com.projectkorra.projectkorra.storage.DBConnection;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,7 +29,7 @@ public class AvatarCommand extends RPGCommand{
 				return;
 		}
 
-		if (args.get(0).equalsIgnoreCase("list")) {
+		if (args.getFirst().equalsIgnoreCase("list")) {
 			List<String> avatars =  ProjectKorraRPG.plugin.getAvatarManager().getPastLives();
 			sender.sendMessage(ChatColor.BOLD + "Avatar Past Lives:");
 			for (String s : avatars) {
@@ -43,16 +37,13 @@ public class AvatarCommand extends RPGCommand{
 			}
 			return;
 		}
-		Player target = Bukkit.getPlayer(args.get(0));
+		Player target = Bukkit.getPlayer(args.getFirst());
 		if (target == null) {
 			sender.sendMessage(ChatColor.RED + "Player not found!");
-			return;
 		} else {
-			BendingPlayer bPlayer = BendingPlayer.getBendingPlayer(target);
 			boolean succesful = ProjectKorraRPG.plugin.getAvatarManager().makeAvatar(target.getUniqueId());
 			if (!succesful) {
 				sender.sendMessage(ChatColor.RED + "Failed to declare avatar!");
-				return;
 			} else {
 				sender.sendMessage(ChatColor.DARK_PURPLE + target.getName() + " has been declared the Avatar!");
 			}
@@ -61,8 +52,8 @@ public class AvatarCommand extends RPGCommand{
 	
 	@Override
 	protected List<String> getTabCompletion(CommandSender sender, List<String> args) {
-		if (args.size() >= 1) return new ArrayList<String>();
-		List<String> players = new ArrayList<String>();
+		if (!args.isEmpty()) return new ArrayList<>();
+		List<String> players = new ArrayList<>();
 		for (Player p : Bukkit.getOnlinePlayers()) {
 			players.add(p.getName());
 		}

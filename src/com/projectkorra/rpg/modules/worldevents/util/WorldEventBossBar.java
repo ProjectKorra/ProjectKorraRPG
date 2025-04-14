@@ -1,4 +1,4 @@
-package com.projectkorra.rpg.modules.events.util;
+package com.projectkorra.rpg.modules.worldevents.util;
 
 import org.bukkit.Bukkit;
 import org.bukkit.boss.BarColor;

@@ -1,4 +1,4 @@
-package com.projectkorra.rpg.modules.elementassignments;
+package com.projectkorra.rpg.modules.elementassignments.listeners;
 
 import com.projectkorra.projectkorra.BendingPlayer;
 import com.projectkorra.projectkorra.event.BendingPlayerLoadEvent;

@@ -8,10 +8,6 @@ import java.io.File;
 import java.util.*;
 
 public class ConfigManager {
-	private static Config config;
-	private static Config language;
-	private static Config sozinsComet;
-
     private static final ConfigType DEFAULT = new ConfigType("Default");
     private static final ConfigType LANGUAGE = new ConfigType("Language");
     private static final ConfigType WORLDEVENTS = new ConfigType("WorldEvents");
@@ -31,9 +27,6 @@ public class ConfigManager {
     }
 
     private static void addDefaultElementAssignGroup(String groupName, boolean enabled, List<String> elements, double weight, String prefix, List<String> commands, String permissionGroup) {
-        if (config == null) {
-            return; // Ensure rpgConfig is initialized
-        }
         FileConfiguration config = ConfigManager.config.get();
 
         config.addDefault("Modules.ElementAssignments.Groups." + groupName + ".Enabled", enabled);
@@ -48,6 +41,7 @@ public class ConfigManager {
         FileConfiguration config;
         if (type == DEFAULT) {
             config = ConfigManager.config.get();
+
             // -------------------------------- Randomized Avatar  ---------------------------------
 
             config.addDefault("Modules.RandomAvatar.Enabled", true);
@@ -79,19 +73,16 @@ public class ConfigManager {
             config.setComments("Modules.RandomAvatar.SubElementBlacklist", List.of("Subelements that will not be given to the Avatar"));
 
             // -------------------------------- Element Assignments  ---------------------------------
+
             config.addDefault("Modules.ElementAssignments.Enabled", true);
             config.addDefault("Modules.ElementAssignments.Default", "None");
             config.addDefault("Modules.ElementAssignments.ChangeOnDeath.Enabled", true); // Allow changing element on death
             config.addDefault("Modules.ElementAssignments.ChangeOnDeath.Chance", 0.2); // 20% chance to change element on death if
-            // enabled
             config.addDefault("Modules.ElementAssignments.ChangeOnDeath.Bypass", false); // Allow bypassing cooldowns for changing
-            // elements on death (if true, will ignore
-            // cooldowns)
             config.addDefault("Modules.ElementAssignments.ChangeOnDeath.Permission", "projectkorra.rpg.elementassign.bypass");
-            // Empty Set
+
             Set<String> elementNames = new HashSet<>();
 
-            // No Element
             addDefaultElementAssignGroup("None", // Group Name
                     true, // Enabled
                     List.of(), // Elements (none)
@@ -241,6 +232,8 @@ public class ConfigManager {
     public static Config getConfig() {
         return config;
     }
+
+    // TEMP
     public static List<Config> getAllConfigs() {
         List<Config> configs = new ArrayList<>();
         configs.add(config);

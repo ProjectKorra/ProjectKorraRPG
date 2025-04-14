@@ -1,10 +1,10 @@
-package com.projectkorra.rpg.modules.events;
+package com.projectkorra.rpg.modules.worldevents;
 
 import com.projectkorra.projectkorra.Element;
 import com.projectkorra.projectkorra.attribute.Attribute;
 import com.projectkorra.projectkorra.util.ChatUtil;
-import com.projectkorra.rpg.modules.events.util.WorldEventBossBar;
-import com.projectkorra.rpg.modules.events.util.WorldEventScheduler;
+import com.projectkorra.rpg.modules.worldevents.util.WorldEventBossBar;
+import com.projectkorra.rpg.modules.worldevents.util.WorldEventScheduler;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.World;

@@ -5,7 +5,6 @@ import com.projectkorra.projectkorra.command.SubCommand;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,10 +14,10 @@ public abstract class RPGCommand implements SubCommand{
 	
 	public static HashMap<String, RPGCommand> instances = new HashMap<>();
 
-	private String name;
-	private String properUse;
-	private String description;
-	private String[] aliases;
+	private final String name;
+	private final String properUse;
+	private final String description;
+	private final String[] aliases;
 	
 	public RPGCommand(String name, String properUse, String description, String[] aliases) {
 		this.name = name;
@@ -44,7 +43,6 @@ public abstract class RPGCommand implements SubCommand{
 	public String[] getAliases() {
 		return aliases;
 	}
-	
 
 	public void help(CommandSender sender, boolean description) {
 		sender.sendMessage(ChatColor.GOLD + "Proper Usage: " + ChatColor.DARK_AQUA + properUse);
@@ -106,26 +104,10 @@ public abstract class RPGCommand implements SubCommand{
 			return true;
 		}
 	}
-
-	/**
-	 * Checks if the CommandSender is an instance of a Player. If not, it tells
-	 * them they must be a Player to use the command.
-	 * 
-	 * @param sender The CommandSender to check
-	 * @return True if sender instanceof Player, false otherwise
-	 */
-	protected boolean isPlayer(CommandSender sender) {
-		if (sender instanceof Player) {
-			return true;
-		} else {
-			sender.sendMessage(ChatColor.RED + "You must be a player to use that command.");
-			return false;
-		}
-	}
 	
 	/**Gets a list of valid arguments that can be used in tabbing.*/
 	protected List<String> getTabCompletion(CommandSender sender, List<String> args)
 	{
-		return new ArrayList<String>();
+		return new ArrayList<>();
 	}
 }

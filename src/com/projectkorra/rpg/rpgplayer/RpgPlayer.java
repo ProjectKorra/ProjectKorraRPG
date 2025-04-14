@@ -20,4 +20,12 @@ public class RpgPlayer extends BendingPlayer {
 	public double getXp() {
 		return this.xp;
 	}
+
+	public void setLevel(int level) {
+		this.level = level;
+	}
+
+	public void setXp(double xp) {
+		this.xp = xp;
+	}
 }

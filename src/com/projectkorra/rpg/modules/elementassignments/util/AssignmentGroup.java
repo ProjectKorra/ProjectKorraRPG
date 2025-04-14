@@ -1,4 +1,4 @@
-package com.projectkorra.rpg.modules.elementassignments;
+package com.projectkorra.rpg.modules.elementassignments.util;
 
 import com.projectkorra.projectkorra.Element;
 

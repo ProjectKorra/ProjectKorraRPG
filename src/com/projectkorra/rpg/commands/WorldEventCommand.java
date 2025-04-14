@@ -1,7 +1,7 @@
 package com.projectkorra.rpg.commands;
 
 import com.projectkorra.rpg.ProjectKorraRPG;
-import com.projectkorra.rpg.modules.events.WorldEvent;
+import com.projectkorra.rpg.modules.worldevents.WorldEvent;
 import org.bukkit.Color;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;

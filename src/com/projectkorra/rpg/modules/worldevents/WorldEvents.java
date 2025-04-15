@@ -6,17 +6,17 @@ import com.projectkorra.rpg.modules.worldevents.listeners.EnhancedBendingListene
 import org.bukkit.Bukkit;
 
 public class WorldEvents extends Module {
-	public WorldEvents() {
-		super("WorldEvents");
-	}
+    public WorldEvents() {
+        super("WorldEvents");
+    }
 
-	@Override
-	public void enable() {
-		Bukkit.getPluginManager().registerEvents(new EnhancedBendingListener(), ProjectKorraRPG.getPlugin());
-	}
+    @Override
+    public void enable() {
+        Bukkit.getPluginManager().registerEvents(new EnhancedBendingListener(), ProjectKorraRPG.getPlugin());
+    }
 
-	@Override
-	public void disable() {
+    @Override
+    public void disable() {
 
-	}
+    }
 }

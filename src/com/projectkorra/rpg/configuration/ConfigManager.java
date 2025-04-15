@@ -20,7 +20,7 @@ public class ConfigManager {
     public ConfigManager() {
         config = new Config(new File("config.yml"));
         language = new Config(new File("language.yml"));
-        sozinsComet = new Config(new File("WorldEvents/sozinscomet.yml"));
+        sozinsComet = new Config(new File("WorldEvents/SozinsComet.yml"));
 
         configCheck(DEFAULT);
         configCheck(LANGUAGE);
@@ -41,6 +41,22 @@ public class ConfigManager {
         config.addDefault("Modules.ElementAssignments.Groups." + groupName + ".PermissionGroup", permissionGroup);
     }
 
+    public static FileConfiguration getFileConfig() {
+        return config.get();
+    }
+
+    public static Config getConfig() {
+        return config;
+    }
+
+    public static List<Config> getAllConfigs() {
+        List<Config> configs = new ArrayList<>();
+        configs.add(config);
+        configs.add(language);
+        configs.add(sozinsComet);
+        return configs;
+    }
+
     public void configCheck(ConfigType type) {
         FileConfiguration config;
         if (type == DEFAULT) {
@@ -57,7 +73,7 @@ public class ConfigManager {
             config.addDefault("Modules.RandomAvatar.LoseAvatarOnDeath", true);
             config.addDefault("Modules.RandomAvatar.OnlyLoseAvatarOnAvatarStateDeath", true);
             config.addDefault("Modules.RandomAvatar.ClearOnSelection", true);
-            config.addDefault("Modules.RandomAvatar.Elements", List.of( "earth", "water", "fire", "air", "avatar"));
+            config.addDefault("Modules.RandomAvatar.Elements", List.of("earth", "water", "fire", "air", "avatar"));
             config.addDefault("Modules.RandomAvatar.IncludeAllSubElements", true);
             config.addDefault("Modules.RandomAvatar.SubElementBlacklist", List.of("blood"));
             config.setComments("Modules.RandomAvatar.Enabled", List.of("Whether to enable the Avatar randomization system", "This gives every player a chance to become Avatar"));
@@ -223,26 +239,31 @@ public class ConfigManager {
         } else if (type == WORLDEVENTS) {
             config = sozinsComet.get();
 
+            List<String> displayMethods = new ArrayList<>();
+            displayMethods.add("CHAT");
+            displayMethods.add("BOSSBAR");
+
+            List<String> blackListedWorlds = new ArrayList<>();
+            blackListedWorlds.add("none");
+
+            List<String> affectedElements = new ArrayList<>();
+            affectedElements.add(Element.FIRE.getName());
+
             config.addDefault("Title", "&cSozins Comet");
             config.addDefault("Duration", 5000);
-            config.addDefault("Color", "RED");
+            config.addDefault("DisplayMethod", displayMethods);
+            config.addDefault("BossBarColor", "RED");
+            config.addDefault("BossBarStyle", "SOLID");
+            config.addDefault("SmoothBossBar", true);
+            config.addDefault("EventStartMessage", "&cSozins Comet has entered the world's atmosphere. Firebenders bending has been extremely hightened");
+            config.addDefault("EventStopMessage", "&cSozins Comet has left the world's atmosphere. Firebenders bending has been normalized");
+            config.addDefault("BlackListedWorlds", blackListedWorlds);
+            config.addDefault("AffectedElements", affectedElements);
 
             config.options().copyDefaults(true);
             sozinsComet.save();
         }
-    }
-    public static FileConfiguration getFileConfig() {
-        return config.get();
+
     }
 
-    public static Config getConfig() {
-        return config;
-    }
-    public static List<Config> getAllConfigs() {
-        List<Config> configs = new ArrayList<>();
-        configs.add(config);
-        configs.add(language);
-        configs.add(sozinsComet);
-        return configs;
-    }
 }

@@ -13,12 +13,12 @@ import java.util.List;
 
 public class EnhancedBendingListener implements Listener {
 
-	@EventHandler
-	public void onBend(AbilityRecalculateAttributeEvent event) {
-		BendingPlayer bPlayer = BendingPlayer.getBendingPlayer(event.getAbility().getPlayer());
-		WorldEvent activeEvent = WorldEvent.getActiveEvents().get(0);
-		CoreAbility abilityToEnhance = event.getAbility();
-		List<Element> affectedElements = activeEvent.getAffectedElements();
-		List<Attribute> affectedAttributes = activeEvent.getAffectedAttributes();
-	}
+    @EventHandler
+    public void onBend(AbilityRecalculateAttributeEvent event) {
+        BendingPlayer bPlayer = BendingPlayer.getBendingPlayer(event.getAbility().getPlayer());
+        WorldEvent activeEvent = WorldEvent.getActiveEvents().get(0);
+        CoreAbility abilityToEnhance = event.getAbility();
+        List<Element> affectedElements = activeEvent.getAffectedElements();
+        List<Attribute> affectedAttributes = activeEvent.getAffectedAttributes();
+    }
 }

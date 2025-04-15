@@ -6,8 +6,8 @@ import com.projectkorra.rpg.commands.HelpCommand;
 import com.projectkorra.rpg.commands.RPGCommandBase;
 import com.projectkorra.rpg.commands.WorldEventCommand;
 import com.projectkorra.rpg.configuration.ConfigManager;
+import com.projectkorra.rpg.modules.ModuleManager;
 import com.projectkorra.rpg.modules.elementassignments.AssignmentManager;
-import com.projectkorra.rpg.modules.manager.ModuleManager;
 import com.projectkorra.rpg.modules.randomavatar.AvatarManager;
 import com.projectkorra.rpg.util.MetricsLite;
 import net.luckperms.api.LuckPerms;
@@ -24,104 +24,102 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 public class ProjectKorraRPG extends JavaPlugin {
-	
-	public static ProjectKorraRPG plugin;
-	public static Logger log;
-	public static LuckPerms luckPermsAPI;
-	private Map<String, Element> elementMap;
-	private AssignmentManager assignmentManager;
-	private AvatarManager avatarManager;
-	public Set<OfflinePlayer> recentPlayers = new HashSet<>();
-	private ModuleManager moduleManager;
 
+    public static ProjectKorraRPG plugin;
+    public static Logger log;
+    public static LuckPerms luckPermsAPI;
+    public Set<OfflinePlayer> recentPlayers = new HashSet<>();
+    private Map<String, Element> elementMap;
+    private AssignmentManager assignmentManager;
+    private AvatarManager avatarManager;
+    private ModuleManager moduleManager;
 
-	@Override
-	public void onEnable() {
-		ProjectKorraRPG.log = this.getLogger();
-		plugin = this;
-		moduleManager = new ModuleManager();
-		RegisteredServiceProvider<LuckPerms> provider = Bukkit.getServicesManager().getRegistration(LuckPerms.class);
-		if (provider != null) {
-			luckPermsAPI = provider.getProvider();
-		}
+    public static ProjectKorraRPG getPlugin() {
+        return plugin;
+    }
 
-		setElementMap(grabElements());
-		new ConfigManager();
-		moduleManager.enableModules();
-		new RPGCommandBase();
-		new AvatarCommand();
-		new HelpCommand();
-		new WorldEventCommand();
-		
-		Bukkit.getServer().getPluginManager().registerEvents(new RPGListener(), this);
+    @Override
+    public void onEnable() {
+        ProjectKorraRPG.log = this.getLogger();
+        plugin = this;
+        moduleManager = new ModuleManager();
+        RegisteredServiceProvider<LuckPerms> provider = Bukkit.getServicesManager().getRegistration(LuckPerms.class);
+        if (provider != null) {
+            luckPermsAPI = provider.getProvider();
+        }
+        setElementMap(grabElements());
+        new ConfigManager();
+        moduleManager.enableModules();
+        new RPGCommandBase();
+        new AvatarCommand();
+        new HelpCommand();
+        new WorldEventCommand();
+        Bukkit.getServer().getPluginManager().registerEvents(new RPGListener(), this);
+        try {
+            MetricsLite metrics = new MetricsLite(this);
+            metrics.start();
+        } catch (IOException e) {
+            e.printStackTrace();
+            log.info("Failed to load metric stats");
+        }
 
-		try {
-	        MetricsLite metrics = new MetricsLite(this);
-	        metrics.start();
-	    } catch (IOException e) {
-	        e.printStackTrace();
-	        log.info("Failed to load metric stats");
-	    }
+    }
 
-	}
-	private Map<String, Element> grabElements() {
-		Element[] elements = Element.getAllElements();
-		Element[] subElements = Element.getAllSubElements();
-		// Return these combined into a Hash
-		Map<String, Element> elementMap = new HashMap<>();
-		for (Element e : elements) {
-			if (e == null) continue;
-			elementMap.put(e.getName().toLowerCase(), e);
-		}
-		for (Element e : subElements) {
-			if (e == null) continue;
-			// Don't overwrite the main elements
-			if (elementMap.containsKey(e.getName().toLowerCase())) {
-				// Append _sub if it already exists to avoid overwriting main elements
-				elementMap.put(e.getName().toLowerCase() + "_sub", e);
-			} else {
-				elementMap.put(e.getName().toLowerCase(), e);
-			}
-		}
-		return elementMap;
-	}
+    private Map<String, Element> grabElements() {
+        Element[] elements = Element.getAllElements();
+        Element[] subElements = Element.getAllSubElements();
+        // Return these combined into a Hash
+        Map<String, Element> elementMap = new HashMap<>();
+        for (Element e : elements) {
+            if (e == null) continue;
+            elementMap.put(e.getName().toLowerCase(), e);
+        }
+        for (Element e : subElements) {
+            if (e == null) continue;
+            // Don't overwrite the main elements
+            if (elementMap.containsKey(e.getName().toLowerCase())) {
+                // Append _sub if it already exists to avoid overwriting main elements
+                elementMap.put(e.getName().toLowerCase() + "_sub", e);
+            } else {
+                elementMap.put(e.getName().toLowerCase(), e);
+            }
+        }
+        return elementMap;
+    }
 
-	@Override
-	public void onDisable() {
-		plugin.getLogger().info("Disabling " + plugin.getName() + "...");
-	}
-	public ModuleManager getModuleManager() {
-		return moduleManager;
-	}
-	public static ProjectKorraRPG getPlugin() {
-		return plugin;
-	}
+    @Override
+    public void onDisable() {
+        plugin.getLogger().info("Disabling " + plugin.getName() + "...");
+    }
 
+    public ModuleManager getModuleManager() {
+        return moduleManager;
+    }
 
-	public Map<String, Element> getElementMap() {
-		return elementMap;
-	}
+    public Map<String, Element> getElementMap() {
+        return elementMap;
+    }
 
-	public void setElementMap(Map<String, Element> elementMap) {
-		this.elementMap = elementMap;
-	}
+    public void setElementMap(Map<String, Element> elementMap) {
+        this.elementMap = elementMap;
+    }
 
-	public AssignmentManager getAssignmentManager() {
-		return assignmentManager;
-	}
+    public AssignmentManager getAssignmentManager() {
+        return assignmentManager;
+    }
 
-	public void setAssignmentManager(AssignmentManager assignmentManager) {
-		this.assignmentManager = assignmentManager;
-		ProjectKorraRPG.log.info(assignmentManager.isEnabled() ? "AssignmentManager enabled" : "AssignmentManager disabled");
-		ProjectKorraRPG.log.info("AssignmentManager set");
-	}
+    public void setAssignmentManager(AssignmentManager assignmentManager) {
+        this.assignmentManager = assignmentManager;
+        ProjectKorraRPG.log.info(assignmentManager.isEnabled() ? "AssignmentManager enabled" : "AssignmentManager disabled");
+        ProjectKorraRPG.log.info("AssignmentManager set");
+    }
 
-	public AvatarManager getAvatarManager() {
-		return avatarManager;
-	}
+    public AvatarManager getAvatarManager() {
+        return avatarManager;
+    }
 
-	public void setAvatarManager(AvatarManager avatarManager) {
-		ProjectKorraRPG.log.info(avatarManager.isEnabled() ? "AvatarManager enabled" : "AvatarManager disabled");
-		this.avatarManager = avatarManager;
-	}
+    public void setAvatarManager(AvatarManager avatarManager) {
+        ProjectKorraRPG.log.info(avatarManager.isEnabled() ? "AvatarManager enabled" : "AvatarManager disabled");
+        this.avatarManager = avatarManager;
+    }
 }

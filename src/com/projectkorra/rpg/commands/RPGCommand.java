@@ -4,6 +4,7 @@ import com.projectkorra.projectkorra.command.PKCommand;
 import com.projectkorra.projectkorra.command.SubCommand;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -124,6 +125,6 @@ public abstract class RPGCommand implements SubCommand {
      * Gets a list of valid arguments that can be used in tabbing.
      */
     protected List<String> getTabCompletion(CommandSender sender, List<String> args) {
-        return new ArrayList<String>();
+        return new ArrayList<>();
     }
 }

@@ -93,7 +93,7 @@ public class WorldEvent {
 		}
 	}
 
-	private static void initAllWorldEvents() {
+	public static void initAllWorldEvents() {
 		File worldEventsFolder = new File(ProjectKorraRPG.getPlugin().getDataFolder(), "WorldEvents");
 		if (!worldEventsFolder.exists() || !worldEventsFolder.isDirectory()) {
 			ProjectKorraRPG.getPlugin().getLogger().warning("WorldEvents folder was not found!");
@@ -105,7 +105,7 @@ public class WorldEvent {
 			return;
 		}
 
-		for (File file : worldEventsFiles) {
+		Arrays.stream(worldEventsFiles).parallel().forEach(file -> {
 			String eventKey = file.getName().toLowerCase();
 			if (eventKey.endsWith(".yml")) {
 				eventKey = eventKey.substring(0, eventKey.length() - 4);
@@ -167,11 +167,7 @@ public class WorldEvent {
 			);
 
 			ALL_EVENTS.put(eventKey, worldEvent);
-		}
-	}
-
-	public static CompletableFuture<Void> initAllWorldEventsAsync() {
-		return CompletableFuture.runAsync(WorldEvent::initAllWorldEvents);
+		});
 	}
 
 	public static HashMap<String, WorldEvent> getAllEvents() {

@@ -12,11 +12,9 @@ import java.util.List;
 public class HelpCommand extends RPGCommand{
 	private final String modifiers = ChatColor.GOLD + "Commands: <required> [optional]";
 
-    private final String[] fullmoon = {"fullmoon", "fm", "fmoon", "fullm"};
-    private final String[] lunar = {"lunareclipse", "le", "leclipse", "lunare"};
-    private final String[] solar = {"solareclipse", "se", "seclipse", "solare"};
-    private final String[] sozins = {"sozinscomet", "sc", "sozins", "sozinsc", "scomet", "comet"};
-    private final String modifiers = ChatColor.GOLD + "Commands: <required> [optional]";
+	public HelpCommand() {
+		super("help", "/bending rpg help <Command/Event>", "Shows all helpful information for rpg", new String[]{"help", "h", "?"});
+	}
 
 	@Override
 	public void execute(CommandSender sender, List<String> args) {
@@ -58,7 +56,6 @@ public class HelpCommand extends RPGCommand{
 			}
 		}
 		l.sort(Comparator.nullsLast(Comparator.naturalOrder()));
-		l.addAll(Arrays.asList("FullMoon", "LunarEclipse", "SolarEclipse", "SozinsComet"));
 		return l;
 	}
 }

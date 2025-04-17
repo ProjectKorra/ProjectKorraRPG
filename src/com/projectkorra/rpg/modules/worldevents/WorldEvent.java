@@ -1,9 +1,7 @@
 package com.projectkorra.rpg.modules.worldevents;
 
-import com.projectkorra.projectkorra.BendingPlayer;
-import com.projectkorra.projectkorra.Element;
-import com.projectkorra.projectkorra.ability.Ability;
-import com.projectkorra.projectkorra.attribute.Attribute;
+import com.projectkorra.rpg.ProjectKorraRPG;
+import com.projectkorra.rpg.RPGMethods;
 import com.projectkorra.rpg.modules.worldevents.util.display.IWorldEventDisplay;
 import com.projectkorra.rpg.modules.worldevents.util.display.bossbar.BossBarDisplay;
 import com.projectkorra.rpg.modules.worldevents.util.display.bossbar.WorldEventBossBar;
@@ -15,93 +13,65 @@ import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 
-import javax.annotation.Nullable;
+import java.io.File;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 
 public class WorldEvent {
+	private static HashMap<String, WorldEvent> ALL_EVENTS = new HashMap<>();
 	private static HashMap<Integer, WorldEvent> ACTIVE_EVENTS = new HashMap<>();
-	private static Set<BendingPlayer> AFFECTED_PLAYERS = new HashSet<>();
+	private static Set<Player> AFFECTED_PLAYERS = new HashSet<>();
 
-	private List<IWorldEventDisplay> displayStrategies;
+	private List<IWorldEventDisplay> displayMethods;
 
-	private String name;
+	private String title;
 	private long duration;
-	private BarColor barColor;
-	private BarStyle barStyle;
-	private boolean smoothBossBar;
 
-	private String eventStartMessage;
-	private String eventStopMessage;
-	private List<World> blacklistedWorlds;
+	private List<World> disabledWorlds;
 
-	private List<Element> affectedElements;
-	private List<Attribute> affectedAttributes;
-	private List<Ability> affectedAbilities;
+	private List<String> affectedElements;
+	private List<String> affectedAttributes;
+	private List<String> affectedAbilities;
 
 	private WorldEventBossBar worldEventBossBar;
 
-	private DISPLAY_METHOD displayMethods;
-
-	public WorldEvent(
-			String name,
-			long duration,
-			@Nullable BarColor barColor,
-			@Nullable BarStyle barStyle,
-			@Nullable String eventStartMessage,
-			@Nullable String eventStopMessage,
-			@Nullable List<World> blacklistedWorlds,
-			@Nullable List<Element> affectedElements,
-			@Nullable List<Attribute> affectedAttributes,
-			@Nullable List<Ability> affectedAbilities,
-			List<DISPLAY_METHOD> displayMethods
-	)
-	{
-		this.name = name;
+	public WorldEvent(String title, long duration, List<World> disabledWorlds, List<String> affectedElements, List<String> affectedAttributes, List<String> affectedAbilities, List<IWorldEventDisplay> displayMethods) {
+		this.title = title;
 		this.duration = duration;
-		this.barColor = barColor;
-		this.barStyle = barStyle;
-		this.eventStartMessage = eventStartMessage;
-		this.eventStopMessage = eventStopMessage;
-		this.blacklistedWorlds = blacklistedWorlds;
+		this.disabledWorlds = disabledWorlds;
 		this.affectedElements = affectedElements;
 		this.affectedAttributes = affectedAttributes;
 		this.affectedAbilities = affectedAbilities;
-
-		this.displayStrategies = new ArrayList<>();
-
-		for (DISPLAY_METHOD method : displayMethods) {
-			switch (method) {
-				case BOSSBAR -> this.displayStrategies.add(new BossBarDisplay());
-				case SCOREBOARD -> this.displayStrategies.add(new ScoreboardDisplay());
-				case CHAT -> this.displayStrategies.add(new ChatDisplay());
-				case NONE -> this.displayStrategies.add(new NoDisplay());
-			}
-		}
+		this.displayMethods = (displayMethods == null || displayMethods.isEmpty())
+				? Collections.singletonList(new NoDisplay())
+				: new ArrayList<>(displayMethods);
 	}
 
 	public void startEvent() {
 		ACTIVE_EVENTS.put(0, this);
 
-		Set<String> blacklistedNames = new HashSet<>();
-		if (blacklistedWorlds != null) {
-			for (World w : blacklistedWorlds) {
+		Set<String> blacklistedWorlds = new HashSet<>();
+		if (disabledWorlds != null) {
+			for (World w : disabledWorlds) {
 				if (w != null) {
-					blacklistedNames.add(w.getName());
+					blacklistedWorlds.add(w.getName());
 				}
 			}
 		}
 
-		// Add all online players whose worlds are not in the blacklist.
+		// Add all online players whose worlds are not disabled
 		for (Player player : Bukkit.getOnlinePlayers()) {
-			if (!blacklistedNames.contains(player.getWorld().getName())) {
-				AFFECTED_PLAYERS.add(BendingPlayer.getBendingPlayer(player));
+			if (!blacklistedWorlds.contains(player.getWorld().getName())) {
+				AFFECTED_PLAYERS.add(player);
 			}
 		}
 
 		// Start the display for the event
-		for (IWorldEventDisplay display : this.displayStrategies) {
+		for (IWorldEventDisplay display : this.displayMethods) {
 			display.startDisplay(this);
 		}
 
@@ -109,107 +79,138 @@ public class WorldEvent {
 	}
 
 	public void updateDisplay(double progress) {
-		Set<String> blacklistedNames = new HashSet<>();
-		if (blacklistedWorlds != null) {
-			for (World w : blacklistedWorlds) {
-				if (w != null) {
-					blacklistedNames.add(w.getName());
-				}
-			}
-		}
-
-		// Update display only for players not in a blacklisted world.
-		for (Player player : Bukkit.getOnlinePlayers()) {
-			if (!blacklistedNames.contains(player.getWorld().getName())) {
-				for (IWorldEventDisplay display : this.displayStrategies) {
-					display.updateDisplay(this, progress);
-				}
-			}
+		for (IWorldEventDisplay display : this.displayMethods) {
+			display.updateDisplay(this, progress);
 		}
 	}
 
 	public void stopEvent() {
 		ACTIVE_EVENTS.remove(0);
 
-		Set<String> blacklistedNames = new HashSet<>();
-		if (blacklistedWorlds != null) {
-			for (World w : blacklistedWorlds) {
-				if (w != null) {
-					blacklistedNames.add(w.getName());
-				}
-			}
-		}
-
-		// Stop display for players not in a blacklisted world.
-		for (Player player : Bukkit.getOnlinePlayers()) {
-			if (!blacklistedNames.contains(player.getWorld().getName())) {
-				for (IWorldEventDisplay display : this.displayStrategies) {
-					display.stopDisplay(this);
-				}
-			}
+		// Stop the display for the event
+		for (IWorldEventDisplay display : this.displayMethods) {
+			display.stopDisplay(this);
 		}
 	}
 
-	public enum DISPLAY_METHOD {
-		BOSSBAR,
-		SCOREBOARD,
-		CHAT,
-		NONE;
+	private static void initAllWorldEvents() {
+		File worldEventsFolder = new File(ProjectKorraRPG.getPlugin().getDataFolder(), "WorldEvents");
+		if (!worldEventsFolder.exists() || !worldEventsFolder.isDirectory()) {
+			ProjectKorraRPG.getPlugin().getLogger().warning("WorldEvents folder was not found!");
+		}
+
+		File[] worldEventsFiles = worldEventsFolder.listFiles(((dir, name) -> name.endsWith(".yml")));
+		if (worldEventsFiles == null ||worldEventsFiles.length == 0) {
+			ProjectKorraRPG.getPlugin().getLogger().info("No WorldEvents were found.");
+			return;
+		}
+
+		for (File file : worldEventsFiles) {
+			String eventKey = file.getName().toLowerCase();
+			if (eventKey.endsWith(".yml")) {
+				eventKey = eventKey.substring(0, eventKey.length() - 4);
+			}
+
+			FileConfiguration config = YamlConfiguration.loadConfiguration(file);
+
+			String eventTitle = config.getString("Title", "&cConfig Title not defined!");
+			long duration = config.getLong("Duration", 1000);
+
+			List<IWorldEventDisplay> displayMethods = new ArrayList<>();
+
+			// BossBar-Display
+			if (config.getBoolean("DisplayMethods.BossBar.Enabled", false)) {
+				BarColor bossBarColor = RPGMethods.convertStringToColor(config.getString("DisplayMethods.BossBar.Color", "RED"));
+				BarStyle bossBarStyle = RPGMethods.convertStringToStyle(config.getString("DisplayMethods.BossBar.Style", "SOLID"));
+				boolean smoothBossBar = config.getBoolean("DisplayMethods.BossBar.Smooth", true);
+
+				displayMethods.add(new BossBarDisplay(eventTitle, bossBarColor, bossBarStyle, smoothBossBar));
+			}
+
+			// Chat-Display
+			if (config.getBoolean("DisplayMethods.Chat.Enabled", false)) {
+				String eventStartMessage = config.getString("DisplayMethods.Chat.EventStartMessage", "&cEventStartMessage not defined!");
+				String eventStopMessage = config.getString("DisplayMethods.Chat.EventStopMessage", "&cEventStopMessage not defined!");
+
+				displayMethods.add(new ChatDisplay(eventStartMessage, eventStopMessage));
+			}
+
+			// Scoreboard - Display
+			if (config.getBoolean("DisplayMethods.Scoreboard.Enabled", false)) {
+				displayMethods.add(new ScoreboardDisplay());
+			}
+
+			// Parse Disabled Worlds
+			List<String> disabledWorldsStringList = config.getStringList("DisabledWorlds");
+			List<World> disabledWorlds = new ArrayList<>();
+			if (!disabledWorldsStringList.isEmpty()) {
+				for (String worldName : disabledWorldsStringList) {
+					World w = Bukkit.getWorld(worldName);
+					if (w != null) {
+						disabledWorlds.add(w);
+					}
+				}
+			}
+
+			List<String> affectedElements = config.getStringList("AffectedElements");
+			List<String> affectedAttributes = config.getStringList("AffectedAttributes");
+			List<String> affectedAbilities = config.getStringList("AffectedAbilities");
+
+			WorldEvent worldEvent = new WorldEvent(
+					eventTitle,
+					duration,
+					disabledWorlds,
+					affectedElements,
+					affectedAttributes,
+					affectedAbilities,
+					displayMethods
+			);
+
+			ALL_EVENTS.put(eventKey, worldEvent);
+		}
+	}
+
+	public static CompletableFuture<Void> initAllWorldEventsAsync() {
+		return CompletableFuture.runAsync(WorldEvent::initAllWorldEvents);
+	}
+
+	public static HashMap<String, WorldEvent> getAllEvents() {
+		return ALL_EVENTS;
 	}
 
 	public static HashMap<Integer, WorldEvent> getActiveEvents() {
 		return ACTIVE_EVENTS;
 	}
 
-	public static Set<BendingPlayer> getAffectedPlayers() {
+	public static Set<Player> getAffectedPlayers() {
 		return AFFECTED_PLAYERS;
 	}
 
-	public List<IWorldEventDisplay> getDisplayStrategies() {
-		return displayStrategies;
+	public List<IWorldEventDisplay> getDisplayMethods() {
+		return displayMethods;
 	}
 
-	public String getName() {
-		return this.name;
+	public String getTitle() {
+		return this.title;
 	}
 
 	public long getDuration() {
 		return this.duration;
 	}
 
-	public BarColor getBarColor() {
-		return this.barColor;
+	public List<World> getDisabledWorlds() {
+		return disabledWorlds;
 	}
 
-	public BarStyle getBarStyle() {
-		return barStyle;
-	}
-
-	public boolean isSmoothBossBar() {
-		return smoothBossBar;
-	}
-
-	public String getEventStartMessage() {
-		return this.eventStartMessage;
-	}
-
-	public String getEventStopMessage() {
-		return eventStopMessage;
-	}
-
-	public List<World> getBlacklistedWorlds() {
-		return blacklistedWorlds;
-	}
-
-	public List<Element> getAffectedElements() {
+	public List<String> getAffectedElements() {
 		return affectedElements;
 	}
 
-	public List<Attribute> getAffectedAttributes() {
+	public List<String> getAffectedAttributes() {
 		return affectedAttributes;
 	}
 
-	public List<Ability> getAffectedAbilities() {
+	public List<String> getAffectedAbilities() {
 		return affectedAbilities;
 	}
 
@@ -217,71 +218,47 @@ public class WorldEvent {
 		return worldEventBossBar;
 	}
 
-	public DISPLAY_METHOD getDisplayMethods() {
-		return displayMethods;
+	public static void setAllEvents(HashMap<String, WorldEvent> allEvents) {
+		ALL_EVENTS = allEvents;
 	}
 
 	public static void setActiveEvents(HashMap<Integer, WorldEvent> activeEvents) {
 		ACTIVE_EVENTS = activeEvents;
 	}
 
-	public static void setAffectedPlayers(Set<BendingPlayer> affectedPlayers) {
+	public static void setAffectedPlayers(Set<Player> affectedPlayers) {
 		AFFECTED_PLAYERS = affectedPlayers;
 	}
 
-	public void setDisplayStrategies(List<IWorldEventDisplay> displayStrategies) {
-		this.displayStrategies = displayStrategies;
+	public void setDisplayMethods(List<IWorldEventDisplay> displayMethods) {
+		this.displayMethods = displayMethods;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public void setTitle(String title) {
+		this.title = title;
 	}
 
 	public void setDuration(long duration) {
 		this.duration = duration;
 	}
 
-	public void setBarColor(BarColor barColor) {
-		this.barColor = barColor;
+	public void setDisabledWorlds(List<World> disabledWorlds) {
+		this.disabledWorlds = disabledWorlds;
 	}
 
-	public void setBarStyle(BarStyle barStyle) {
-		this.barStyle = barStyle;
-	}
-
-	public void setSmoothBossBar(boolean smoothBossBar) {
-		this.smoothBossBar = smoothBossBar;
-	}
-
-	public void setEventStartMessage(String eventStartMessage) {
-		this.eventStartMessage = eventStartMessage;
-	}
-
-	public void setEventStopMessage(String eventStopMessage) {
-		this.eventStopMessage = eventStopMessage;
-	}
-
-	public void setBlacklistedWorlds(List<World> blacklistedWorlds) {
-		this.blacklistedWorlds = blacklistedWorlds;
-	}
-
-	public void setAffectedElements(List<Element> affectedElements) {
+	public void setAffectedElements(List<String> affectedElements) {
 		this.affectedElements = affectedElements;
 	}
 
-	public void setAffectedAttributes(List<Attribute> affectedAttributes) {
+	public void setAffectedAttributes(List<String> affectedAttributes) {
 		this.affectedAttributes = affectedAttributes;
 	}
 
-	public void setAffectedAbilities(List<Ability> affectedAbilities) {
+	public void setAffectedAbilities(List<String> affectedAbilities) {
 		this.affectedAbilities = affectedAbilities;
 	}
 
 	public void setWorldEventBossBar(WorldEventBossBar worldEventBossBar) {
 		this.worldEventBossBar = worldEventBossBar;
-	}
-
-	public void setDisplayMethods(DISPLAY_METHOD displayMethods) {
-		this.displayMethods = displayMethods;
 	}
 }

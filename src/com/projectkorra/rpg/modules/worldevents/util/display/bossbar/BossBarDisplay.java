@@ -4,23 +4,37 @@ import com.projectkorra.projectkorra.util.ChatUtil;
 import com.projectkorra.rpg.modules.worldevents.WorldEvent;
 import com.projectkorra.rpg.modules.worldevents.util.display.IWorldEventDisplay;
 import org.bukkit.Bukkit;
+import org.bukkit.boss.BarColor;
+import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.Player;
-
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 public class BossBarDisplay implements IWorldEventDisplay {
 
+	private final WorldEventBossBar worldEventBossBar;
+	private final BarColor barColor;
+	private final BarStyle barStyle;
+	private final boolean smooth;
+
+	/**
+	 *
+	 * @param barColor Color of BossBar
+	 * @param barStyle Style of BossBar
+	 * @param smooth   <code>true</code> Refresh every tick <code>else</code> every second
+	 */
+	public BossBarDisplay(String title, BarColor barColor, BarStyle barStyle, boolean smooth) {
+		this.barColor = barColor;
+		this.barStyle = barStyle;
+		this.smooth = smooth;
+
+		worldEventBossBar = new WorldEventBossBar(ChatUtil.color(title), barColor, barStyle, smooth);
+	}
+
 	@Override
 	public void startDisplay(WorldEvent event) {
-		event.setWorldEventBossBar(new WorldEventBossBar(ChatUtil.color(event.getName()), event.getBarColor(), event.getBarStyle()));
-
-		Set<String> blacklistedNames = getBlacklistedWorldNames(event);
+		event.setWorldEventBossBar(getWorldEventBossBar());
 
 		for (Player player : Bukkit.getOnlinePlayers()) {
-			String worldName = player.getWorld().getName();
-			if (!blacklistedNames.contains(worldName)) {
+			if (WorldEvent.getAffectedPlayers().contains(player)) {
 				event.getWorldEventBossBar().getBossBar().addPlayer(player);
 			}
 		}
@@ -36,23 +50,27 @@ public class BossBarDisplay implements IWorldEventDisplay {
 	@Override
 	public void stopDisplay(WorldEvent event) {
 		if (event.getWorldEventBossBar() != null && event.getWorldEventBossBar().getBossBar() != null) {
-			event.getWorldEventBossBar().getBossBar().removeAll();
-		}
-	}
-
-	/**
-	 * Helper method to extract a set of valid blacklisted world names from the event.
-	 */
-	private Set<String> getBlacklistedWorldNames(WorldEvent event) {
-		Set<String> names = new HashSet<>();
-		List<org.bukkit.World> blWorlds = event.getBlacklistedWorlds();
-		if (blWorlds != null) {
-			for (org.bukkit.World world : blWorlds) {
-				if (world != null) {
-					names.add(world.getName());
+			for (Player player : Bukkit.getOnlinePlayers()) {
+				if (WorldEvent.getAffectedPlayers().contains(player)) {
+					event.getWorldEventBossBar().getBossBar().removePlayer(player);
 				}
 			}
 		}
-		return names;
+	}
+
+	public WorldEventBossBar getWorldEventBossBar() {
+		return worldEventBossBar;
+	}
+
+	public BarColor getBarColor() {
+		return barColor;
+	}
+
+	public BarStyle getBarStyle() {
+		return barStyle;
+	}
+
+	public boolean isSmooth() {
+		return smooth;
 	}
 }

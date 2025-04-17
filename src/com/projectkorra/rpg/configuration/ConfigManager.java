@@ -1,6 +1,7 @@
 package com.projectkorra.rpg.configuration;
 
 import com.projectkorra.projectkorra.Element;
+import com.projectkorra.projectkorra.attribute.Attribute;
 import com.projectkorra.projectkorra.configuration.ConfigType;
 import org.bukkit.configuration.file.FileConfiguration;
 
@@ -80,6 +81,8 @@ public class ConfigManager {
             config.addDefault("Modules.ElementAssignments.ChangeOnDeath.Chance", 0.2); // 20% chance to change element on death if
             config.addDefault("Modules.ElementAssignments.ChangeOnDeath.Bypass", false); // Allow bypassing cooldowns for changing
             config.addDefault("Modules.ElementAssignments.ChangeOnDeath.Permission", "projectkorra.rpg.elementassign.bypass");
+
+            config.addDefault("Modules.WorldEvents.Enabled", true);
 
             Set<String> elementNames = new HashSet<>();
 
@@ -217,26 +220,27 @@ public class ConfigManager {
         } else if (type == WORLDEVENTS) {
             config = sozinsComet.get();
 
-            List<String> displayMethods = new ArrayList<>();
-            displayMethods.add("CHAT");
-            displayMethods.add("BOSSBAR");
-
-            List<String> blackListedWorlds = new ArrayList<>();
-            blackListedWorlds.add("none");
+            List<String> disabledWorlds = new ArrayList<>();
+            disabledWorlds.add("none");
 
             List<String> affectedElements = new ArrayList<>();
             affectedElements.add(Element.FIRE.getName());
 
+            List<String> affectedAttributes = new ArrayList<>();
+
             config.addDefault("Title", "&cSozins Comet");
             config.addDefault("Duration", 5000);
-            config.addDefault("DisplayMethod", displayMethods);
-            config.addDefault("BossBarColor", "RED");
-            config.addDefault("BossBarStyle", "SOLID");
-            config.addDefault("SmoothBossBar", true);
-            config.addDefault("EventStartMessage", "&cSozins Comet has entered the world's atmosphere. Firebenders bending has been extremely hightened");
-            config.addDefault("EventStopMessage", "&cSozins Comet has left the world's atmosphere. Firebenders bending has been normalized");
-            config.addDefault("BlackListedWorlds", blackListedWorlds);
+            config.addDefault("DisplayMethods.BossBar.Enabled", true);
+            config.addDefault("DisplayMethods.BossBar.Color", "RED");
+            config.addDefault("DisplayMethods.BossBar.Style", "SOLID");
+            config.addDefault("DisplayMethods.BossBar.Smooth", true);
+            config.addDefault("DisplayMethods.Chat.Enabled", true);
+            config.addDefault("DisplayMethods.Chat.EventStartMessage", "&cSozins Comet has entered the world's atmosphere. Firebenders bending has been extremely hightened");
+            config.addDefault("DisplayMethods.Chat.EventStopMessage", "&cSozins Comet has left the world's atmosphere. Firebenders bending has been normalized");
+            config.addDefault("DisplayMethods.ScoreBoard.Enabled", false);
+            config.addDefault("DisabledWorlds", disabledWorlds);
             config.addDefault("AffectedElements", affectedElements);
+            config.addDefault("AffectedAttributes", affectedAttributes);
 
             config.options().copyDefaults(true);
             sozinsComet.save();

@@ -25,6 +25,6 @@ public class WorldEventScheduler {
 
 				worldEvent.updateDisplay(progress);
 			}
-		}.runTaskTimer(ProjectKorraRPG.getPlugin(), 0, worldEvent.isSmoothBossBar() ? 1 : 20);
+		}.runTaskTimer(ProjectKorraRPG.getPlugin(), 0, worldEvent.getWorldEventBossBar().isSmooth() ? 1 : 20);
 	}
 }

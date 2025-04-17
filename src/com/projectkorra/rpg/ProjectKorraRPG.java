@@ -3,8 +3,11 @@ package com.projectkorra.rpg;
 import com.projectkorra.rpg.commands.AvatarCommand;
 import com.projectkorra.rpg.commands.HelpCommand;
 import com.projectkorra.rpg.commands.RPGCommandBase;
-import com.projectkorra.rpg.commands.WorldEventCommand;
+import com.projectkorra.rpg.modules.worldevents.WorldEvent;
+import com.projectkorra.rpg.modules.worldevents.WorldEvents;
+import com.projectkorra.rpg.modules.worldevents.commands.WorldEventCommand;
 import com.projectkorra.rpg.configuration.ConfigManager;
+import com.projectkorra.rpg.listeners.RPGListener;
 import com.projectkorra.rpg.modules.elementassignments.manager.AssignmentManager;
 import com.projectkorra.rpg.modules.ModuleManager;
 import com.projectkorra.rpg.modules.randomavatar.manager.AvatarManager;
@@ -33,6 +36,7 @@ public class ProjectKorraRPG extends JavaPlugin {
 		plugin = this;
 		moduleManager = new ModuleManager();
 		Storage.init();
+		setLog(ProjectKorraRPG.getPlugin().getLogger());
 
 		RegisteredServiceProvider<LuckPerms> provider = Bukkit.getServicesManager().getRegistration(LuckPerms.class);
 
@@ -49,7 +53,7 @@ public class ProjectKorraRPG extends JavaPlugin {
 		try {
 	        new MetricsLite(this).start();
 	    } catch (IOException e) {
-	        log.severe("Failed to load metric stats" + e.getMessage());
+	        getLogger().severe("Failed to load metric stats" + e.getMessage());
 	    }
 
 		moduleManager.enableModules();
@@ -64,7 +68,6 @@ public class ProjectKorraRPG extends JavaPlugin {
 		new RPGCommandBase();
 		new AvatarCommand();
 		new HelpCommand();
-		new WorldEventCommand();
 	}
 
 	public static ProjectKorraRPG getPlugin() {

@@ -32,7 +32,7 @@ public class RPGCommandBase extends PKCommand {
 				return;
 			}
 		}
-		sender.sendMessage(ChatColor.RED + "Unbekanntes Subcommand. Nutze '/bending rpg help' für Hilfe.");
+		sender.sendMessage(ChatColor.RED + "Unknown Subcommand. Use '/bending rpg help' for help.");
 	}
 	
 	@Override

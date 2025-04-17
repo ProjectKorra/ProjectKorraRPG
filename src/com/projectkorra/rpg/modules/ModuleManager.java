@@ -11,11 +11,16 @@ import java.util.List;
 public class ModuleManager {
 	private final List<Module> modules = new ArrayList<>();
 
+	private final WorldEvents worldEventsModule;
+	private final RPGLeveling rpgLevelingModule;
+	private final RandomAvatar randomAvatarModule;
+	private final ElementAssignments elementAssignmentsModule;
+
 	public ModuleManager() {
-		modules.add(new WorldEvents());
-		modules.add(new RPGLeveling());
-		modules.add(new RandomAvatar());
-		modules.add(new ElementAssignments());
+		modules.add(worldEventsModule = new WorldEvents());
+		modules.add(rpgLevelingModule = new RPGLeveling());
+		modules.add(randomAvatarModule = new RandomAvatar());
+		modules.add(elementAssignmentsModule = new ElementAssignments());
 	}
 
 	public void enableModules() {
@@ -34,5 +39,21 @@ public class ModuleManager {
 
 	public List<Module> getModules() {
 		return modules;
+	}
+
+	public WorldEvents getWorldEventsModule() {
+		return worldEventsModule;
+	}
+
+	public RPGLeveling getRpgLevelingModule() {
+		return rpgLevelingModule;
+	}
+
+	public RandomAvatar getRandomAvatarModule() {
+		return randomAvatarModule;
+	}
+
+	public ElementAssignments getElementAssignmentsModule() {
+		return elementAssignmentsModule;
 	}
 }

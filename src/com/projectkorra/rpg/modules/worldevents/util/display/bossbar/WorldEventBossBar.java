@@ -9,12 +9,14 @@ public class WorldEventBossBar {
 	private String title;
 	private BarColor barColor;
 	private BarStyle barStyle;
+	private boolean smooth;
 	private BossBar bossBar;
 
-	public WorldEventBossBar(String title, BarColor barColor, BarStyle barStyle) {
+	public WorldEventBossBar(String title, BarColor barColor, BarStyle barStyle, boolean smooth) {
 		this.title = title;
 		this.barColor = barColor;
 		this.barStyle = barStyle;
+		this.smooth = smooth;
 
 		this.bossBar = Bukkit.createBossBar(this.title, this.barColor, this.barStyle);
 	}
@@ -31,6 +33,10 @@ public class WorldEventBossBar {
 		return barStyle;
 	}
 
+	public boolean isSmooth() {
+		return smooth;
+	}
+
 	public BossBar getBossBar() {
 		return bossBar;
 	}
@@ -45,6 +51,10 @@ public class WorldEventBossBar {
 
 	public void setBarStyle(BarStyle barStyle) {
 		this.barStyle = barStyle;
+	}
+
+	public void setSmooth(boolean smooth) {
+		this.smooth = smooth;
 	}
 
 	public void setBossBar(BossBar bossBar) {

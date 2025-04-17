@@ -10,24 +10,24 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AvatarCommand extends RPGCommand{
+public class AvatarCommand extends RPGCommand {
 
-	public AvatarCommand() {
-		super("avatar", "/bending rpg avatar <Player>", "This command defines a player as the avatar and gives them all the elements and other perks.", new String[] {"avatar", "av", "avy"});
-	}
+    public AvatarCommand() {
+        super("avatar", "/bending rpg avatar <Player>", "This command defines a player as the avatar and gives them all the elements and other perks.", new String[]{"avatar", "av", "avy"});
+    }
 
-	@Override
-	public void execute(CommandSender sender, List<String> args) {
-		if (!correctLength(sender, args.size(), 1, 1))
-			return;
-		if (ProjectKorraRPG.plugin.getAvatarManager() == null || !ProjectKorraRPG.plugin.getAvatarManager().isEnabled()) {
-			sender.sendMessage(ChatColor.RED + "Avatar system is not enabled!");
-			return;
-		}
-		if (sender instanceof Player) {
-			if (!hasPermission(sender))
-				return;
-		}
+    @Override
+    public void execute(CommandSender sender, List<String> args) {
+        if (!correctLength(sender, args.size(), 1, 1))
+            return;
+        if (ProjectKorraRPG.plugin.getAvatarManager() == null || !ProjectKorraRPG.plugin.getAvatarManager().isEnabled()) {
+            sender.sendMessage(ChatColor.RED + "Avatar system is not enabled!");
+            return;
+        }
+        if (sender instanceof Player) {
+            if (!hasPermission(sender))
+                return;
+        }
 
 		if (args.getFirst().equalsIgnoreCase("list")) {
 			List<String> avatars =  ProjectKorraRPG.plugin.getAvatarManager().getPastLives();

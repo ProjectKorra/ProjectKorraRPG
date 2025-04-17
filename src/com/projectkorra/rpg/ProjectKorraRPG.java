@@ -82,9 +82,9 @@ public class ProjectKorraRPG extends JavaPlugin {
 		return luckPermsAPI;
 	}
 
-	public AssignmentManager getAssignmentManager() {
-		return assignmentManager;
-	}
+    public AssignmentManager getAssignmentManager() {
+        return assignmentManager;
+    }
 
 	public AvatarManager getAvatarManager() {
 		return avatarManager;

@@ -1,7 +1,6 @@
 package com.projectkorra.rpg.commands;
 
 import com.projectkorra.projectkorra.Element;
-
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
@@ -13,9 +12,11 @@ import java.util.List;
 public class HelpCommand extends RPGCommand{
 	private final String modifiers = ChatColor.GOLD + "Commands: <required> [optional]";
 
-	public HelpCommand() {
-		super("help", "/bending rpg help <Command/Event>", "Shows all helpful information for rpg", new String[] {"help", "h", "?"});
-	}
+    private final String[] fullmoon = {"fullmoon", "fm", "fmoon", "fullm"};
+    private final String[] lunar = {"lunareclipse", "le", "leclipse", "lunare"};
+    private final String[] solar = {"solareclipse", "se", "seclipse", "solare"};
+    private final String[] sozins = {"sozinscomet", "sc", "sozins", "sozinsc", "scomet", "comet"};
+    private final String modifiers = ChatColor.GOLD + "Commands: <required> [optional]";
 
 	@Override
 	public void execute(CommandSender sender, List<String> args) {

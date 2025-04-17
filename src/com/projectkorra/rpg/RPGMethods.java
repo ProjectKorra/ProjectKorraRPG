@@ -105,7 +105,19 @@ public class RPGMethods {
 				.add(Node.builder(permission).build());
 		luckPermsAPI.getUserManager().saveUser(luckPermsAPI.getUserManager().getUser(player.getUniqueId()));
 
-	}
+    /**
+     * @param player     Player who will receive permission
+     * @param permission Permission to give to the player as a string
+     * @author CrashCringle
+     * @Description This method is a simplified way of adding
+     * Permissions to players via LuckPerms
+     */
+    public static void addPermission(Player player, String permission) {
+        if (luckPermsAPI == null)
+            return;
+        luckPermsAPI.getUserManager().getUser(player.getUniqueId()).data()
+                .add(Node.builder(permission).build());
+        luckPermsAPI.getUserManager().saveUser(luckPermsAPI.getUserManager().getUser(player.getUniqueId()));
 
 	public static Set<String> getCachedDisabledWorldNames() {
 		return cachedDisabledWorldNames;

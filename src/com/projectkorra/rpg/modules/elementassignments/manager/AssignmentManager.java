@@ -19,16 +19,16 @@ import java.util.List;
 import java.util.Set;
 
 public class AssignmentManager {
-    // Map every Group to a weight
-    private List<AssignmentGroup> groups = new ArrayList<>();
-    private double totalWeight = 0;
-    private boolean enabled = false;
     double chance = 0.2;
     boolean changeOnDeathEnabled = true; // Allow changing element on death
     boolean changeOnDeathBypass = false; // Allow bypassing cooldowns for changing elements on death (if true, will ignore cooldowns)
     String changeOnDeathPermission;
     String defaultElement = "None"; // Default element to assign if no group is found
     Set<String> permissionGroups = new HashSet<>();
+    // Map every Group to a weight
+    private List<AssignmentGroup> groups = new ArrayList<>();
+    private double totalWeight = 0;
+    private boolean enabled = false;
 
     public AssignmentManager() {
 
@@ -67,6 +67,7 @@ public class AssignmentManager {
             setEnabled(false);
         }
     }
+
     public AssignmentGroup getRandomGroup() {
         if (groups.isEmpty() || totalWeight <= 0) {
             return null;
@@ -85,6 +86,7 @@ public class AssignmentManager {
 
     /**
      * Assigns a group to a player, assigning and removing elements as needed.
+     *
      * @param assignmentGroup
      * @param bp
      */
@@ -145,6 +147,7 @@ public class AssignmentManager {
             }
         }
     }
+
     public List<AssignmentGroup> getGroups() {
         return groups;
     }

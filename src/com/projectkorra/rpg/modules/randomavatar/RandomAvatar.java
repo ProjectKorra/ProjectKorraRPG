@@ -5,17 +5,17 @@ import com.projectkorra.rpg.modules.Module;
 import com.projectkorra.rpg.modules.randomavatar.manager.AvatarManager;
 
 public class RandomAvatar extends Module {
-	public RandomAvatar() {
-		super("RandomAvatar");
-	}
+    public RandomAvatar() {
+        super("RandomAvatar");
+    }
 
-	@Override
-	public void enable() {
-		ProjectKorraRPG.plugin.setAvatarManager(new AvatarManager());
-	}
+    @Override
+    public void enable() {
+        ProjectKorraRPG.plugin.setAvatarManager(new AvatarManager());
+    }
 
-	@Override
-	public void disable() {
+    @Override
+    public void disable() {
 
-	}
+    }
 }

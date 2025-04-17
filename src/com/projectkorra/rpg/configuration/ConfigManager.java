@@ -38,6 +38,22 @@ public class ConfigManager {
         config.addDefault("Modules.ElementAssignments.Groups." + groupName + ".PermissionGroup", permissionGroup);
     }
 
+    public static FileConfiguration getFileConfig() {
+        return config.get();
+    }
+
+    public static Config getConfig() {
+        return config;
+    }
+
+    public static List<Config> getAllConfigs() {
+        List<Config> configs = new ArrayList<>();
+        configs.add(config);
+        configs.add(language);
+        configs.add(sozinsComet);
+        return configs;
+    }
+
     public void configCheck(ConfigType type) {
         FileConfiguration config;
         if (type == DEFAULT) {
@@ -55,7 +71,7 @@ public class ConfigManager {
             config.addDefault("Modules.RandomAvatar.LoseAvatarOnDeath", true);
             config.addDefault("Modules.RandomAvatar.OnlyLoseAvatarOnAvatarStateDeath", true);
             config.addDefault("Modules.RandomAvatar.ClearOnSelection", true);
-            config.addDefault("Modules.RandomAvatar.Elements", List.of( "earth", "water", "fire", "air", "avatar"));
+            config.addDefault("Modules.RandomAvatar.Elements", List.of("earth", "water", "fire", "air", "avatar"));
             config.addDefault("Modules.RandomAvatar.IncludeAllSubElements", true);
             config.addDefault("Modules.RandomAvatar.SubElementBlacklist", List.of("blood"));
             config.setComments("Modules.RandomAvatar.Enabled", List.of("Whether to enable the Avatar randomization system", "This gives every player a chance to become Avatar"));
@@ -245,9 +261,7 @@ public class ConfigManager {
             config.options().copyDefaults(true);
             sozinsComet.save();
         }
-    }
-    public static FileConfiguration getFileConfig() {
-        return config.get();
+
     }
 
     public static Config getConfig() {

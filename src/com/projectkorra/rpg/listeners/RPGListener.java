@@ -6,8 +6,6 @@ import com.projectkorra.rpg.ProjectKorraRPG;
 import com.projectkorra.rpg.commands.AvatarCommand;
 import com.projectkorra.rpg.commands.HelpCommand;
 import com.projectkorra.rpg.commands.RPGCommandBase;
-import com.projectkorra.rpg.modules.worldevents.WorldEvent;
-import com.projectkorra.rpg.modules.worldevents.commands.WorldEventCommand;
 import com.projectkorra.rpg.configuration.Config;
 import com.projectkorra.rpg.configuration.ConfigManager;
 import org.bukkit.ChatColor;

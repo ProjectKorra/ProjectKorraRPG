@@ -42,18 +42,6 @@ public class ConfigManager {
         return config.get();
     }
 
-    public static Config getConfig() {
-        return config;
-    }
-
-    public static List<Config> getAllConfigs() {
-        List<Config> configs = new ArrayList<>();
-        configs.add(config);
-        configs.add(language);
-        configs.add(sozinsComet);
-        return configs;
-    }
-
     public void configCheck(ConfigType type) {
         FileConfiguration config;
         if (type == DEFAULT) {

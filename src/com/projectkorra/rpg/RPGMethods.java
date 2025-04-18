@@ -3,6 +3,8 @@ package com.projectkorra.rpg;
 import net.luckperms.api.node.Node;
 import org.bukkit.entity.Player;
 
+import java.time.Duration;
+
 import static com.projectkorra.rpg.ProjectKorraRPG.luckPermsAPI;
 
 public class RPGMethods {
@@ -38,5 +40,35 @@ public class RPGMethods {
         luckPermsAPI.getUserManager().saveUser(luckPermsAPI.getUserManager().getUser(player.getUniqueId()));
 
     }
+
+    /**
+     * @param period String to convert to duration
+     * @return Duration in the period string
+     * @author CrashCringle
+     * @Description This method converts a period string like 3d4h to a duration object
+     */
+    public static Duration periodStringToDuration(String period) {
+        // Can be in the formats like: 1s, 1m, 1h, 1d, 2d1h10s etc etc.
+        Duration duration = Duration.ZERO;
+        if (period == null || period.isEmpty()) {
+            ProjectKorraRPG.plugin.getLogger().info("Invalid period string: " + period);
+            return duration;
+        }
+        String[] parts = period.split("(?<=\\D)(?=\\d)");
+        for (String part : parts) {
+            String unit = part.replaceAll("\\d", "");
+            double value = Double.parseDouble(part.replaceAll("\\D", ""));
+            duration = switch (unit) {
+                case "w" -> duration.plusHours((long) (value * 168));
+                case "d" -> duration.plusHours((long) (value * 24));
+                case "h" -> duration.plusHours((long) value);
+                case "m" -> duration.plusMinutes((long) value);
+                case "s" -> duration.plusSeconds((long) value);
+                default -> duration;
+            };
+        }
+        return duration;
+    }
+
 
 }

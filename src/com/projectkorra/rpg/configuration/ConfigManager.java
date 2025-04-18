@@ -230,7 +230,6 @@ public class ConfigManager {
             List<String> affectedElements = new ArrayList<>();
             affectedElements.add(Element.FIRE.getName());
 
-            List<String> affectedAttributes = new ArrayList<>();
 
             config.addDefault("Title", "&cSozins Comet");
             config.addDefault("Duration", 5000);
@@ -244,7 +243,13 @@ public class ConfigManager {
             config.addDefault("DisplayMethods.ScoreBoard.Enabled", false);
             config.addDefault("DisabledWorlds", disabledWorlds);
             config.addDefault("AffectedElements", affectedElements);
-            config.addDefault("AffectedAttributes", affectedAttributes);
+            config.addDefault("Abilities._All.Damage", "x2.0");
+            config.addDefault("Abilities._All.Speed", "x2.0");
+            config.addDefault("Abilities._All.Cooldown", "x0.5");
+            config.addDefault("Abilities._All.ChargeTime", "x0.5");
+            config.addDefault("Abilities._All.Duration", "x2.0");
+            config.addDefault("Abilities._All.Range", "x2.0");
+            config.addDefault("Abilities.Fire.FireBlast.Speed", "x4.0");
 
             config.options().copyDefaults(true);
             sozinsComet.save();

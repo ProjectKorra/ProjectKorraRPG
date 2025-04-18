@@ -8,10 +8,13 @@ import com.projectkorra.rpg.commands.HelpCommand;
 import com.projectkorra.rpg.commands.RPGCommandBase;
 import com.projectkorra.rpg.configuration.Config;
 import com.projectkorra.rpg.configuration.ConfigManager;
+import com.projectkorra.rpg.modules.worldevents.WorldEvent;
+import com.projectkorra.rpg.modules.worldevents.commands.WorldEventCommand;
 import org.bukkit.ChatColor;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.scheduler.BukkitRunnable;
 
 public class RPGListener implements Listener {
 	@EventHandler
@@ -20,7 +23,16 @@ public class RPGListener implements Listener {
 			config.reload();
 		}
 
-		initCommands();
+		new BukkitRunnable() {
+			@Override
+			public void run() {
+				initCommands();
+			}
+		}.runTaskLater(ProjectKorraRPG.getPlugin(), 20);
+
+		for (WorldEvent worldEvent : WorldEvent.getActiveEvents()) {
+			worldEvent.stopEvent();
+		}
 
 		if (ProjectKorraRPG.getPlugin().getModuleManager().getWorldEventsModule().isEnabled()) {
 			ProjectKorraRPG.getPlugin().getModuleManager().getWorldEventsModule().enable();
@@ -31,6 +43,7 @@ public class RPGListener implements Listener {
 		new RPGCommandBase();
 		new AvatarCommand();
 		new HelpCommand();
+		new WorldEventCommand();
 	}
 
 	@EventHandler

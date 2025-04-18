@@ -2,6 +2,8 @@ package com.projectkorra.rpg.modules.worldevents;
 
 import com.projectkorra.rpg.ProjectKorraRPG;
 import com.projectkorra.rpg.RPGMethods;
+import com.projectkorra.rpg.modules.worldevents.event.WorldEventStartEvent;
+import com.projectkorra.rpg.modules.worldevents.event.WorldEventStopEvent;
 import com.projectkorra.rpg.modules.worldevents.util.display.IWorldEventDisplay;
 import com.projectkorra.rpg.modules.worldevents.util.display.bossbar.BossBarDisplay;
 import com.projectkorra.rpg.modules.worldevents.util.display.bossbar.WorldEventBossBar;
@@ -19,40 +21,42 @@ import org.bukkit.entity.Player;
 
 import java.io.File;
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
 
 public class WorldEvent {
 	private static HashMap<String, WorldEvent> ALL_EVENTS = new HashMap<>();
-	private static HashMap<Integer, WorldEvent> ACTIVE_EVENTS = new HashMap<>();
-	private static Set<Player> AFFECTED_PLAYERS = new HashSet<>();
+	private static HashSet<WorldEvent> ACTIVE_EVENTS = new HashSet<>();
+	private static HashSet<Player> AFFECTED_PLAYERS = new HashSet<>();
 
 	private List<IWorldEventDisplay> displayMethods;
 
+	private final String key;
 	private String title;
 	private long duration;
 
 	private List<World> disabledWorlds;
-
 	private List<String> affectedElements;
-	private List<String> affectedAttributes;
 	private List<String> affectedAbilities;
 
 	private WorldEventBossBar worldEventBossBar;
+	private final FileConfiguration config;
 
-	public WorldEvent(String title, long duration, List<World> disabledWorlds, List<String> affectedElements, List<String> affectedAttributes, List<String> affectedAbilities, List<IWorldEventDisplay> displayMethods) {
+	public WorldEvent(String key, String title, long duration, List<World> disabledWorlds, List<String> affectedElements, List<String> affectedAbilities, List<IWorldEventDisplay> displayMethods, FileConfiguration config) {
+		this.key = key;
 		this.title = title;
 		this.duration = duration;
 		this.disabledWorlds = disabledWorlds;
 		this.affectedElements = affectedElements;
-		this.affectedAttributes = affectedAttributes;
 		this.affectedAbilities = affectedAbilities;
 		this.displayMethods = (displayMethods == null || displayMethods.isEmpty())
 				? Collections.singletonList(new NoDisplay())
 				: new ArrayList<>(displayMethods);
+		this.config = config;
 	}
 
 	public void startEvent() {
-		ACTIVE_EVENTS.put(0, this);
+		Bukkit.getPluginManager().callEvent(new WorldEventStartEvent(this));
+
+		ACTIVE_EVENTS.add(this);
 
 		Set<String> blacklistedWorlds = new HashSet<>();
 		if (disabledWorlds != null) {
@@ -85,7 +89,9 @@ public class WorldEvent {
 	}
 
 	public void stopEvent() {
-		ACTIVE_EVENTS.remove(0);
+		Bukkit.getPluginManager().callEvent(new WorldEventStopEvent(this));
+
+		ACTIVE_EVENTS.remove(this);
 
 		// Stop the display for the event
 		for (IWorldEventDisplay display : this.displayMethods) {
@@ -105,12 +111,9 @@ public class WorldEvent {
 			return;
 		}
 
+		// Iterate through all WorldEvent configurations
 		Arrays.stream(worldEventsFiles).parallel().forEach(file -> {
-			String eventKey = file.getName().toLowerCase();
-			if (eventKey.endsWith(".yml")) {
-				eventKey = eventKey.substring(0, eventKey.length() - 4);
-			}
-
+			String eventKey = file.getName().toLowerCase().replace(".yml", "");
 			FileConfiguration config = YamlConfiguration.loadConfiguration(file);
 
 			String eventTitle = config.getString("Title", "&cConfig Title not defined!");
@@ -153,17 +156,17 @@ public class WorldEvent {
 			}
 
 			List<String> affectedElements = config.getStringList("AffectedElements");
-			List<String> affectedAttributes = config.getStringList("AffectedAttributes");
 			List<String> affectedAbilities = config.getStringList("AffectedAbilities");
 
 			WorldEvent worldEvent = new WorldEvent(
+					eventKey,
 					eventTitle,
 					duration,
 					disabledWorlds,
 					affectedElements,
-					affectedAttributes,
 					affectedAbilities,
-					displayMethods
+					displayMethods,
+					config
 			);
 
 			ALL_EVENTS.put(eventKey, worldEvent);
@@ -174,16 +177,20 @@ public class WorldEvent {
 		return ALL_EVENTS;
 	}
 
-	public static HashMap<Integer, WorldEvent> getActiveEvents() {
+	public static HashSet<WorldEvent> getActiveEvents() {
 		return ACTIVE_EVENTS;
 	}
 
-	public static Set<Player> getAffectedPlayers() {
+	public static HashSet<Player> getAffectedPlayers() {
 		return AFFECTED_PLAYERS;
 	}
 
 	public List<IWorldEventDisplay> getDisplayMethods() {
 		return displayMethods;
+	}
+
+	public String getKey() {
+		return key;
 	}
 
 	public String getTitle() {
@@ -202,10 +209,6 @@ public class WorldEvent {
 		return affectedElements;
 	}
 
-	public List<String> getAffectedAttributes() {
-		return affectedAttributes;
-	}
-
 	public List<String> getAffectedAbilities() {
 		return affectedAbilities;
 	}
@@ -214,15 +217,19 @@ public class WorldEvent {
 		return worldEventBossBar;
 	}
 
+	public FileConfiguration getConfig() {
+		return config;
+	}
+
 	public static void setAllEvents(HashMap<String, WorldEvent> allEvents) {
 		ALL_EVENTS = allEvents;
 	}
 
-	public static void setActiveEvents(HashMap<Integer, WorldEvent> activeEvents) {
+	public static void setActiveEvents(HashSet<WorldEvent> activeEvents) {
 		ACTIVE_EVENTS = activeEvents;
 	}
 
-	public static void setAffectedPlayers(Set<Player> affectedPlayers) {
+	public static void setAffectedPlayers(HashSet<Player> affectedPlayers) {
 		AFFECTED_PLAYERS = affectedPlayers;
 	}
 
@@ -244,10 +251,6 @@ public class WorldEvent {
 
 	public void setAffectedElements(List<String> affectedElements) {
 		this.affectedElements = affectedElements;
-	}
-
-	public void setAffectedAttributes(List<String> affectedAttributes) {
-		this.affectedAttributes = affectedAttributes;
 	}
 
 	public void setAffectedAbilities(List<String> affectedAbilities) {

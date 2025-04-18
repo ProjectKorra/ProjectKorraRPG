@@ -1,6 +1,6 @@
 package com.projectkorra.rpg.modules.worldevents.commands;
 
-import com.projectkorra.projectkorra.command.PKCommand;
+import com.projectkorra.rpg.commands.RPGCommand;
 import com.projectkorra.rpg.modules.worldevents.WorldEvent;
 import org.bukkit.command.CommandSender;
 
@@ -9,7 +9,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-public class WorldEventCommand extends PKCommand {
+public class WorldEventCommand extends RPGCommand {
 	private List<String> worldEvents;
 
 	public WorldEventCommand() {

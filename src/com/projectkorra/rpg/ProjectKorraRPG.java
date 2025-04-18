@@ -1,88 +1,96 @@
 package com.projectkorra.rpg;
 
-import java.io.IOException;
-import java.util.logging.Logger;
-
-import org.bukkit.Bukkit;
-import org.bukkit.plugin.java.JavaPlugin;
-
+import com.projectkorra.projectkorra.Element;
 import com.projectkorra.rpg.commands.AvatarCommand;
-import com.projectkorra.rpg.commands.EventCommand;
 import com.projectkorra.rpg.commands.HelpCommand;
 import com.projectkorra.rpg.commands.RPGCommandBase;
+import com.projectkorra.rpg.commands.WorldEventCommand;
 import com.projectkorra.rpg.configuration.ConfigManager;
-import com.projectkorra.rpg.storage.RPGStorage;
+import com.projectkorra.rpg.modules.ModuleManager;
+import com.projectkorra.rpg.modules.elementassignments.AssignmentManager;
+import com.projectkorra.rpg.modules.randomavatar.AvatarManager;
 import com.projectkorra.rpg.util.MetricsLite;
-import com.projectkorra.rpg.worldevent.util.EventManager;
-import com.projectkorra.rpg.worldevent.util.WorldEventDisplayManager;
-import com.projectkorra.rpg.worldevent.util.WorldEventFileManager;
+import net.luckperms.api.LuckPerms;
+import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.plugin.RegisteredServiceProvider;
+import org.bukkit.plugin.java.JavaPlugin;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.logging.Logger;
 
 public class ProjectKorraRPG extends JavaPlugin {
 
-	private static ProjectKorraRPG plugin;
-	private static Logger log;
-	private static EventManager eventManager;
-	private static WorldEventFileManager wFileManager;
-	private static WorldEventDisplayManager wDisplayManager;
-	private static RPGStorage storage;
+    public static ProjectKorraRPG plugin;
+    public static Logger log;
+    public static LuckPerms luckPermsAPI;
 
-	@Override
-	public void onEnable() {
-		ProjectKorraRPG.log = this.getLogger();
-		plugin = this;
+    private AssignmentManager assignmentManager;
+    private AvatarManager avatarManager;
+    private ModuleManager moduleManager;
 
-		new ConfigManager();
-		new RPGMethods();
-		new RPGCommandBase();
-		new AvatarCommand();
-		new EventCommand();
-		new HelpCommand();
-		wFileManager = new WorldEventFileManager();
-		wDisplayManager = new WorldEventDisplayManager(this);
-		eventManager = new EventManager();
-		storage = new RPGStorage();
-		RPGMethods.loadAvatarCycle();
+    public static ProjectKorraRPG getPlugin() {
+        return plugin;
+    }
 
-		Bukkit.getServer().getPluginManager().registerEvents(new RPGListener(), this);
-		Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(this, eventManager, 0L, 1L);
+    @Override
+    public void onEnable() {
+        ProjectKorraRPG.log = this.getLogger();
+        plugin = this;
+        moduleManager = new ModuleManager();
+        RegisteredServiceProvider<LuckPerms> provider = Bukkit.getServicesManager().getRegistration(LuckPerms.class);
+        if (provider != null) {
+            luckPermsAPI = provider.getProvider();
+        }
+        new ConfigManager();
+        moduleManager.enableModules();
+        new RPGCommandBase();
+        new AvatarCommand();
+        new HelpCommand();
+        new WorldEventCommand();
+        Bukkit.getServer().getPluginManager().registerEvents(new RPGListener(), this);
+        try {
+            MetricsLite metrics = new MetricsLite(this);
+            metrics.start();
+        } catch (IOException e) {
+            e.printStackTrace();
+            log.info("Failed to load metric stats");
+        }
 
-		try {
-			MetricsLite metrics = new MetricsLite(this);
-			metrics.start();
-		}
-		catch (IOException e) {
-			e.printStackTrace();
-			log.info("Failed to load metric stats");
-		}
-	}
+    }
 
-	@Override
-	public void onDisable() {
-		wDisplayManager.removeAll();
-		RPGMethods.saveAvatarCycle();
-	}
 
-	public static ProjectKorraRPG getPlugin() {
-		return plugin;
-	}
 
-	public static Logger getLog() {
-		return log;
-	}
+    @Override
+    public void onDisable() {
+        plugin.getLogger().info("Disabling " + plugin.getName() + "...");
+    }
 
-	public static EventManager getEventManager() {
-		return eventManager;
-	}
+    public ModuleManager getModuleManager() {
+        return moduleManager;
+    }
 
-	public static WorldEventFileManager getFileManager() {
-		return wFileManager;
-	}
 
-	public static WorldEventDisplayManager getDisplayManager() {
-		return wDisplayManager;
-	}
+    public AssignmentManager getAssignmentManager() {
+        return assignmentManager;
+    }
 
-	public static RPGStorage getStorage() {
-		return storage;
-	}
+    public void setAssignmentManager(AssignmentManager assignmentManager) {
+        this.assignmentManager = assignmentManager;
+        ProjectKorraRPG.log.info(assignmentManager.isEnabled() ? "AssignmentManager enabled" : "AssignmentManager disabled");
+        ProjectKorraRPG.log.info("AssignmentManager set");
+    }
+
+    public AvatarManager getAvatarManager() {
+        return avatarManager;
+    }
+
+    public void setAvatarManager(AvatarManager avatarManager) {
+        ProjectKorraRPG.log.info(avatarManager.isEnabled() ? "AvatarManager enabled" : "AvatarManager disabled");
+        this.avatarManager = avatarManager;
+    }
 }

@@ -12,6 +12,8 @@ import com.projectkorra.rpg.modules.worldevents.util.display.chat.ChatDisplay;
 import com.projectkorra.rpg.modules.worldevents.util.display.none.NoDisplay;
 import com.projectkorra.rpg.modules.worldevents.util.display.scoreboard.ScoreboardDisplay;
 import org.bukkit.Bukkit;
+import org.bukkit.NamespacedKey;
+import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
@@ -27,55 +29,65 @@ public class WorldEvent {
 	private static HashSet<WorldEvent> ACTIVE_EVENTS = new HashSet<>();
 	private static HashSet<Player> AFFECTED_PLAYERS = new HashSet<>();
 
-	private List<IWorldEventDisplay> displayMethods;
+	private final NamespacedKey worldEventNamespacedKey;
 
 	private final String key;
 	private String title;
 	private long duration;
+	private World world;
 
-	private List<World> disabledWorlds;
+	private List<IWorldEventDisplay> displayMethods;
 	private List<String> affectedElements;
-	private List<String> affectedAbilities;
+	private List<World> disabledWorlds;
 
-	private WorldEventBossBar worldEventBossBar;
 	private final FileConfiguration config;
 
-	public WorldEvent(String key, String title, long duration, List<World> disabledWorlds, List<String> affectedElements, List<String> affectedAbilities, List<IWorldEventDisplay> displayMethods, FileConfiguration config) {
+	private WorldEventBossBar worldEventBossBar;
+
+	public WorldEvent(String key, String title, long duration, List<IWorldEventDisplay> displayMethods, List<String> affectedElements, List<World> disabledWorlds, FileConfiguration config) {
 		this.key = key;
 		this.title = title;
 		this.duration = duration;
-		this.disabledWorlds = disabledWorlds;
-		this.affectedElements = affectedElements;
-		this.affectedAbilities = affectedAbilities;
 		this.displayMethods = (displayMethods == null || displayMethods.isEmpty())
 				? Collections.singletonList(new NoDisplay())
 				: new ArrayList<>(displayMethods);
+		this.affectedElements = affectedElements;
+		this.disabledWorlds = disabledWorlds;
 		this.config = config;
+
+		this.worldEventNamespacedKey = new NamespacedKey(ProjectKorraRPG.getPlugin(), key);
 	}
 
 	public void startEvent() {
 		Bukkit.getPluginManager().callEvent(new WorldEventStartEvent(this));
 
-		ACTIVE_EVENTS.add(this);
+		getActiveEvents().add(this);
 
-		Set<String> blacklistedWorlds = new HashSet<>();
-		if (disabledWorlds != null) {
-			for (World w : disabledWorlds) {
+		Set<String> disabledWorlds = new HashSet<>();
+		if (getDisabledWorlds() != null) {
+			for (World w : getDisabledWorlds()) {
 				if (w != null) {
-					blacklistedWorlds.add(w.getName());
+					disabledWorlds.add(w.getName());
 				}
 			}
 		}
 
 		// Add all online players whose worlds are not disabled
 		for (Player player : Bukkit.getOnlinePlayers()) {
-			if (!blacklistedWorlds.contains(player.getWorld().getName())) {
-				AFFECTED_PLAYERS.add(player);
+			if (!disabledWorlds.contains(player.getWorld().getName())) {
+				getAffectedPlayers().add(player);
+				if (getConfig().getBoolean("PlayEventStartSound")) {
+					Sound eventStartSound = Sound.valueOf(getConfig().getString("EventStart.Sound"));
+					float volume = Float.parseFloat(getConfig().getString("EventStart.Volume"));
+					float pitch = Float.parseFloat(getConfig().getString("EventStart.Pitch"));
+
+					player.getWorld().playSound(player.getLocation(), eventStartSound, volume, pitch);
+				}
 			}
 		}
 
 		// Start the display for the event
-		for (IWorldEventDisplay display : this.displayMethods) {
+		for (IWorldEventDisplay display : getDisplayMethods()) {
 			display.startDisplay(this);
 		}
 
@@ -83,19 +95,36 @@ public class WorldEvent {
 	}
 
 	public void updateDisplay(double progress) {
-		for (IWorldEventDisplay display : this.displayMethods) {
+		for (IWorldEventDisplay display : getDisplayMethods()) {
 			display.updateDisplay(this, progress);
 		}
 	}
 
 	public void stopEvent() {
-		Bukkit.getPluginManager().callEvent(new WorldEventStopEvent(this));
+		if (getActiveEvents().contains(this)) {
+			Bukkit.getPluginManager().callEvent(new WorldEventStopEvent(this));
 
-		ACTIVE_EVENTS.remove(this);
+			getActiveEvents().remove(this);
 
-		// Stop the display for the event
-		for (IWorldEventDisplay display : this.displayMethods) {
-			display.stopDisplay(this);
+			for (Player player : Bukkit.getOnlinePlayers()) {
+				if (!getDisabledWorlds().contains(player.getWorld())) {
+					if (getConfig().getBoolean("PlayEventStopSound")) {
+						Sound eventStopSound = Sound.valueOf(getConfig().getString("EventStop.Sound"));
+
+						float volume = Float.parseFloat(getConfig().getString("EventStop.Volume"));
+						float pitch = Float.parseFloat(getConfig().getString("EventStop.Pitch"));
+
+						player.getWorld().playSound(player.getLocation(), eventStopSound, volume, pitch);
+					}
+				}
+			}
+
+			// Stop the display for the event
+			for (IWorldEventDisplay display : getDisplayMethods()) {
+				display.stopDisplay(this);
+			}
+		} else {
+			ProjectKorraRPG.getLog().info("WorldEvent isn't active therefore can't be stopped.");
 		}
 	}
 
@@ -156,20 +185,22 @@ public class WorldEvent {
 			}
 
 			List<String> affectedElements = config.getStringList("AffectedElements");
-			List<String> affectedAbilities = config.getStringList("AffectedAbilities");
+
+			if (affectedElements.isEmpty()) {
+				affectedElements = new ArrayList<>();
+			}
 
 			WorldEvent worldEvent = new WorldEvent(
 					eventKey,
 					eventTitle,
 					duration,
-					disabledWorlds,
-					affectedElements,
-					affectedAbilities,
 					displayMethods,
+					affectedElements,
+					disabledWorlds,
 					config
 			);
 
-			ALL_EVENTS.put(eventKey, worldEvent);
+			getAllEvents().put(eventKey, worldEvent);
 		});
 	}
 
@@ -185,8 +216,8 @@ public class WorldEvent {
 		return AFFECTED_PLAYERS;
 	}
 
-	public List<IWorldEventDisplay> getDisplayMethods() {
-		return displayMethods;
+	public NamespacedKey getWorldEventNamespacedKey() {
+		return worldEventNamespacedKey;
 	}
 
 	public String getKey() {
@@ -194,31 +225,35 @@ public class WorldEvent {
 	}
 
 	public String getTitle() {
-		return this.title;
+		return title;
 	}
 
 	public long getDuration() {
-		return this.duration;
+		return duration;
 	}
 
-	public List<World> getDisabledWorlds() {
-		return disabledWorlds;
+	public World getWorld() {
+		return world;
+	}
+
+	public List<IWorldEventDisplay> getDisplayMethods() {
+		return displayMethods;
 	}
 
 	public List<String> getAffectedElements() {
 		return affectedElements;
 	}
 
-	public List<String> getAffectedAbilities() {
-		return affectedAbilities;
-	}
-
-	public WorldEventBossBar getWorldEventBossBar() {
-		return worldEventBossBar;
+	public List<World> getDisabledWorlds() {
+		return disabledWorlds;
 	}
 
 	public FileConfiguration getConfig() {
 		return config;
+	}
+
+	public WorldEventBossBar getWorldEventBossBar() {
+		return worldEventBossBar;
 	}
 
 	public static void setAllEvents(HashMap<String, WorldEvent> allEvents) {
@@ -233,10 +268,6 @@ public class WorldEvent {
 		AFFECTED_PLAYERS = affectedPlayers;
 	}
 
-	public void setDisplayMethods(List<IWorldEventDisplay> displayMethods) {
-		this.displayMethods = displayMethods;
-	}
-
 	public void setTitle(String title) {
 		this.title = title;
 	}
@@ -245,16 +276,20 @@ public class WorldEvent {
 		this.duration = duration;
 	}
 
-	public void setDisabledWorlds(List<World> disabledWorlds) {
-		this.disabledWorlds = disabledWorlds;
+	public void setWorld(World world) {
+		this.world = world;
+	}
+
+	public void setDisplayMethods(List<IWorldEventDisplay> displayMethods) {
+		this.displayMethods = displayMethods;
 	}
 
 	public void setAffectedElements(List<String> affectedElements) {
 		this.affectedElements = affectedElements;
 	}
 
-	public void setAffectedAbilities(List<String> affectedAbilities) {
-		this.affectedAbilities = affectedAbilities;
+	public void setDisabledWorlds(List<World> disabledWorlds) {
+		this.disabledWorlds = disabledWorlds;
 	}
 
 	public void setWorldEventBossBar(WorldEventBossBar worldEventBossBar) {

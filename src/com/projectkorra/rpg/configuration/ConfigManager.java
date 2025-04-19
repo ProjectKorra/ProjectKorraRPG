@@ -3,6 +3,7 @@ package com.projectkorra.rpg.configuration;
 import com.projectkorra.projectkorra.Element;
 import com.projectkorra.projectkorra.attribute.Attribute;
 import com.projectkorra.projectkorra.configuration.ConfigType;
+import org.bukkit.Sound;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.io.File;
@@ -230,7 +231,6 @@ public class ConfigManager {
             List<String> affectedElements = new ArrayList<>();
             affectedElements.add(Element.FIRE.getName());
 
-
             config.addDefault("Title", "&cSozins Comet");
             config.addDefault("Duration", 5000);
             config.addDefault("DisplayMethods.BossBar.Enabled", true);
@@ -241,6 +241,14 @@ public class ConfigManager {
             config.addDefault("DisplayMethods.Chat.EventStartMessage", "&cSozins Comet has entered the world's atmosphere. Firebenders bending has been extremely hightened");
             config.addDefault("DisplayMethods.Chat.EventStopMessage", "&cSozins Comet has left the world's atmosphere. Firebenders bending has been normalized");
             config.addDefault("DisplayMethods.ScoreBoard.Enabled", false);
+            config.addDefault("PlayEventStartSound", true);
+            config.addDefault("EventStart.Sound", Sound.ENTITY_ENDER_DRAGON_GROWL.toString());
+            config.addDefault("EventStart.Volume", "1F");
+            config.addDefault("EventStart.Pitch", "0.5F");
+            config.addDefault("PlayEventStopSound", true);
+            config.addDefault("EventStop.Sound", Sound.ENTITY_ENDER_DRAGON_AMBIENT.toString());
+            config.addDefault("EventStop.Volume", "1F");
+            config.addDefault("EventStop.Pitch", "0.5F");
             config.addDefault("DisabledWorlds", disabledWorlds);
             config.addDefault("AffectedElements", affectedElements);
             config.addDefault("Abilities._All.Damage", "x2.0");

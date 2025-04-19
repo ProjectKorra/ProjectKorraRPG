@@ -26,11 +26,28 @@ public class WorldEventCommand extends RPGCommand {
 
 		if (args.get(0).equalsIgnoreCase("start")) {
 			WorldEvent we = WorldEvent.getAllEvents().get(args.get(1).toLowerCase());
+
 			if (we == null) {
 				sender.sendMessage("WorldEvent '" + args.get(1) + "' not found.");
 				return;
 			}
+
 			we.startEvent();
+		} else if (args.get(0).equalsIgnoreCase("stop")) {
+			if (args.get(1) != null) {
+				WorldEvent we = WorldEvent.getAllEvents().get(args.get(1).toLowerCase());
+
+				if (we == null) {
+					sender.sendMessage("WorldEvent '" + args.get(1) + "' not found.");
+					return;
+				}
+
+				we.stopEvent();
+			} else {
+				for (WorldEvent worldEvent : WorldEvent.getActiveEvents()) {
+					worldEvent.stopEvent();
+				}
+			}
 		} else {
 			help(sender, true);
 		}

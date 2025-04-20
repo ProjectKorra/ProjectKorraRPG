@@ -1,21 +1,28 @@
 package com.projectkorra.rpg.modules.elementassignments;
 
-import com.projectkorra.rpg.ProjectKorraRPG;
 import com.projectkorra.rpg.modules.Module;
 import com.projectkorra.rpg.modules.elementassignments.manager.AssignmentManager;
 
 public class ElementAssignments extends Module {
-    public ElementAssignments() {
+	private AssignmentManager assignmentManager;
+
+	public ElementAssignments() {
         super("ElementAssignments");
     }
 
 	@Override
 	public void enable() {
-		ProjectKorraRPG.plugin.setAssignmentManager(new AssignmentManager());
+		this.assignmentManager = new AssignmentManager();
 	}
 
     @Override
-    public void disable() {
+    public void disable() {}
 
-    }
+	public AssignmentManager getAssignmentManager() {
+		return assignmentManager;
+	}
+
+	public void setAssignmentManager(AssignmentManager assignmentManager) {
+		this.assignmentManager = assignmentManager;
+	}
 }

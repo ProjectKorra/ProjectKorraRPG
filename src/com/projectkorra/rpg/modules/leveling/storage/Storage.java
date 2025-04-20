@@ -1,4 +1,4 @@
-package com.projectkorra.rpg.storage;
+package com.projectkorra.rpg.modules.leveling.storage;
 
 import com.projectkorra.projectkorra.storage.DBConnection;
 import com.projectkorra.projectkorra.storage.MySQL;

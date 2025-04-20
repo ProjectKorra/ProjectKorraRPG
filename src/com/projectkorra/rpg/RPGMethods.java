@@ -1,47 +1,14 @@
 package com.projectkorra.rpg;
 
-import com.projectkorra.rpg.modules.worldevents.WorldEvent;
 import net.luckperms.api.node.Node;
-import org.bukkit.World;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.Player;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import static com.projectkorra.rpg.ProjectKorraRPG.luckPermsAPI;
 
 public class RPGMethods {
-	private static Set<String> cachedDisabledWorldNames = new HashSet<>();
-
-	public static Set<String> getDisabledWorldNames(WorldEvent event) {
-		Set<String> names = new HashSet<>();
-		List<World> disabledWorlds = event.getDisabledWorlds();
-		if (disabledWorlds != null) {
-			for (World world : disabledWorlds) {
-				if (world != null) {
-					names.add(world.getName());
-				}
-			}
-		}
-		return names;
-	}
-
-	public static void updateBlacklistedWorldNames(List<World> blacklistedWorlds) {
-		Set<String> names = new HashSet<>();
-		if (blacklistedWorlds != null) {
-			for (World world : blacklistedWorlds) {
-				if (world != null) {
-					names.add(world.getName());
-				}
-			}
-		}
-		cachedDisabledWorldNames = names;
-	}
-
-	public static BarColor convertStringToColor(String colorStr) {
+	public static BarColor convertStringToBarColor(String colorStr) {
 		if (colorStr == null) {
 			return BarColor.RED;
 		}
@@ -56,7 +23,7 @@ public class RPGMethods {
 		};
 	}
 
-	public static BarStyle convertStringToStyle(String styleStr) {
+	public static BarStyle convertStringToBarStyle(String styleStr) {
 		if (styleStr == null) {
 			return BarStyle.SOLID;
 		}
@@ -99,9 +66,5 @@ public class RPGMethods {
 		luckPermsAPI.getUserManager().getUser(player.getUniqueId()).data()
 				.add(Node.builder(permission).build());
 		luckPermsAPI.getUserManager().saveUser(luckPermsAPI.getUserManager().getUser(player.getUniqueId()));
-	}
-
-	public static Set<String> getCachedDisabledWorldNames() {
-		return cachedDisabledWorldNames;
 	}
 }

@@ -33,7 +33,7 @@ public class AssignmentManager {
     public AssignmentManager() {
 
         if (ConfigManager.config.get().getBoolean("Modules.ElementAssignments.Enabled")) {
-            ProjectKorraRPG.log.info("ElementAssignments is enabled in the config.yml.");
+            ProjectKorraRPG.getPlugin().getLogger().info("ElementAssignments is enabled in the config.yml.");
             setEnabled(true);
             // Get the default group from the configuration
             defaultElement = ConfigManager.config.get().getString("Modules.ElementAssignments.Default");

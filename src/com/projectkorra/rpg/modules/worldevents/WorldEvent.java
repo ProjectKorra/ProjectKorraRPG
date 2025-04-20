@@ -58,31 +58,31 @@ public class WorldEvent {
 		this.worldEventNamespacedKey = new NamespacedKey(ProjectKorraRPG.getPlugin(), key);
 	}
 
-	public void startEvent() {
-		Bukkit.getPluginManager().callEvent(new WorldEventStartEvent(this));
-
-		getActiveEvents().add(this);
-
-		Set<String> disabledWorlds = new HashSet<>();
-		if (getDisabledWorlds() != null) {
-			for (World w : getDisabledWorlds()) {
-				if (w != null) {
-					disabledWorlds.add(w.getName());
-				}
-			}
+	/**
+	 * Start WorldEvent
+	 * @param world World to start event in
+	 */
+	public void startEvent(World world) {
+		if (getDisabledWorlds().contains(world)) {
+			ProjectKorraRPG.getPlugin().getLogger().info("Couldn't start worldevent because world is a disabled world!");
+			return;
 		}
 
-		// Add all online players whose worlds are not disabled
-		for (Player player : Bukkit.getOnlinePlayers()) {
-			if (!disabledWorlds.contains(player.getWorld().getName())) {
-				getAffectedPlayers().add(player);
-				if (getConfig().getBoolean("PlayEventStartSound")) {
-					Sound eventStartSound = Sound.valueOf(getConfig().getString("EventStart.Sound"));
-					float volume = Float.parseFloat(getConfig().getString("EventStart.Volume"));
-					float pitch = Float.parseFloat(getConfig().getString("EventStart.Pitch"));
+		Bukkit.getPluginManager().callEvent(new WorldEventStartEvent(this));
+		getActiveEvents().add(this);
 
-					player.getWorld().playSound(player.getLocation(), eventStartSound, volume, pitch);
-				}
+		// Add all online players in world to the Set
+		// And play Sound if user configured
+		for (Player player : Bukkit.getOnlinePlayers()) {
+			getAffectedPlayers().add(player);
+			if (getConfig().getBoolean("PlayEventStartSound")) {
+				String soundName = getConfig().getString("EventStart.Sound", "ENTITY_EXPERIENCE_ORB_PICKUP");
+
+				Sound eventStartSound = Sound.valueOf(soundName);
+				float volume = (float) getConfig().getDouble("EventStart.Volume");
+				float pitch = (float) getConfig().getDouble("EventStart.Pitch");
+
+				player.getWorld().playSound(player.getLocation(), eventStartSound, volume, pitch);
 			}
 		}
 
@@ -94,40 +94,47 @@ public class WorldEvent {
 		WorldEventScheduler.startWorldEventSchedule(this);
 	}
 
+	/**
+	 * Stop active WorldEvent
+	 */
+	public void stopEvent() {
+		if (!getActiveEvents().contains(this)) {
+			ProjectKorraRPG.getPlugin().getLogger().info("WorldEvent isn't active therefore can't be stopped.");
+			return;
+		}
+
+		Bukkit.getPluginManager().callEvent(new WorldEventStopEvent(this));
+		getActiveEvents().remove(this);
+
+		// Play EventStop sound for each player in active WorldEvent world
+		for (Player player : getWorld().getPlayers()) {
+			if (getConfig().getBoolean("PlayEventStopSound")) {
+				String soundName = getConfig().getString("EventStop.Sound", "ENTITY_EXPERIENCE_ORB_PICKUP"); // Default in case user doesn't use sound from Sound enum
+
+				Sound eventStopSound = Sound.valueOf(soundName.toUpperCase());
+				float volume = (float) getConfig().getDouble("EventStop.Volume", 1.0);
+				float pitch = (float) getConfig().getDouble("EventStop.Pitch", 1.0);
+
+				player.getWorld().playSound(player.getLocation(), eventStopSound, volume, pitch);
+			}
+		}
+
+		// Stop the display for the event
+		for (IWorldEventDisplay display : getDisplayMethods()) {
+			display.stopDisplay(this);
+		}
+	}
+
+	// Updated WorldEvent display
 	public void updateDisplay(double progress) {
 		for (IWorldEventDisplay display : getDisplayMethods()) {
 			display.updateDisplay(this, progress);
 		}
 	}
 
-	public void stopEvent() {
-		if (getActiveEvents().contains(this)) {
-			Bukkit.getPluginManager().callEvent(new WorldEventStopEvent(this));
-
-			getActiveEvents().remove(this);
-
-			for (Player player : Bukkit.getOnlinePlayers()) {
-				if (!getDisabledWorlds().contains(player.getWorld())) {
-					if (getConfig().getBoolean("PlayEventStopSound")) {
-						Sound eventStopSound = Sound.valueOf(getConfig().getString("EventStop.Sound"));
-
-						float volume = Float.parseFloat(getConfig().getString("EventStop.Volume"));
-						float pitch = Float.parseFloat(getConfig().getString("EventStop.Pitch"));
-
-						player.getWorld().playSound(player.getLocation(), eventStopSound, volume, pitch);
-					}
-				}
-			}
-
-			// Stop the display for the event
-			for (IWorldEventDisplay display : getDisplayMethods()) {
-				display.stopDisplay(this);
-			}
-		} else {
-			ProjectKorraRPG.getLog().info("WorldEvent isn't active therefore can't be stopped.");
-		}
-	}
-
+	/**
+	 * Puts all WorldEvents from WorldEvents directory into the {@link WorldEvent#getAllEvents()} map
+	 */
 	public static void initAllWorldEvents() {
 		File worldEventsFolder = new File(ProjectKorraRPG.getPlugin().getDataFolder(), "WorldEvents");
 		if (!worldEventsFolder.exists() || !worldEventsFolder.isDirectory()) {
@@ -152,8 +159,8 @@ public class WorldEvent {
 
 			// BossBar-Display
 			if (config.getBoolean("DisplayMethods.BossBar.Enabled", false)) {
-				BarColor bossBarColor = RPGMethods.convertStringToColor(config.getString("DisplayMethods.BossBar.Color", "RED"));
-				BarStyle bossBarStyle = RPGMethods.convertStringToStyle(config.getString("DisplayMethods.BossBar.Style", "SOLID"));
+				BarColor bossBarColor = RPGMethods.convertStringToBarColor(config.getString("DisplayMethods.BossBar.Color", "RED"));
+				BarStyle bossBarStyle = RPGMethods.convertStringToBarStyle(config.getString("DisplayMethods.BossBar.Style", "SOLID"));
 				boolean smoothBossBar = config.getBoolean("DisplayMethods.BossBar.Smooth", true);
 
 				displayMethods.add(new BossBarDisplay(eventTitle, bossBarColor, bossBarStyle, smoothBossBar));

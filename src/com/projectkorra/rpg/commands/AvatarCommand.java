@@ -20,7 +20,7 @@ public class AvatarCommand extends RPGCommand {
     public void execute(CommandSender sender, List<String> args) {
         if (!correctLength(sender, args.size(), 1, 1))
             return;
-        if (ProjectKorraRPG.plugin.getAvatarManager() == null || !ProjectKorraRPG.plugin.getAvatarManager().isEnabled()) {
+        if (ProjectKorraRPG.getPlugin().getModuleManager().getRandomAvatarModule().getAvatarManager() == null || !ProjectKorraRPG.getPlugin().getModuleManager().getRandomAvatarModule().getAvatarManager().isEnabled()) {
             sender.sendMessage(ChatColor.RED + "Avatar system is not enabled!");
             return;
         }
@@ -30,7 +30,7 @@ public class AvatarCommand extends RPGCommand {
         }
 
 		if (args.getFirst().equalsIgnoreCase("list")) {
-			List<String> avatars =  ProjectKorraRPG.plugin.getAvatarManager().getPastLives();
+			List<String> avatars =  ProjectKorraRPG.getPlugin().getModuleManager().getRandomAvatarModule().getAvatarManager().getPastLives();
 			sender.sendMessage(ChatColor.BOLD + "Avatar Past Lives:");
 			for (String s : avatars) {
 				sender.sendMessage(s);
@@ -41,7 +41,7 @@ public class AvatarCommand extends RPGCommand {
 		if (target == null) {
 			sender.sendMessage(ChatColor.RED + "Player not found!");
 		} else {
-			boolean succesful = ProjectKorraRPG.plugin.getAvatarManager().makeAvatar(target.getUniqueId());
+			boolean succesful = ProjectKorraRPG.getPlugin().getModuleManager().getRandomAvatarModule().getAvatarManager().makeAvatar(target.getUniqueId());
 			if (!succesful) {
 				sender.sendMessage(ChatColor.RED + "Failed to declare avatar!");
 			} else {

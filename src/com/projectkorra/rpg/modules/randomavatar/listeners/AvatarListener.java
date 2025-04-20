@@ -15,8 +15,8 @@ public class AvatarListener implements Listener {
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         OfflinePlayer player = Bukkit.getOfflinePlayer(event.getPlayer().getUniqueId());
-        ProjectKorraRPG.plugin.getAvatarManager().recentPlayers.remove(player);
-        ProjectKorraRPG.plugin.getAvatarManager().recentPlayers.add(player);
-        ProjectKorraRPG.plugin.getAvatarManager().checkAvatars();
+        ProjectKorraRPG.getPlugin().getModuleManager().getRandomAvatarModule().getAvatarManager().recentPlayers.remove(player);
+        ProjectKorraRPG.getPlugin().getModuleManager().getRandomAvatarModule().getAvatarManager().recentPlayers.add(player);
+        ProjectKorraRPG.getPlugin().getModuleManager().getRandomAvatarModule().getAvatarManager().checkAvatars();
     }
 }

@@ -1,4 +1,4 @@
-package com.projectkorra.rpg.modules.leveling;
+package com.projectkorra.rpg.modules.leveling.rpgplayer;
 
 import com.projectkorra.projectkorra.BendingPlayer;
 import org.bukkit.entity.Player;

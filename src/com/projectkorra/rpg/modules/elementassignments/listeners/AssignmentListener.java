@@ -18,7 +18,7 @@ public class AssignmentListener implements Listener {
         if (event.getBendingPlayer().isOnline()) {
             BendingPlayer bPlayer = (BendingPlayer) event.getBendingPlayer();
             if (bPlayer.getElements().isEmpty() && !bPlayer.isPermaRemoved()) {
-                ProjectKorraRPG.plugin.getAssignmentManager().assignRandomGroup(bPlayer, false);
+                ProjectKorraRPG.getPlugin().getModuleManager().getElementAssignmentsModule().getAssignmentManager().assignRandomGroup(bPlayer, false);
             }
         }
     }

@@ -3,6 +3,7 @@ package com.projectkorra.rpg.modules.worldevents.commands;
 import com.projectkorra.rpg.commands.RPGCommand;
 import com.projectkorra.rpg.modules.worldevents.WorldEvent;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -19,6 +20,11 @@ public class WorldEventCommand extends RPGCommand {
 
 	@Override
 	public void execute(CommandSender sender, List<String> args) {
+		if (!(sender instanceof Player player)) {
+			sender.sendMessage("Console may not execute this type of command!");
+			return;
+		}
+
 		if (args.size() < 2) {
 			help(sender, true);
 			return;
@@ -29,23 +35,25 @@ public class WorldEventCommand extends RPGCommand {
 
 			if (we == null) {
 				sender.sendMessage("WorldEvent '" + args.get(1) + "' not found.");
-				return;
+			} else {
+				we.startEvent(player.getWorld());
 			}
 
-			we.startEvent();
 		} else if (args.get(0).equalsIgnoreCase("stop")) {
 			if (args.get(1) != null) {
 				WorldEvent we = WorldEvent.getAllEvents().get(args.get(1).toLowerCase());
 
 				if (we == null) {
 					sender.sendMessage("WorldEvent '" + args.get(1) + "' not found.");
-					return;
+				} else {
+					we.stopEvent();
 				}
 
-				we.stopEvent();
 			} else {
 				for (WorldEvent worldEvent : WorldEvent.getActiveEvents()) {
-					worldEvent.stopEvent();
+					if (worldEvent.getWorld() == player.getWorld()) {
+						worldEvent.stopEvent();
+					}
 				}
 			}
 		} else {

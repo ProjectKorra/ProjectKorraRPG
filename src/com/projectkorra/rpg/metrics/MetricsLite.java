@@ -26,7 +26,7 @@
  * either expressed or implied, of anybody else.
  */
 
-package com.projectkorra.rpg.util;
+package com.projectkorra.rpg.metrics;
 
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.InvalidConfigurationException;
@@ -40,7 +40,6 @@ import java.net.Proxy;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.zip.GZIPOutputStream;

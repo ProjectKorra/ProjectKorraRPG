@@ -258,6 +258,8 @@ public class ConfigManager {
             config.addDefault("Abilities._All.Duration", "x2.0");
             config.addDefault("Abilities._All.Range", "x2.0");
             config.addDefault("Abilities.Fire.FireBlast.Speed", "x4.0");
+            config.addDefault("Abilities.Fire.WallOfFire.Width", "x2.0");
+            config.addDefault("Abilities.Fire.WallOfFire.Height", "x2.0");
 
             config.options().copyDefaults(true);
             sozinsComet.save();
@@ -269,12 +271,9 @@ public class ConfigManager {
         return config;
     }
 
-    // TEMP
-    public static List<Config> getAllConfigs() {
-        List<Config> configs = new ArrayList<>();
-        configs.add(config);
-        configs.add(language);
-        configs.add(sozinsComet);
-        return configs;
+    public static void reloadConfigs() {
+        config.reload();
+        language.reload();
+        sozinsComet.reload();
     }
 }

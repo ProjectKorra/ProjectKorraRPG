@@ -1,8 +1,7 @@
-package com.projectkorra.rpg.listeners;
+package com.projectkorra.rpg;
 
 import com.projectkorra.projectkorra.BendingPlayer;
 import com.projectkorra.projectkorra.event.BendingReloadEvent;
-import com.projectkorra.rpg.ProjectKorraRPG;
 import com.projectkorra.rpg.commands.AvatarCommand;
 import com.projectkorra.rpg.commands.HelpCommand;
 import com.projectkorra.rpg.commands.RPGCommandBase;

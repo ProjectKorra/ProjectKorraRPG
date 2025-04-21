@@ -3,7 +3,6 @@ package com.projectkorra.rpg;
 import com.projectkorra.rpg.commands.HelpCommand;
 import com.projectkorra.rpg.commands.RPGCommandBase;
 import com.projectkorra.rpg.configuration.ConfigManager;
-import com.projectkorra.rpg.listeners.RPGListener;
 import com.projectkorra.rpg.modules.ModuleManager;
 import com.projectkorra.rpg.metrics.MetricsLite;
 import net.luckperms.api.LuckPerms;

@@ -9,10 +9,6 @@ import org.bukkit.event.Listener;
 
 public class AssignmentListener implements Listener {
 
-    public AssignmentListener() {
-        super();
-    }
-
     @EventHandler (priority = EventPriority.LOW)
     public void onPlayerJoin(BendingPlayerLoadEvent event) {
         if (event.getBendingPlayer().isOnline()) {

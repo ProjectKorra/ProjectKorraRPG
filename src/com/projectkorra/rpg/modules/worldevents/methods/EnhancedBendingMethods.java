@@ -14,8 +14,8 @@ import org.bukkit.configuration.file.FileConfiguration;
 public class EnhancedBendingMethods {
 
 	/**
-	 * For every active worldevent, look up any matching modifier in its config
-	 * and apply it to the event.
+	 * For every active {@link WorldEvent}, look up any matching modifier in its {@link WorldEvent#config}
+	 * and apply it to the {@link WorldEvent} / {@link com.projectkorra.projectkorra.BendingPlayer}.
 	 */
 	public static void applyWorldEventMods(AbilityRecalculateAttributeEvent event) {
 		CoreAbility ability = event.getAbility();

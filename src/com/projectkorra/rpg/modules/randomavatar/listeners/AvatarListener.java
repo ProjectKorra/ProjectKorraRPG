@@ -8,9 +8,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 
 public class AvatarListener implements Listener {
-    public AvatarListener() {
-        super();
-    }
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {

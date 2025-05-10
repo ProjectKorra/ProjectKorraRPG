@@ -1,10 +1,14 @@
 package com.projectkorra.rpg.commands;
 
 import com.projectkorra.projectkorra.command.PKCommand;
+import com.projectkorra.rpg.commands.RPGCommand;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
 
 public class RPGCommandBase extends PKCommand {
 

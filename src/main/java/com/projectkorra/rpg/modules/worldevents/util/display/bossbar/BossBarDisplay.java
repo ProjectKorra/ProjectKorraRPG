@@ -3,6 +3,7 @@ package com.projectkorra.rpg.modules.worldevents.util.display.bossbar;
 import com.projectkorra.projectkorra.util.ChatUtil;
 import com.projectkorra.rpg.modules.worldevents.WorldEvent;
 import com.projectkorra.rpg.modules.worldevents.util.display.IWorldEventDisplay;
+import com.projectkorra.rpg.modules.worldevents.util.display.bossbar.WorldEventBossBar;
 import org.bukkit.Bukkit;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;

@@ -2,6 +2,7 @@ package com.projectkorra.rpg.modules.worldevents;
 
 import com.projectkorra.rpg.ProjectKorraRPG;
 import com.projectkorra.rpg.modules.Module;
+import com.projectkorra.rpg.modules.worldevents.WorldEvent;
 import com.projectkorra.rpg.modules.worldevents.commands.WorldEventCommand;
 import com.projectkorra.rpg.modules.worldevents.listeners.EnhancedBendingListener;
 import com.projectkorra.rpg.modules.worldevents.util.schedule.WorldEventScheduleStrategy;

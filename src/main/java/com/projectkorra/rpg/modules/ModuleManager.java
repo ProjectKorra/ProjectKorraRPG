@@ -1,5 +1,6 @@
 package com.projectkorra.rpg.modules;
 
+import com.projectkorra.rpg.modules.Module;
 import com.projectkorra.rpg.modules.worldevents.WorldEvents;
 import com.projectkorra.rpg.modules.leveling.RPGLeveling;
 import com.projectkorra.rpg.modules.randomavatar.RandomAvatar;
@@ -9,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ModuleManager {
-	private final List<Module> modules = new ArrayList<>();
+	private final List<com.projectkorra.rpg.modules.Module> modules = new ArrayList<>();
 
 	private final WorldEvents worldEventsModule;
 	private final RPGLeveling rpgLevelingModule;
@@ -24,7 +25,7 @@ public class ModuleManager {
 	}
 
 	public void enableModules() {
-		for (Module module : modules) {
+		for (com.projectkorra.rpg.modules.Module module : modules) {
 			if (module.isEnabled()) {
 				module.enable();
 			}
@@ -32,7 +33,7 @@ public class ModuleManager {
 	}
 
 	public void disableModules() {
-		for (Module module : modules) {
+		for (com.projectkorra.rpg.modules.Module module : modules) {
 			module.disable();
 		}
 	}

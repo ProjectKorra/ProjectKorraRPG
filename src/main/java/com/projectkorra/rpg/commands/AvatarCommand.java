@@ -1,7 +1,6 @@
 package com.projectkorra.rpg.commands;
 
 import com.projectkorra.rpg.ProjectKorraRPG;
-
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;

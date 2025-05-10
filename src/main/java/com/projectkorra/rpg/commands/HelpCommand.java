@@ -9,7 +9,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
-public class HelpCommand extends RPGCommand{
+public class HelpCommand extends RPGCommand {
 	private final String modifiers = ChatColor.GOLD + "Commands: <required> [optional]";
 
 	public HelpCommand() {

@@ -56,7 +56,6 @@
     <build>
         <defaultGoal>clean package install</defaultGoal>
         <finalName>${project.name}-${project.version}</finalName>
-        <sourceDirectory>${project.basedir}/src/</sourceDirectory>
         <resources>
             <resource>
                 <targetPath>.</targetPath>
@@ -78,6 +77,9 @@
             </plugin>
 	        <plugin>
 	            <artifactId>maven-shade-plugin</artifactId>
+                <configuration>
+                    <createDependencyReducedPom>false</createDependencyReducedPom>
+                </configuration>
 		        <version>3.5.2</version>
 		        <executions>
 		            <execution>

@@ -3,6 +3,7 @@ package com.projectkorra.rpg.configuration;
 import com.projectkorra.projectkorra.Element;
 import com.projectkorra.projectkorra.attribute.Attribute;
 import com.projectkorra.projectkorra.configuration.ConfigType;
+import com.projectkorra.rpg.configuration.Config;
 import org.bukkit.Sound;
 import org.bukkit.configuration.file.FileConfiguration;
 
@@ -14,14 +15,14 @@ public class ConfigManager {
     private static final ConfigType LANGUAGE = new ConfigType("Language");
     private static final ConfigType WORLDEVENTS = new ConfigType("WorldEvents");
 
-    public static Config config;
-    public static Config language;
-    public static Config sozinsComet;
+    public static com.projectkorra.rpg.configuration.Config config;
+    public static com.projectkorra.rpg.configuration.Config language;
+    public static com.projectkorra.rpg.configuration.Config sozinsComet;
 
     public ConfigManager() {
-        config = new Config(new File("config.yml"));
-        language = new Config(new File("language.yml"));
-        sozinsComet = new Config(new File("WorldEvents/SozinsComet.yml"));
+        config = new com.projectkorra.rpg.configuration.Config(new File("config.yml"));
+        language = new com.projectkorra.rpg.configuration.Config(new File("language.yml"));
+        sozinsComet = new com.projectkorra.rpg.configuration.Config(new File("WorldEvents/SozinsComet.yml"));
 
         configCheck(DEFAULT);
         configCheck(LANGUAGE);

@@ -90,6 +90,7 @@ target/
 *.ipr
 
 .idea/
+/./idea/
 
 # VSCode project files
 .vscode/

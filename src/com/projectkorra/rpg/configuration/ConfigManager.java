@@ -233,6 +233,21 @@ public class ConfigManager {
 
             config.addDefault("Title", "&cSozins Comet");
             config.addDefault("Duration", 5000);
+            config.addDefault("World", "world");
+
+            config.addDefault("Schedule.AtTime.Enabled", true);
+            config.addDefault("Schedule.AtTime.TimeOfDay", "14:30");
+            config.addDefault("Schedule.AtTime.ChancePerCheck", 1.0);
+            config.addDefault("Schedule.RealDays.Enabled", false);
+            config.addDefault("Schedule.RealDays.IntervalDays", 7);
+            config.addDefault("Schedule.RealDays.ChancePerCheck", 1.0);
+            config.addDefault("Schedule.GameDays.Enabled", true);
+            config.addDefault("Schedule.GameDays.IntervalDays", 12);
+            config.addDefault("Schedule.GameDays.ChancePerCheck", 1.0);
+            config.addDefault("Schedule.RandomChance.Enabled", true);
+            config.addDefault("Schedule.RandomChance.ChancePerCheck", 0.90);
+            config.addDefault("Schedule.RandomChance.CooldownSeconds", 160);
+
             config.addDefault("DisplayMethods.BossBar.Enabled", true);
             config.addDefault("DisplayMethods.BossBar.Color", "RED");
             config.addDefault("DisplayMethods.BossBar.Style", "SOLID");

@@ -1,11 +1,11 @@
-package com.projectkorra.rpg.modules.worldevents.util;
+package com.projectkorra.rpg.modules.worldevents.util.schedule;
 
 import com.projectkorra.rpg.ProjectKorraRPG;
 import com.projectkorra.rpg.modules.worldevents.WorldEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
-public class WorldEventScheduler {
-	public static void startWorldEventSchedule(WorldEvent worldEvent) {
+public class WorldEventTimer {
+	public static void startWorldEventTimer(WorldEvent worldEvent) {
 		final long duration = worldEvent.getDuration();
 		final long startTime = System.currentTimeMillis();
 

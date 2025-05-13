@@ -7,10 +7,10 @@ import com.projectkorra.rpg.modules.randomavatar.listeners.AvatarListener;
 import com.projectkorra.rpg.modules.randomavatar.manager.AvatarManager;
 import org.bukkit.Bukkit;
 
-public class RandomAvatar extends Module {
+public class AvatarCycleModule extends Module {
     private AvatarManager avatarManager;
 
-    public RandomAvatar() {
+    public AvatarCycleModule() {
         super("RandomAvatar");
     }
 

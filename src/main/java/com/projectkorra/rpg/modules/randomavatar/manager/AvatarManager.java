@@ -11,7 +11,6 @@ import com.projectkorra.projectkorra.storage.DBConnection;
 import com.projectkorra.projectkorra.storage.MySQL;
 import com.projectkorra.rpg.ProjectKorraRPG;
 import com.projectkorra.rpg.configuration.ConfigManager;
-import com.projectkorra.rpg.modules.randomavatar.RandomAvatar;
 import com.projectkorra.rpg.util.ChatUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -468,6 +467,11 @@ public class AvatarManager {
         if (!originalElements.isEmpty()) {
             originalElements.forEach(el -> {
                 bendingPlayer.addElement(el);
+
+                if (el instanceof Element.SubElement) {
+                    bendingPlayer.addSubElement((Element.SubElement) el);
+                }
+
                 ChatUtil.sendBrandingMessage(bendingPlayer.getPlayer(), el.getColor() + "You are once again a " + el.getName() +  " bender.");
             });
         }

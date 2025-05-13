@@ -3,8 +3,8 @@ package com.projectkorra.rpg.modules.leveling;
 import com.projectkorra.rpg.modules.Module;
 import com.projectkorra.rpg.modules.leveling.storage.Storage;
 
-public class RPGLeveling extends Module {
-    public RPGLeveling() {
+public class LevelingModule extends Module {
+    public LevelingModule() {
         super("Leveling");
     }
 

@@ -4,10 +4,10 @@ import com.projectkorra.rpg.modules.Module;
 import com.projectkorra.rpg.modules.elementassignments.listeners.AssignmentListener;
 import com.projectkorra.rpg.modules.elementassignments.manager.AssignmentManager;
 
-public class ElementAssignments extends Module {
+public class ElementAssignModule extends Module {
 	private AssignmentManager assignmentManager;
 
-	public ElementAssignments() {
+	public ElementAssignModule() {
         super("ElementAssignments");
     }
 

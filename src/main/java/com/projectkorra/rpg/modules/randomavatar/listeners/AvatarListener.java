@@ -3,7 +3,6 @@ package com.projectkorra.rpg.modules.randomavatar.listeners;
 import com.projectkorra.projectkorra.BendingPlayer;
 import com.projectkorra.projectkorra.Element;
 import com.projectkorra.rpg.ProjectKorraRPG;
-import com.projectkorra.rpg.modules.elementassignments.manager.AssignmentManager;
 import com.projectkorra.rpg.modules.randomavatar.manager.AvatarManager;
 import com.projectkorra.rpg.util.ChatUtil;
 import org.bukkit.Bukkit;
@@ -15,11 +14,9 @@ import org.bukkit.event.player.PlayerJoinEvent;
 
 public class AvatarListener implements Listener {
     private final AvatarManager avatarManager;
-    private final AssignmentManager assignmentManager;
 
     public AvatarListener() {
         this.avatarManager = ProjectKorraRPG.getPlugin().getModuleManager().getRandomAvatarModule().getAvatarManager();
-        this.assignmentManager = ProjectKorraRPG.getPlugin().getModuleManager().getElementAssignmentsModule().getAssignmentManager();
     }
 
     @EventHandler
@@ -31,21 +28,12 @@ public class AvatarListener implements Listener {
 
     @EventHandler
     public void onBendingPlayerDeath(final PlayerDeathEvent event) {
-        boolean valid = true;
         BendingPlayer bPlayer = BendingPlayer.getBendingPlayer(event.getEntity());
         if (bPlayer != null) {
-            if (avatarManager.isEnabled()) {
-                if (avatarManager.isCurrentRPGAvatar(bPlayer.getUUID())) {
-                    valid = false;
-                    if (avatarManager.handleAvatarDeath(bPlayer)) {
-                        ChatUtil.sendBrandingMessage(bPlayer.getPlayer(), Element.AVATAR.getColor() + "You have lost Avatar");
-                        ProjectKorraRPG.getPlugin().getLogger().info(bPlayer.getName() + " is no longer the Avatar.");
-                    }
-                }
-            }
-            if (assignmentManager.isEnabled()) {
-                if (valid) {
-                    assignmentManager.assignRandomGroup(bPlayer, true);
+            if (avatarManager.isCurrentRPGAvatar(bPlayer.getUUID())) {
+                if (avatarManager.handleAvatarDeath(bPlayer)) {
+                    ChatUtil.sendBrandingMessage(bPlayer.getPlayer(), Element.AVATAR.getColor() + "You have lost Avatar");
+                    ProjectKorraRPG.getPlugin().getLogger().info(bPlayer.getName() + " is no longer the Avatar.");
                 }
             }
         }

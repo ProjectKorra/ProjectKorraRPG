@@ -234,25 +234,16 @@ public class ConfigManager {
             List<String> disabledWorlds = new ArrayList<>();
             disabledWorlds.add("none");
 
-            List<String> affectedElements = new ArrayList<>();
-            affectedElements.add(Element.FIRE.getName());
-
             config.addDefault("Title", "&cSozins Comet");
             config.addDefault("Duration", 5000);
             config.addDefault("World", "world");
 
-            config.addDefault("Schedule.AtTime.Enabled", true);
-            config.addDefault("Schedule.AtTime.TimeOfDay", "14:30");
-            config.addDefault("Schedule.AtTime.ChancePerCheck", 1.0);
-            config.addDefault("Schedule.RealDays.Enabled", false);
-            config.addDefault("Schedule.RealDays.IntervalDays", 7);
-            config.addDefault("Schedule.RealDays.ChancePerCheck", 1.0);
-            config.addDefault("Schedule.GameDays.Enabled", true);
-            config.addDefault("Schedule.GameDays.IntervalDays", 12);
-            config.addDefault("Schedule.GameDays.ChancePerCheck", 1.0);
-            config.addDefault("Schedule.RandomChance.Enabled", true);
-            config.addDefault("Schedule.RandomChance.ChancePerCheck", 0.90);
-            config.addDefault("Schedule.RandomChance.CooldownSeconds", 160);
+            config.addDefault("Schedule.At", "7am");
+            config.addDefault("Schedule.Repeat", "7d");
+            config.addDefault("Schedule.Calendar", "INGAME");
+            config.addDefault("Schedule.Offset", "3d12h");
+            config.addDefault("Schedule.TriggerChance", "0.1");
+            config.addDefault("Schedule.Cooldown", "60d");
 
             config.addDefault("DisplayMethods.BossBar.Enabled", true);
             config.addDefault("DisplayMethods.BossBar.Color", "RED");
@@ -271,13 +262,12 @@ public class ConfigManager {
             config.addDefault("EventStop.Volume", "1F");
             config.addDefault("EventStop.Pitch", "0.5F");
             config.addDefault("DisabledWorlds", disabledWorlds);
-            config.addDefault("AffectedElements", affectedElements);
-            config.addDefault("Abilities._All.Damage", "x2.0");
-            config.addDefault("Abilities._All.Speed", "x2.0");
-            config.addDefault("Abilities._All.Cooldown", "x0.5");
-            config.addDefault("Abilities._All.ChargeTime", "x0.5");
-            config.addDefault("Abilities._All.Duration", "x2.0");
-            config.addDefault("Abilities._All.Range", "x2.0");
+            config.addDefault("Abilities.Fire._All.Damage", "x2.0");
+            config.addDefault("Abilities.Fire._All.Speed", "x2.0");
+            config.addDefault("Abilities.Fire._All.Cooldown", "x0.5");
+            config.addDefault("Abilities.Fire._All.ChargeTime", "x0.5");
+            config.addDefault("Abilities.Fire._All.Duration", "x2.0");
+            config.addDefault("Abilities.Fire._All.Range", "x2.0");
             config.addDefault("Abilities.Fire.FireBlast.Speed", "x4.0");
             config.addDefault("Abilities.Fire.WallOfFire.Width", "x2.0");
             config.addDefault("Abilities.Fire.WallOfFire.Height", "x2.0");

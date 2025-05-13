@@ -130,7 +130,7 @@ public class AssignmentManager {
 
     public void assignRandomGroup(BendingPlayer bp, boolean onDeath) {
         if (onDeath) {
-            // If change on death isn't enabled do nothing
+            // If change on death isn't enabled, do nothing
             if (!changeOnDeathEnabled)
                 return;
             if (!(changeOnDeathBypass && bp.getPlayer().hasPermission(changeOnDeathPermission))) {

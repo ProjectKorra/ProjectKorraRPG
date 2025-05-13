@@ -1,0 +1,42 @@
+package com.projectkorra.rpg.modules.worldevents.schedule.strategies;
+
+import com.projectkorra.rpg.modules.worldevents.WorldEvent;
+import com.projectkorra.rpg.modules.worldevents.schedule.WorldEventScheduleStrategy;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.scheduler.BukkitTask;
+
+import java.time.Duration;
+import java.time.Instant;
+import java.time.LocalTime;
+
+public class EveryInGameDaysStrategy implements WorldEventScheduleStrategy {
+	private final LocalTime timeOfDay;
+	private final Duration repeatDuration;
+	private final Duration offsetDuration;
+	private final double chance;
+	private final Duration cooldownDuration;
+
+	private BukkitTask task;
+	private Instant lastTriggerTime = null;
+
+	public EveryInGameDaysStrategy(LocalTime timeOfDay, Duration repeatDuration, Duration offsetDuration, double chance, Duration cooldownDuration) {
+		this.timeOfDay = timeOfDay;
+		this.repeatDuration = repeatDuration;
+		this.offsetDuration = offsetDuration;
+		this.chance = chance;
+		this.cooldownDuration = cooldownDuration;
+	}
+
+	@Override
+	public void scheduleNext(WorldEvent event, Plugin plugin) {
+		//TODO: Implement scheduling
+	}
+
+	@Override
+	public void cancelSchedule() {
+		if (task != null && !task.isCancelled()) {
+			task.cancel();
+			task = null;
+		}
+	}
+}

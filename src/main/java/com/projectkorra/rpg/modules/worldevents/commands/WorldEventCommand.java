@@ -5,17 +5,13 @@ import com.projectkorra.rpg.modules.worldevents.WorldEvent;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 public class WorldEventCommand extends RPGCommand {
-	private List<String> worldEvents;
-
 	public WorldEventCommand() {
 		super("event", "/bending rpg event start <Event>", "Starts a world event", new String[]{"event", "e", "ev"});
-		fillWorldEvents();
 	}
 
 	@Override
@@ -36,7 +32,7 @@ public class WorldEventCommand extends RPGCommand {
 			if (we == null) {
 				sender.sendMessage("WorldEvent '" + args.get(1) + "' not found.");
 			} else {
-				we.startEvent(player.getWorld());
+				we.startEvent();
 			}
 
 		} else if (args.get(0).equalsIgnoreCase("stop")) {
@@ -66,14 +62,9 @@ public class WorldEventCommand extends RPGCommand {
 		if (args.isEmpty()) {
 			return Arrays.asList("start", "stop");
 		}
-		if (args.size() == 1 && args.getFirst().equalsIgnoreCase("start")) {
-			return worldEvents;
+		if (args.size() == 1 && args.getFirst().equalsIgnoreCase("start") || args.size() == 1 && args.getFirst().equalsIgnoreCase("stop")) {
+			return WorldEvent.getAllEvents().keySet().stream().sorted().toList();
 		}
 		return Collections.emptyList();
-	}
-
-	private void fillWorldEvents() {
-		worldEvents = new ArrayList<>(WorldEvent.getAllEvents().keySet());
-		Collections.sort(worldEvents);
 	}
 }

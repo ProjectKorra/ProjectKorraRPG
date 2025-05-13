@@ -1,9 +1,9 @@
 package com.projectkorra.rpg.modules;
 
-import com.projectkorra.rpg.modules.elementassignments.ElementAssignments;
-import com.projectkorra.rpg.modules.leveling.RPGLeveling;
-import com.projectkorra.rpg.modules.randomavatar.RandomAvatar;
-import com.projectkorra.rpg.modules.worldevents.WorldEvents;
+import com.projectkorra.rpg.modules.elementassignments.ElementAssignModule;
+import com.projectkorra.rpg.modules.leveling.LevelingModule;
+import com.projectkorra.rpg.modules.randomavatar.AvatarCycleModule;
+import com.projectkorra.rpg.modules.worldevents.WorldEventModule;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,16 +11,16 @@ import java.util.List;
 public class ModuleManager {
 	private final List<Module> modules = new ArrayList<>();
 
-	private final WorldEvents worldEventsModule;
-	private final RPGLeveling rpgLevelingModule;
-	private final RandomAvatar randomAvatarModule;
-	private final ElementAssignments elementAssignmentsModule;
+	private final WorldEventModule worldEventModuleModule;
+	private final LevelingModule levelingModuleModule;
+	private final AvatarCycleModule avatarCycleModule;
+	private final ElementAssignModule elementAssignModule;
 
 	public ModuleManager() {
-		modules.add(worldEventsModule = new WorldEvents());
-		modules.add(rpgLevelingModule = new RPGLeveling());
-		modules.add(randomAvatarModule = new RandomAvatar());
-		modules.add(elementAssignmentsModule = new ElementAssignments());
+		modules.add(worldEventModuleModule = new WorldEventModule());
+		modules.add(levelingModuleModule = new LevelingModule());
+		modules.add(avatarCycleModule = new AvatarCycleModule());
+		modules.add(elementAssignModule = new ElementAssignModule());
 	}
 
 	public void enableModules() {
@@ -41,30 +41,30 @@ public class ModuleManager {
 		return modules;
 	}
 
-	public WorldEvents getWorldEventsModule() {
-		if (worldEventsModule.isEnabled()) {
-			return worldEventsModule;
+	public WorldEventModule getWorldEventsModule() {
+		if (worldEventModuleModule.isEnabled()) {
+			return worldEventModuleModule;
 		}
 		throw new NullPointerException("WorldEvents Module is disabled! Enable it in config.yml");
 	}
 
-	public RPGLeveling getRpgLevelingModule() {
-		if (rpgLevelingModule.isEnabled()) {
-			return rpgLevelingModule;
+	public LevelingModule getRpgLevelingModule() {
+		if (levelingModuleModule.isEnabled()) {
+			return levelingModuleModule;
 		}
 		throw new NullPointerException("Level Module is disabled! Enable it in config.yml");
 	}
 
-	public RandomAvatar getRandomAvatarModule() {
-		if (randomAvatarModule.isEnabled()) {
-			return randomAvatarModule;
+	public AvatarCycleModule getRandomAvatarModule() {
+		if (avatarCycleModule.isEnabled()) {
+			return avatarCycleModule;
 		}
 		throw new NullPointerException("AvatarCycle Module is disabled! Enable it in config.yml");
 	}
 
-	public ElementAssignments getElementAssignmentsModule() {
-		if (elementAssignmentsModule.isEnabled()) {
-			return elementAssignmentsModule;
+	public ElementAssignModule getElementAssignmentsModule() {
+		if (elementAssignModule.isEnabled()) {
+			return elementAssignModule;
 		}
 		throw new NullPointerException("ElementAssign Module is disabled! Enable it in config.yml");
 	}

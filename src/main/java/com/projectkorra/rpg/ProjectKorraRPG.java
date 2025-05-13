@@ -21,6 +21,8 @@ public class ProjectKorraRPG extends JavaPlugin {
 	@Override
 	public void onEnable() {
 		plugin = this;
+		new ConfigManager();
+
 		moduleManager = new ModuleManager();
 
 		Bukkit.getServer().getPluginManager().registerEvents(new RPGListener(), this);
@@ -31,7 +33,6 @@ public class ProjectKorraRPG extends JavaPlugin {
 		}
 
 		// Default Command Instantiations
-		new ConfigManager();
 		new RPGCommandBase();
 		new HelpCommand();
 

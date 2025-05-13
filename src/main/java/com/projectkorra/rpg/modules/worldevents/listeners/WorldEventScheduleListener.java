@@ -2,7 +2,7 @@ package com.projectkorra.rpg.modules.worldevents.listeners;
 
 import com.projectkorra.rpg.modules.worldevents.WorldEvent;
 import com.projectkorra.rpg.modules.worldevents.event.WorldEventStopEvent;
-import com.projectkorra.rpg.modules.worldevents.util.schedule.WorldEventScheduleStrategy;
+import com.projectkorra.rpg.modules.worldevents.schedule.WorldEventScheduleStrategy;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
@@ -22,13 +22,14 @@ public class WorldEventScheduleListener implements Listener {
 	@EventHandler
 	public void onWorldEventStop(WorldEventStopEvent event) {
 		WorldEvent worldEvent = event.getWorldEvent();
-		List<WorldEventScheduleStrategy> list = strategies.get(worldEvent);
-		if (list == null) return;
+		List<WorldEventScheduleStrategy> eventStrategies = this.strategies.get(worldEvent);
 
-		for (WorldEventScheduleStrategy strat : list) {
-			if (worldEvent.getWorld() != null) {
-				strat.scheduleNext(worldEvent, plugin);
+		if (eventStrategies != null && !eventStrategies.isEmpty()) {
+			this.plugin.getLogger().info("WorldEvent " + worldEvent.getKey() + " stopped, rescheduling...");
+
+			for (WorldEventScheduleStrategy strat : eventStrategies) {
+				strat.scheduleNext(worldEvent, this.plugin);
 			}
-		}
+		};
 	}
 }

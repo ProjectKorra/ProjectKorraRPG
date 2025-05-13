@@ -30,7 +30,7 @@ public class EveryRealWorldDaysStrategy implements WorldEventScheduleStrategy {
 		this.cooldownDuration = cooldownDuration;
 	}
 
-	//TODO: Still very early WIP with AI quirks (probably, haven't tested yet)
+	//TODO: Still very early WIP with AI quirks and probably doesn't work (haven't fully tested yet)
 	@Override
 	public void scheduleNext(WorldEvent event, Plugin plugin) {
 		cancelSchedule();
@@ -51,6 +51,7 @@ public class EveryRealWorldDaysStrategy implements WorldEventScheduleStrategy {
 				// Check if we're still on cooldown
 				if (lastTriggerTime != null && Duration.between(lastTriggerTime, Instant.now()).compareTo(cooldownDuration) < 0) {
 					ProjectKorraRPG.getPlugin().getLogger().info("Event " + event.getKey() + " still on cooldown, skipping trigger");
+					rescheduleNext(event, plugin);
 					return;
 				}
 

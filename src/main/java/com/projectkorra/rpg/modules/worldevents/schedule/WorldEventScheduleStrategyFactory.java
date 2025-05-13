@@ -13,12 +13,12 @@ import java.util.regex.Pattern;
 
 public class WorldEventScheduleStrategyFactory {
 	public static WorldEventScheduleStrategy get(FileConfiguration config) {
-		String rawType = config.getString("Schedule.Calendar", "INGAME");
+		String rawType = config.getString("Schedule.Calendar", "REALTIME");
 		ScheduleType scheduleType = ScheduleType.fromString(rawType);
 
 		LocalTime timeOfDay 	= parseTimeOfDay(config.getString("Schedule.At", "7am"));
 		Duration repeatDuration = parseDuration(config.getString("Schedule.Repeat", "7d"));
-		Duration offsetDuration = parseDuration(config.getString("Schedule.OffsetDays", "0d"));
+		Duration offsetDuration = parseDuration(config.getString("Schedule.Offset", "1d5h"));
 		Duration cooldown 		= parseDuration(config.getString("Schedule.Cooldown", "1d"));
 		double chance 			= config.getDouble("Schedule.TriggerChance", 0.5);
 
@@ -31,11 +31,11 @@ public class WorldEventScheduleStrategyFactory {
 					cooldown
 			);
 			case IN_GAME_DAYS -> new EveryInGameDaysStrategy(
-				timeOfDay,
-				repeatDuration,
-				offsetDuration,
-				chance,
-				cooldown
+					timeOfDay,
+					repeatDuration,
+					offsetDuration,
+					chance,
+					cooldown
 			);
 		};
 	}

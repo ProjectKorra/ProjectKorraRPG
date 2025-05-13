@@ -240,7 +240,7 @@ public class ConfigManager {
 
             config.addDefault("Schedule.At", "7am");
             config.addDefault("Schedule.Repeat", "7d");
-            config.addDefault("Schedule.Calendar", "INGAME");
+            config.addDefault("Schedule.Calendar", "REALTIME");
             config.addDefault("Schedule.Offset", "3d12h");
             config.addDefault("Schedule.TriggerChance", "0.1");
             config.addDefault("Schedule.Cooldown", "60d");

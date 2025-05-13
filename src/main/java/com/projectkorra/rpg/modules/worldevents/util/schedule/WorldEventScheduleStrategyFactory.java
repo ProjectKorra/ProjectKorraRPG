@@ -1,6 +1,5 @@
 package com.projectkorra.rpg.modules.worldevents.util.schedule;
 
-import com.projectkorra.rpg.modules.worldevents.util.schedule.WorldEventScheduleStrategy;
 import com.projectkorra.rpg.modules.worldevents.util.schedule.strategies.AtTimeStrategy;
 import com.projectkorra.rpg.modules.worldevents.util.schedule.strategies.EveryInGameDaysStrategy;
 import com.projectkorra.rpg.modules.worldevents.util.schedule.strategies.EveryRealWorldDaysStrategy;

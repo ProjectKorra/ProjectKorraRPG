@@ -1,6 +1,8 @@
 package com.projectkorra.rpg.modules;
 
+import com.projectkorra.rpg.ProjectKorraRPG;
 import com.projectkorra.rpg.configuration.ConfigManager;
+import org.bukkit.event.Listener;
 
 public abstract class Module {
     private final String name;
@@ -12,6 +14,12 @@ public abstract class Module {
     public abstract void enable();
 
     public abstract void disable();
+
+    public void registerListeners(Listener... l) {
+        for (Listener listener : l) {
+            ProjectKorraRPG.getPlugin().getServer().getPluginManager().registerEvents(listener, ProjectKorraRPG.getPlugin());
+        }
+    }
 
     public String getName() {
         return this.name;

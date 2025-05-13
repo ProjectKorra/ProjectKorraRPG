@@ -3,11 +3,12 @@ package com.projectkorra.rpg.modules.worldevents.util.schedule;
 import com.projectkorra.rpg.ProjectKorraRPG;
 import com.projectkorra.rpg.modules.worldevents.WorldEvent;
 import com.projectkorra.rpg.modules.worldevents.listeners.WorldEventScheduleListener;
-import com.projectkorra.rpg.modules.worldevents.util.schedule.WorldEventScheduleStrategy;
-import com.projectkorra.rpg.modules.worldevents.util.schedule.WorldEventScheduleStrategyFactory;
 import org.bukkit.plugin.Plugin;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class WorldEventScheduler {
 	private final Plugin plugin = ProjectKorraRPG.getPlugin();
@@ -15,7 +16,6 @@ public class WorldEventScheduler {
 
 	public WorldEventScheduler() {
 		initStrategies();
-		plugin.getServer().getPluginManager().registerEvents(new WorldEventScheduleListener(plugin, strategies), plugin);
 	}
 
 	private void initStrategies() {
@@ -35,5 +35,7 @@ public class WorldEventScheduler {
 			strategy.scheduleNext(event, plugin);
 			strategies.put(event, Collections.singletonList(strategy));
 		}
+
+		plugin.getServer().getPluginManager().registerEvents(new WorldEventScheduleListener(plugin, strategies), plugin);
 	}
 }

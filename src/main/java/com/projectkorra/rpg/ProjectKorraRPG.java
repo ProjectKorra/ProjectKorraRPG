@@ -30,19 +30,20 @@ public class ProjectKorraRPG extends JavaPlugin {
 			luckPermsAPI = provider.getProvider();
 		}
 
-		// DEFAULT INITS
+		// Default Command Instantiations
 		new ConfigManager();
 		new RPGCommandBase();
 		new HelpCommand();
 
-		// No need to init all other commands here, since we are doing it in ModuleManager.enable()
+		// No need to instantiate other commands, since we are doing it in Module.enable()
 		moduleManager.enableModules();
 
-		// METRICS
+		// Metrics
 		try {
-			new MetricsLite(this).start();
+			MetricsLite metrics = new MetricsLite(plugin);
+			metrics.start();
 		} catch (IOException e) {
-			getLogger().severe("Failed to load metric stats" + e.getMessage());
+			getLogger().severe("Failed to submit stats to bStats!" + e.getMessage());
 		}
 	}
 

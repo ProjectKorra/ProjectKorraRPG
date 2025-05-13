@@ -1,8 +1,8 @@
 package com.projectkorra.rpg.modules.worldevents.util.display.chat;
 
-import com.projectkorra.projectkorra.util.ChatUtil;
 import com.projectkorra.rpg.modules.worldevents.WorldEvent;
 import com.projectkorra.rpg.modules.worldevents.util.display.IWorldEventDisplay;
+import com.projectkorra.rpg.util.ChatUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 

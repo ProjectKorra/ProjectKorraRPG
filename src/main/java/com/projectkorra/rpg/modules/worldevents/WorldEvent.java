@@ -7,10 +7,10 @@ import com.projectkorra.rpg.modules.worldevents.event.WorldEventStopEvent;
 import com.projectkorra.rpg.modules.worldevents.util.display.IWorldEventDisplay;
 import com.projectkorra.rpg.modules.worldevents.util.display.bossbar.BossBarDisplay;
 import com.projectkorra.rpg.modules.worldevents.util.display.bossbar.WorldEventBossBar;
-import com.projectkorra.rpg.modules.worldevents.util.schedule.WorldEventTimer;
 import com.projectkorra.rpg.modules.worldevents.util.display.chat.ChatDisplay;
 import com.projectkorra.rpg.modules.worldevents.util.display.none.NoDisplay;
 import com.projectkorra.rpg.modules.worldevents.util.display.scoreboard.ScoreboardDisplay;
+import com.projectkorra.rpg.modules.worldevents.util.schedule.WorldEventTimer;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
@@ -119,18 +119,13 @@ public class WorldEvent {
 	 * Stop active WorldEvent
 	 */
 	public void stopEvent() {
-		if (!getActiveEvents().contains(this)) {
-			ProjectKorraRPG.getPlugin().getLogger().info("WorldEvent isn't active therefore can't be stopped.");
-			return;
-		}
-
 		Bukkit.getPluginManager().callEvent(new WorldEventStopEvent(this));
 		getActiveEvents().remove(this);
 
 		// Play EventStop sound for each player in active WorldEvent world
 		for (Player player : getWorld().getPlayers()) {
 			if (getConfig().getBoolean("PlayEventStopSound")) {
-				String soundName = getConfig().getString("EventStop.Sound", "ENTITY_EXPERIENCE_ORB_PICKUP"); // Default in case user doesn't use sound from Sound enum
+				String soundName = getConfig().getString("EventStop.Sound", "ENTITY_EXPERIENCE_ORB_PICKUP");
 
 				Sound eventStopSound = Sound.valueOf(soundName.toUpperCase());
 				float volume = (float) getConfig().getDouble("EventStop.Volume", 1.0);

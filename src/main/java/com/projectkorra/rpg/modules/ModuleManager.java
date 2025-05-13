@@ -1,16 +1,15 @@
 package com.projectkorra.rpg.modules;
 
-import com.projectkorra.rpg.modules.Module;
-import com.projectkorra.rpg.modules.worldevents.WorldEvents;
+import com.projectkorra.rpg.modules.elementassignments.ElementAssignments;
 import com.projectkorra.rpg.modules.leveling.RPGLeveling;
 import com.projectkorra.rpg.modules.randomavatar.RandomAvatar;
-import com.projectkorra.rpg.modules.elementassignments.ElementAssignments;
+import com.projectkorra.rpg.modules.worldevents.WorldEvents;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class ModuleManager {
-	private final List<com.projectkorra.rpg.modules.Module> modules = new ArrayList<>();
+	private final List<Module> modules = new ArrayList<>();
 
 	private final WorldEvents worldEventsModule;
 	private final RPGLeveling rpgLevelingModule;
@@ -25,7 +24,7 @@ public class ModuleManager {
 	}
 
 	public void enableModules() {
-		for (com.projectkorra.rpg.modules.Module module : modules) {
+		for (Module module : modules) {
 			if (module.isEnabled()) {
 				module.enable();
 			}
@@ -33,7 +32,7 @@ public class ModuleManager {
 	}
 
 	public void disableModules() {
-		for (com.projectkorra.rpg.modules.Module module : modules) {
+		for (Module module : modules) {
 			module.disable();
 		}
 	}
@@ -43,18 +42,30 @@ public class ModuleManager {
 	}
 
 	public WorldEvents getWorldEventsModule() {
-		return worldEventsModule;
+		if (worldEventsModule.isEnabled()) {
+			return worldEventsModule;
+		}
+		throw new NullPointerException("WorldEvents Module is disabled! Enable it in config.yml");
 	}
 
 	public RPGLeveling getRpgLevelingModule() {
-		return rpgLevelingModule;
+		if (rpgLevelingModule.isEnabled()) {
+			return rpgLevelingModule;
+		}
+		throw new NullPointerException("Level Module is disabled! Enable it in config.yml");
 	}
 
 	public RandomAvatar getRandomAvatarModule() {
-		return randomAvatarModule;
+		if (randomAvatarModule.isEnabled()) {
+			return randomAvatarModule;
+		}
+		throw new NullPointerException("AvatarCycle Module is disabled! Enable it in config.yml");
 	}
 
 	public ElementAssignments getElementAssignmentsModule() {
-		return elementAssignmentsModule;
+		if (elementAssignmentsModule.isEnabled()) {
+			return elementAssignmentsModule;
+		}
+		throw new NullPointerException("ElementAssign Module is disabled! Enable it in config.yml");
 	}
 }

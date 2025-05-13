@@ -1,16 +1,24 @@
 package com.projectkorra.rpg.modules.leveling.rpgplayer;
 
 import com.projectkorra.projectkorra.BendingPlayer;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-public class RpgPlayer extends BendingPlayer {
+import java.util.UUID;
+
+public class RpgPlayer {
+    private final UUID uuid;
     private final int level;
     private final double xp;
 
-    public RpgPlayer(Player player, int level, double xp) {
-        super(player);
+    public RpgPlayer(UUID uuid, int level, double xp) {
+        this.uuid = uuid;
         this.level = level;
         this.xp = xp;
+    }
+
+    public UUID getUuid() {
+        return uuid;
     }
 
     public int getLevel() {
@@ -19,5 +27,13 @@ public class RpgPlayer extends BendingPlayer {
 
     public double getXp() {
         return this.xp;
+    }
+
+    private Player asPlayer() {
+        return Bukkit.getPlayer(uuid);
+    }
+
+    public BendingPlayer asBendingPlayer() {
+        return BendingPlayer.getBendingPlayer(asPlayer());
     }
 }

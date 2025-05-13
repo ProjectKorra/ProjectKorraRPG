@@ -1,6 +1,7 @@
-package com.projectkorra.rpg.commands;
+package com.projectkorra.rpg.modules.randomavatar.commands;
 
 import com.projectkorra.rpg.ProjectKorraRPG;
+import com.projectkorra.rpg.commands.RPGCommand;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -10,7 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AvatarCommand extends RPGCommand {
-
     public AvatarCommand() {
         super("avatar", "/bending rpg avatar <Player>", "This command defines a player as the avatar and gives them all the elements and other perks.", new String[]{"avatar", "av", "avy"});
     }

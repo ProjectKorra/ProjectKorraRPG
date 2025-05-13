@@ -1,9 +1,7 @@
 package com.projectkorra.rpg.configuration;
 
 import com.projectkorra.projectkorra.Element;
-import com.projectkorra.projectkorra.attribute.Attribute;
 import com.projectkorra.projectkorra.configuration.ConfigType;
-import com.projectkorra.rpg.configuration.Config;
 import org.bukkit.Sound;
 import org.bukkit.configuration.file.FileConfiguration;
 
@@ -15,14 +13,14 @@ public class ConfigManager {
     private static final ConfigType LANGUAGE = new ConfigType("Language");
     private static final ConfigType WORLDEVENTS = new ConfigType("WorldEvents");
 
-    public static com.projectkorra.rpg.configuration.Config config;
-    public static com.projectkorra.rpg.configuration.Config language;
-    public static com.projectkorra.rpg.configuration.Config sozinsComet;
+    public static Config config;
+    public static Config language;
+    public static Config sozinsComet;
 
     public ConfigManager() {
-        config = new com.projectkorra.rpg.configuration.Config(new File("config.yml"));
-        language = new com.projectkorra.rpg.configuration.Config(new File("language.yml"));
-        sozinsComet = new com.projectkorra.rpg.configuration.Config(new File("WorldEvents/SozinsComet.yml"));
+        config = new Config(new File("config.yml"));
+        language = new Config(new File("language.yml"));
+        sozinsComet = new Config(new File("WorldEvents/SozinsComet.yml"));
 
         configCheck(DEFAULT);
         configCheck(LANGUAGE);
@@ -220,6 +218,13 @@ public class ConfigManager {
 
         } else if (type == LANGUAGE) {
             config = language.get();
+
+            config.addDefault("Chat.Branding.Color", "LIGHT_PURPLE");
+            config.addDefault("Chat.Branding.ChatPrefix.Prefix", "");
+            config.addDefault("Chat.Branding.ChatPrefix.Main", "RPG");
+            config.addDefault("Chat.Branding.ChatPrefix.Suffix", " \u00BB ");
+            config.addDefault("Chat.Branding.ChatPrefix.Hover", "Bending brought to you by ProjectKorra!\\nClick for more info.");
+            config.addDefault("Chat.Branding.ChatPrefix.Click", "https://projectkorra.com");
 
             config.options().copyDefaults(true);
             language.save();

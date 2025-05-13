@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AssignmentGroup {
-
     private String name;
     private List<Element> elements;
     private double weight;
@@ -31,7 +30,6 @@ public class AssignmentGroup {
             }
         }
     }
-
 
     public String getName() {
         return name;

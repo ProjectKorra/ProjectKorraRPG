@@ -13,6 +13,8 @@ import java.time.Instant;
 import java.util.Optional;
 import java.util.logging.Level;
 
+import static com.projectkorra.rpg.storage.TableCreator.RPG_SCHEDULE_TABLE;
+
 public class ScheduleStorage extends DBConnection {
     /**
      * Gets the last time a specific world event was triggered.
@@ -29,7 +31,7 @@ public class ScheduleStorage extends DBConnection {
                 throw new SQLException("Could not get database connection");
             }
             
-            final String query = "SELECT last_triggered FROM " + TABLE_NAME + " WHERE worldevent = ?";
+            final String query = "SELECT last_triggered FROM " + RPG_SCHEDULE_TABLE + " WHERE worldevent = ?";
             PreparedStatement ps = conn.prepareStatement(query);
             ps.setString(1, worldEventKey);
 
@@ -68,7 +70,7 @@ public class ScheduleStorage extends DBConnection {
             }
             
             // First, check if the event record exists
-            PreparedStatement checkPs = conn.prepareStatement("SELECT id FROM " + TABLE_NAME + " WHERE worldevent = ?");
+            PreparedStatement checkPs = conn.prepareStatement("SELECT id FROM " + RPG_SCHEDULE_TABLE + " WHERE worldevent = ?");
             checkPs.setString(1, worldEventKey);
             ResultSet rs = checkPs.executeQuery();
             
@@ -80,14 +82,14 @@ public class ScheduleStorage extends DBConnection {
             
             if (recordExists) {
                 // Update existing record
-                updatePs = conn.prepareStatement("UPDATE " + TABLE_NAME + " SET last_triggered = ? WHERE worldevent = ?");
+                updatePs = conn.prepareStatement("UPDATE " + RPG_SCHEDULE_TABLE + " SET last_triggered = ? WHERE worldevent = ?");
                 updatePs.setTimestamp(1, Timestamp.from(timeToRecord));
                 updatePs.setString(2, worldEventKey);
 
                 updatePs.executeUpdate();
             } else {
                 // Insert a new record
-                updatePs = conn.prepareStatement("INSERT INTO " + TABLE_NAME + " (worldevent, last_triggered) VALUES (?, ?)");
+                updatePs = conn.prepareStatement("INSERT INTO " + RPG_SCHEDULE_TABLE + " (worldevent, last_triggered) VALUES (?, ?)");
                 updatePs.setString(1, worldEventKey);
                 updatePs.setTimestamp(2, Timestamp.from(timeToRecord));
 

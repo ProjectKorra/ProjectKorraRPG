@@ -5,8 +5,8 @@ import com.projectkorra.projectkorra.storage.MySQL;
 import com.projectkorra.rpg.ProjectKorraRPG;
 
 public class TableCreator extends DBConnection {
-    private static final String RPG_PLAYER_TABLE = "pkrpg_players";
-    private static final String RPG_SCHEDULE_TABLE = "pkrpg_schedule";
+    public static final String RPG_PLAYER_TABLE = "pkrpg_players";
+    public static final String RPG_SCHEDULE_TABLE = "pkrpg_schedule";
 
     public TableCreator() {
         this.createRpgPlayerTable();

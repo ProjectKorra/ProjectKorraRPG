@@ -54,8 +54,6 @@ public class WorldEventModule extends Module {
 
 		// Stop all active events
 		try {
-			int activeCount = WorldEvent.getActiveEvents().size();
-			ProjectKorraRPG.getPlugin().getLogger().info("Stopping " + activeCount + " active WorldEvents...");
 			new ArrayList<>(WorldEvent.getActiveEvents()).forEach( WorldEvent::stopEvent);
 		} catch (Exception e) {
 			ProjectKorraRPG.getPlugin().getLogger().severe("Failed to stop all active events!" + e.getMessage());

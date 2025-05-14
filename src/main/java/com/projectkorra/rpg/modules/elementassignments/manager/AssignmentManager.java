@@ -31,26 +31,26 @@ public class AssignmentManager {
 
     public AssignmentManager() {
 
-        if (ConfigManager.config.get().getBoolean("Modules.ElementAssignments.Enabled")) {
+        if (ConfigManager.defaultConfig.get().getBoolean("Modules.ElementAssignments.Enabled")) {
             setEnabled(true);
             // Get the default group from the configuration
-            defaultElement = ConfigManager.config.get().getString("Modules.ElementAssignments.Default");
-            changeOnDeathEnabled = ConfigManager.config.get().getBoolean("Modules.ElementAssignments.ChangeOnDeath.Enabled");
-            changeOnDeathBypass = ConfigManager.config.get().getBoolean("Modules.ElementAssignments.ChangeOnDeath.Bypass");
-            changeOnDeathPermission = ConfigManager.config.get().getString("Modules.ElementAssignments.ChangeOnDeath.Permission");
-            chance = ConfigManager.config.get().getDouble("Modules.ElementAssignments.ChangeOnDeath.Chance");
+            defaultElement = ConfigManager.defaultConfig.get().getString("Modules.ElementAssignments.Default");
+            changeOnDeathEnabled = ConfigManager.defaultConfig.get().getBoolean("Modules.ElementAssignments.ChangeOnDeath.Enabled");
+            changeOnDeathBypass = ConfigManager.defaultConfig.get().getBoolean("Modules.ElementAssignments.ChangeOnDeath.Bypass");
+            changeOnDeathPermission = ConfigManager.defaultConfig.get().getString("Modules.ElementAssignments.ChangeOnDeath.Permission");
+            chance = ConfigManager.defaultConfig.get().getDouble("Modules.ElementAssignments.ChangeOnDeath.Chance");
 
             // Create a list to hold enabled groups with their weights
-            ConfigurationSection groupsSection = ConfigManager.config.get().getConfigurationSection("Modules.ElementAssignments.Groups");
+            ConfigurationSection groupsSection = ConfigManager.defaultConfig.get().getConfigurationSection("Modules.ElementAssignments.Groups");
             // Loop through each group in the configuration
 			for (String groupKey : groupsSection.getKeys(false)) {
-                boolean groupEnabled = ConfigManager.config.get().getBoolean("Modules.ElementAssignments.Groups." + groupKey + ".Enabled");
+                boolean groupEnabled = ConfigManager.defaultConfig.get().getBoolean("Modules.ElementAssignments.Groups." + groupKey + ".Enabled");
                 if (groupEnabled) {
-                    double weight = ConfigManager.config.get().getDouble("Modules.ElementAssignments.Groups." + groupKey + ".Weight");
-                    List<String> elements = ConfigManager.config.get().getStringList("Modules.ElementAssignments.Groups." + groupKey + ".Elements");
-                    String prefix = ConfigManager.config.get().getString("Modules.ElementAssignments.Groups." + groupKey + ".Prefix");
-                    List<String> commandsToRun = ConfigManager.config.get().getStringList("Modules.ElementAssignments.Groups." + groupKey + ".Commands");
-                    String permissionGroup = ConfigManager.config.get().getString("Modules.ElementAssignments.Groups." + groupKey + ".PermissionGroup");
+                    double weight = ConfigManager.defaultConfig.get().getDouble("Modules.ElementAssignments.Groups." + groupKey + ".Weight");
+                    List<String> elements = ConfigManager.defaultConfig.get().getStringList("Modules.ElementAssignments.Groups." + groupKey + ".Elements");
+                    String prefix = ConfigManager.defaultConfig.get().getString("Modules.ElementAssignments.Groups." + groupKey + ".Prefix");
+                    List<String> commandsToRun = ConfigManager.defaultConfig.get().getStringList("Modules.ElementAssignments.Groups." + groupKey + ".Commands");
+                    String permissionGroup = ConfigManager.defaultConfig.get().getString("Modules.ElementAssignments.Groups." + groupKey + ".PermissionGroup");
                     permissionGroups.add(permissionGroup);
                     totalWeight = totalWeight + weight;
                     AssignmentGroup group = new AssignmentGroup(groupKey, elements, weight, true, prefix, commandsToRun, permissionGroup);

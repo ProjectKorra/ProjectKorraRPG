@@ -53,7 +53,7 @@ public class AvatarManager {
     private final Set<Element.SubElement> subElementBlacklist = new HashSet<>();
 
     public AvatarManager() {
-        FileConfiguration config = ConfigManager.config.get();
+        FileConfiguration config = ConfigManager.defaultConfig.get();
         enabled = config.getBoolean("Modules.RandomAvatar.Enabled");
         recentPlayers = new HashSet<>();
         maxAvatars = config.getInt("Modules.RandomAvatar.MaxAvatars");

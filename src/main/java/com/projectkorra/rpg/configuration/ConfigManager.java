@@ -13,14 +13,14 @@ public class ConfigManager {
     private static final ConfigType LANGUAGE = new ConfigType("Language");
     private static final ConfigType WORLDEVENTS = new ConfigType("WorldEvents");
 
-    public static Config config;
-    public static Config language;
-    public static Config sozinsComet;
+    public static Config defaultConfig;
+    public static Config languageConfig;
+    public static Config sozinsCometConfig;
 
     public ConfigManager() {
-        config = new Config(new File("config.yml"));
-        language = new Config(new File("language.yml"));
-        sozinsComet = new Config(new File("WorldEvents/SozinsComet.yml"));
+        defaultConfig = new Config(new File("config.yml"));
+        languageConfig = new Config(new File("language.yml"));
+        sozinsCometConfig = new Config(new File("WorldEvents/SozinsComet.yml"));
 
         configCheck(DEFAULT);
         configCheck(LANGUAGE);
@@ -28,7 +28,7 @@ public class ConfigManager {
     }
 
     private static void addDefaultElementAssignGroup(String groupName, boolean enabled, List<String> elements, double weight, String prefix, List<String> commands, String permissionGroup) {
-        FileConfiguration config = ConfigManager.config.get();
+        FileConfiguration config = ConfigManager.defaultConfig.get();
 
         config.addDefault("Modules.ElementAssignments.Groups." + groupName + ".Enabled", enabled);
         config.addDefault("Modules.ElementAssignments.Groups." + groupName + ".Elements", elements);
@@ -38,14 +38,10 @@ public class ConfigManager {
         config.addDefault("Modules.ElementAssignments.Groups." + groupName + ".PermissionGroup", permissionGroup);
     }
 
-    public static FileConfiguration getFileConfig() {
-        return config.get();
-    }
-
     public void configCheck(ConfigType type) {
         FileConfiguration config;
         if (type == DEFAULT) {
-            config = ConfigManager.config.get();
+            config = ConfigManager.defaultConfig.get();
 
             // -------------------------------- Randomized Avatar  ---------------------------------
 
@@ -214,10 +210,10 @@ public class ConfigManager {
             });
             config.options().copyDefaults(true);
             config.options().parseComments(true);
-            ConfigManager.config.save();
+            ConfigManager.defaultConfig.save();
 
         } else if (type == LANGUAGE) {
-            config = language.get();
+            config = languageConfig.get();
 
             config.addDefault("Chat.Branding.Color", "LIGHT_PURPLE");
             config.addDefault("Chat.Branding.ChatPrefix.Prefix", "");
@@ -227,9 +223,9 @@ public class ConfigManager {
             config.addDefault("Chat.Branding.ChatPrefix.Click", "https://projectkorra.com");
 
             config.options().copyDefaults(true);
-            language.save();
+            languageConfig.save();
         } else if (type == WORLDEVENTS) {
-            config = sozinsComet.get();
+            config = sozinsCometConfig.get();
 
             List<String> disabledWorlds = new ArrayList<>();
             disabledWorlds.add("none");
@@ -273,18 +269,16 @@ public class ConfigManager {
             config.addDefault("Abilities.Fire.WallOfFire.Height", "x2.0");
 
             config.options().copyDefaults(true);
-            sozinsComet.save();
+            sozinsCometConfig.save();
         }
 
     }
 
-    public static Config getConfig() {
-        return config;
+    public static FileConfiguration getDefaultFileConfig() {
+        return defaultConfig.get();
     }
 
-    public static void reloadConfigs() {
-        config.reload();
-        language.reload();
-        sozinsComet.reload();
+    public static FileConfiguration getLanguageFileConfig() {
+        return languageConfig.get();
     }
 }

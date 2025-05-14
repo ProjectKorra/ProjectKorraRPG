@@ -4,7 +4,6 @@ import com.projectkorra.projectkorra.event.BendingReloadEvent;
 import com.projectkorra.rpg.commands.HelpCommand;
 import com.projectkorra.rpg.commands.RPGCommandBase;
 import com.projectkorra.rpg.configuration.ConfigManager;
-import com.projectkorra.rpg.modules.worldevents.WorldEvent;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -12,8 +11,14 @@ import org.bukkit.scheduler.BukkitRunnable;
 public class RPGListener implements Listener {
 	@EventHandler
 	public void onBendingConfigReload(BendingReloadEvent event) {
-		ConfigManager.reloadConfigs();
+		// Disable all enabled modules for clear module start
+		ProjectKorraRPG.getPlugin().getModuleManager().disableModules();
 
+		// Reload configs
+		ConfigManager.defaultConfig.reload();
+		ConfigManager.languageConfig.reload();
+
+		// Instantiate BaseCommands (tick later because of Bukkit "limitation")
 		new BukkitRunnable() {
 			@Override
 			public void run() {
@@ -21,10 +26,6 @@ public class RPGListener implements Listener {
 				new HelpCommand();
 			}
 		}.runTaskLater(ProjectKorraRPG.getPlugin(), 20);
-
-		for (WorldEvent worldEvent : WorldEvent.getActiveEvents()) {
-			worldEvent.stopEvent();
-		}
 
 		ProjectKorraRPG.getPlugin().getModuleManager().enableModules();
 	}

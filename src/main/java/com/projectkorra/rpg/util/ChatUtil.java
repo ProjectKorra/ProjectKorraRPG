@@ -40,7 +40,7 @@ public class ChatUtil {
 	 */
 	public static void sendBrandingMessage(final CommandSender receiver, final BaseComponent message) {
 		FileConfiguration coreLanguageConfig = com.projectkorra.projectkorra.configuration.ConfigManager.languageConfig.get();
-		FileConfiguration addonLanguageConfig = ConfigManager.language.get();
+		FileConfiguration addonLanguageConfig = ConfigManager.languageConfig.get();
 
 		ChatColor coreColor = ChatColor.of(coreLanguageConfig.getString("Chat.Branding.Color", "GOLD").toUpperCase());
 		ChatColor addonColor = ChatColor.of(addonLanguageConfig.getString("Chat.Branding.Color", "LIGHT_PURPLE").toUpperCase());

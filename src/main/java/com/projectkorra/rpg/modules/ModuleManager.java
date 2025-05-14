@@ -45,27 +45,27 @@ public class ModuleManager {
 		if (worldEventModuleModule.isEnabled()) {
 			return worldEventModuleModule;
 		}
-		throw new NullPointerException("WorldEvents Module is disabled! Enable it in config.yml");
+		throw new IllegalStateException("WorldEvents Module is disabled! Enable it in config.yml");
 	}
 
 	public LevelingModule getRpgLevelingModule() {
 		if (levelingModuleModule.isEnabled()) {
 			return levelingModuleModule;
 		}
-		throw new NullPointerException("Level Module is disabled! Enable it in config.yml");
+		throw new IllegalStateException("Level Module is disabled! Enable it in config.yml");
 	}
 
 	public AvatarCycleModule getRandomAvatarModule() {
 		if (avatarCycleModule.isEnabled()) {
 			return avatarCycleModule;
 		}
-		throw new NullPointerException("AvatarCycle Module is disabled! Enable it in config.yml");
+		throw new IllegalStateException("AvatarCycle Module is disabled! Enable it in config.yml");
 	}
 
 	public ElementAssignModule getElementAssignmentsModule() {
 		if (elementAssignModule.isEnabled()) {
 			return elementAssignModule;
 		}
-		throw new NullPointerException("ElementAssign Module is disabled! Enable it in config.yml");
+		throw new IllegalStateException("ElementAssign Module is disabled! Enable it in config.yml");
 	}
 }

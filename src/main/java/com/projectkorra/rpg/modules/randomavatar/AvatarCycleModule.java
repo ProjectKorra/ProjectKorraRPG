@@ -18,7 +18,7 @@ public class AvatarCycleModule extends Module {
     public void enable() {
         this.avatarManager = new AvatarManager();
 
-        new AvatarCommand();
+        new AvatarCommand(this.avatarManager);
 
         registerListeners(
                 new AvatarListener()

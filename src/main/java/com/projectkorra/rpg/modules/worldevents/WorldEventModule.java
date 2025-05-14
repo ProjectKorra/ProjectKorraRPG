@@ -38,17 +38,18 @@ public class WorldEventModule extends Module {
 
 		// Scheduler to make events start based on config
 		this.worldEventScheduler = new WorldEventScheduler();
-		ProjectKorraRPG.getPlugin().getLogger().info("WorldEvent module enabled successfully");
+
+		ProjectKorraRPG.getPlugin().getLogger().info("WorldEvent module enabled successfully!");
 	}
 
 	@Override
 	public void disable() {
 		ProjectKorraRPG.getPlugin().getLogger().info("Disabling WorldEvent module...");
 
+		// Cleanup Scheduler
 		if (this.worldEventScheduler != null) {
 			this.worldEventScheduler.cleanup();
 			this.worldEventScheduler = null;
-			ProjectKorraRPG.getPlugin().getLogger().info("WorldEvent scheduler cleaned up");
 		}
 
 		// Stop all active events
@@ -60,10 +61,10 @@ public class WorldEventModule extends Module {
 			ProjectKorraRPG.getPlugin().getLogger().severe("Failed to stop all active events!" + e.getMessage());
 		}
 
+		// Unregister ModificationListener
 		if (this.modificationListener != null) {
 			HandlerList.unregisterAll(this.modificationListener);
 			this.modificationListener = null;
-			ProjectKorraRPG.getPlugin().getLogger().info("WorldEvent modification listener unregistered");
 		}
 
 		// Clear Worldevent maps
@@ -71,7 +72,7 @@ public class WorldEventModule extends Module {
 		WorldEvent.getAllEvents().clear();
 		WorldEvent.getAffectedPlayers().clear();
 
-		ProjectKorraRPG.getPlugin().getLogger().info("WorldEvent module disabled successfully");
+		ProjectKorraRPG.getPlugin().getLogger().info("WorldEvent module disabled successfully!");
 	}
 
 	public WorldEventScheduler getWorldEventScheduler() {

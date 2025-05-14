@@ -68,15 +68,17 @@ public class WorldEvent {
 		// Add all online players in the world to the Set
 		// And play Sound if user configured
 		for (Player player : Bukkit.getOnlinePlayers()) {
-			getAffectedPlayers().add(player);
-			if (getConfig().getBoolean("PlayEventStartSound")) {
-				String soundName = getConfig().getString("EventStart.Sound", "ENTITY_EXPERIENCE_ORB_PICKUP");
+			if (player.getWorld() == this.getWorld()) {
+				getAffectedPlayers().add(player);
+				if (getConfig().getBoolean("PlayEventStartSound")) {
+					String soundName = getConfig().getString("EventStart.Sound", "ENTITY_EXPERIENCE_ORB_PICKUP");
 
-				Sound eventStartSound = Sound.valueOf(soundName);
-				float volume = (float) getConfig().getDouble("EventStart.Volume");
-				float pitch = (float) getConfig().getDouble("EventStart.Pitch");
+					Sound eventStartSound = Sound.valueOf(soundName);
+					float volume = (float) getConfig().getDouble("EventStart.Volume");
+					float pitch = (float) getConfig().getDouble("EventStart.Pitch");
 
-				player.getWorld().playSound(player.getLocation(), eventStartSound, volume, pitch);
+					this.world.playSound(player.getLocation(), eventStartSound, volume, pitch);
+				}
 			}
 		}
 

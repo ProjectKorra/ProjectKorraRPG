@@ -30,6 +30,7 @@ public class WorldEventScheduleStrategyFactory {
 					chance,
 					cooldown
 			);
+
 			case IN_GAME_DAYS -> new EveryInGameDaysStrategy(
 					timeOfDay,
 					repeatDuration,

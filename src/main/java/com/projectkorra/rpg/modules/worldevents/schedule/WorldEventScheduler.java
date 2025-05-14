@@ -6,21 +6,24 @@ import com.projectkorra.rpg.modules.worldevents.listeners.WorldEventScheduleList
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.Plugin;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class WorldEventScheduler {
 	private final Plugin plugin = ProjectKorraRPG.getPlugin();
-	private final Map<WorldEvent, List<WorldEventScheduleStrategy>> strategies = new HashMap<>();
+	private final Map<WorldEvent, ScheduledEventContext> scheduledEvents = new ConcurrentHashMap<>();
 	private WorldEventScheduleListener worldEventScheduleListener;
 
-	public WorldEventScheduler() {
-		initStrategies();
+	public WorldEventScheduler(WorldEventScheduleListener worldEventScheduleListener) {
+		this.worldEventScheduleListener = worldEventScheduleListener;
+
+		initSchedules();
 	}
 
-	private void initStrategies() {
+	/**
+	 * Initialize all world event schedules
+	 */
+	private void initSchedules() {
 		// Clean up any existing strategies before initializing new ones
 		cleanup();
 
@@ -28,45 +31,126 @@ public class WorldEventScheduler {
 
 		// Process each registered WorldEvent
 		for (WorldEvent event : WorldEvent.getAllEvents().values()) {
-			if (event.getWorld() == null) {
-				this.plugin.getLogger().warning("WorldEvent " + event.getKey() + " has no valid world - skipping scheduling.");
-				continue;
+			try {
+				scheduleEvent(event);
+			} catch (Exception e) {
+				this.plugin.getLogger().severe("Failed to schedule event: " + event.getKey() + e.getMessage());
 			}
-
-			WorldEventScheduleStrategy strategy = WorldEventScheduleStrategyFactory.get(event.getConfig());
-
-			this.strategies.put(event, Collections.singletonList(strategy));
-			this.plugin.getLogger().info("Scheduling event: " + event.getKey() + " with strategy: " + strategy.getClass().getSimpleName());
-			strategy.scheduleNext(event, this.plugin);
-		}
-
-		if (!this.strategies.isEmpty()) {
-			this.worldEventScheduleListener = new WorldEventScheduleListener(this.plugin, this.strategies);
-			this.plugin.getServer().getPluginManager().registerEvents(this.worldEventScheduleListener, this.plugin);
-			this.plugin.getLogger().info("WorldEventScheduler initialized");
-		} else {
-			this.plugin.getLogger().info("WorldEventScheduler initialized but no events were scheduled");
 		}
 	}
 
+	/**
+	 * Schedule a single world event
+	 */
+	private void scheduleEvent(WorldEvent event) {
+		cancelEvent(event);
+
+		// Create a new strategy based on WorldEvent configuration
+		WorldEventScheduleStrategy scheduleStrategy = WorldEventScheduleStrategyFactory.get(event.getConfig());
+
+		// Store the event context
+		ScheduledEventContext context = new ScheduledEventContext(event, scheduleStrategy);
+		this.scheduledEvents.put(event, context);
+
+		this.plugin.getLogger().info("Scheduling event: " + event.getKey() + " with strategy: " + scheduleStrategy.getClass().getSimpleName());
+
+		// Start the schedule
+		scheduleStrategy.scheduleNext(event, this.plugin);
+		context.setActive(true);
+	}
+
+	/**
+	 * Reschedule an event after it has stopped
+	 */
+	public void rescheduleEvent(WorldEvent event) {
+		ScheduledEventContext context = this.scheduledEvents.get(event);
+		if (context != null && context.isActive()) {
+			plugin.getLogger().info("Rescheduling event: " + event.getKey());
+			context.getStrategy().scheduleNext(context.getEvent(), this.plugin);;
+		}
+	}
+
+	/**
+	 * Cancel a scheduling for a specific event
+	 */
+	public void cancelEvent(WorldEvent event) {
+		ScheduledEventContext context = this.scheduledEvents.get(event);
+		if (context != null) {
+			context.getStrategy().cancelSchedule();
+			context.setActive(false);
+			plugin.getLogger().info("Cancelled schedule for event: " + event.getKey());
+		}
+	}
+
+	/**
+	 * Set an event as active or inactive
+	 */
+	public void setEventActive(WorldEvent event, boolean active) {
+		ScheduledEventContext context = this.scheduledEvents.get(event);
+		if (context != null) {
+			context.setActive(active);
+		}
+	}
+
+	/**
+	 * Check if an event is currently scheduled
+	 */
+	public boolean isEventScheduled(WorldEvent event) {
+		ScheduledEventContext context = this.scheduledEvents.get(event);
+		return context != null && context.isActive();
+	}
+
+	/**
+	 * Clean up all scheduled events
+	 */
 	public void cleanup() {
 		this.plugin.getLogger().info("Cleaning up WorldEventScheduler...");
 
 		// Cancel all existing strategies
-		for (List<WorldEventScheduleStrategy> strategyList : this.strategies.values()) {
-			for (WorldEventScheduleStrategy strategy : strategyList) {
-				strategy.cancelSchedule();
+		for (ScheduledEventContext context : scheduledEvents.values()) {
+			try {
+				context.getStrategy().cancelSchedule();
+			} catch (Exception e) {
+				this.plugin.getLogger().severe("Failed to cancel strategy for event: " + context.getEvent().getKey() + e.getMessage());
 			}
 		}
-		this.strategies.clear();
+
+		scheduledEvents.clear();
 
 		// Unregister listener
 		if (this.worldEventScheduleListener != null) {
 			HandlerList.unregisterAll(this.worldEventScheduleListener);
 			this.worldEventScheduleListener = null;
-			this.plugin.getLogger().info("WorldEventScheduler listener unregistered.");
+		}
+	}
+
+	/**
+	 * ScheduledEventContext keeps all scheduling information about a single world event
+	 */
+	private static class ScheduledEventContext {
+		private final WorldEvent event;
+		private final WorldEventScheduleStrategy strategy;
+		private boolean active = false;
+
+		public ScheduledEventContext(WorldEvent event, WorldEventScheduleStrategy strategy) {
+			this.event = event;
+			this.strategy = strategy;
 		}
 
-		this.plugin.getLogger().info("WorldEventScheduler cleanup complete");
+		public WorldEvent getEvent() {
+			return event;
+		}
+
+		public WorldEventScheduleStrategy getStrategy() {
+			return strategy;
+		}
+
+		public boolean isActive() {
+			return active;
+		}
+
+		public void setActive(boolean active) {
+			this.active = active;
+		}
 	}
 }

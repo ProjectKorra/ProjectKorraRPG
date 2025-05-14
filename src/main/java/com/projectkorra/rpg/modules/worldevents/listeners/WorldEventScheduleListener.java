@@ -1,35 +1,32 @@
 package com.projectkorra.rpg.modules.worldevents.listeners;
 
 import com.projectkorra.rpg.modules.worldevents.WorldEvent;
+import com.projectkorra.rpg.modules.worldevents.event.WorldEventStartEvent;
 import com.projectkorra.rpg.modules.worldevents.event.WorldEventStopEvent;
-import com.projectkorra.rpg.modules.worldevents.schedule.WorldEventScheduleStrategy;
+import com.projectkorra.rpg.modules.worldevents.schedule.WorldEventScheduler;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.plugin.Plugin;
-
-import java.util.List;
-import java.util.Map;
 
 public class WorldEventScheduleListener implements Listener {
-	private final Plugin plugin;
-	private final Map<WorldEvent, List<WorldEventScheduleStrategy>> strategies;
+	private final WorldEventScheduler scheduler;
 
-	public WorldEventScheduleListener(Plugin plugin, Map<WorldEvent, List<WorldEventScheduleStrategy>> strategies) {
-		this.plugin = plugin;
-		this.strategies = strategies;
+	public WorldEventScheduleListener(WorldEventScheduler scheduler) {
+		this.scheduler = scheduler;
+	}
+
+	@EventHandler
+	public void onWorldEventStart(WorldEventStartEvent event) {
+		scheduler.setEventActive(event.getWorldEvent(), true);
 	}
 
 	@EventHandler
 	public void onWorldEventStop(WorldEventStopEvent event) {
 		WorldEvent worldEvent = event.getWorldEvent();
-		List<WorldEventScheduleStrategy> eventStrategies = this.strategies.get(worldEvent);
 
-		if (eventStrategies != null && !eventStrategies.isEmpty()) {
-			this.plugin.getLogger().info("WorldEvent " + worldEvent.getKey() + " stopped, rescheduling...");
+		// Mark the event as inactive
+		scheduler.setEventActive(worldEvent, false);
 
-			for (WorldEventScheduleStrategy strat : eventStrategies) {
-				strat.scheduleNext(worldEvent, this.plugin);
-			}
-		};
+		// Reschedule it
+		scheduler.rescheduleEvent(worldEvent);
 	}
 }

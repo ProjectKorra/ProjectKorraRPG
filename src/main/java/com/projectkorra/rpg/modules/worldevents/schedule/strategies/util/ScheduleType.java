@@ -11,13 +11,13 @@ public enum ScheduleType {
 
 		String lowercaseName = name.toLowerCase();
 
-		// Regex for REAL_DAYS to prevent user input failures
-		if (lowercaseName.matches("^real(-?days|-?time)$")) {
+		// Regex for REAL_DAYS to cover all possible variations
+		if (lowercaseName.matches("^(?:real)[-_\\s]?(?:world[-_\\s]?)?(?:days?|time|hours?|minutes?)$")) {
 			return REAL_DAYS;
 		}
 
-		// Regex for IN_GAME_DAYS to prevent user input failures
-		if (lowercaseName.matches("^in-?game(-?days|-?time)$")) {
+		// Regex for IN_GAME_DAYS to cover all possible variations
+		if (lowercaseName.matches("^(?:(?:in)[-_\\s]?)?(?:game|mc|minecraft)[-_\\s]?(?:days?|time|hours?|minutes?)$")) {
 			return IN_GAME_DAYS;
 		}
 

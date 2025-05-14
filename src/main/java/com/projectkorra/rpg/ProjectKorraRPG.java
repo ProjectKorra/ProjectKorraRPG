@@ -5,6 +5,7 @@ import com.projectkorra.rpg.commands.RPGCommandBase;
 import com.projectkorra.rpg.configuration.ConfigManager;
 import com.projectkorra.rpg.metrics.MetricsLite;
 import com.projectkorra.rpg.modules.ModuleManager;
+import com.projectkorra.rpg.storage.TableCreator;
 import net.luckperms.api.LuckPerms;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.RegisteredServiceProvider;
@@ -21,7 +22,9 @@ public class ProjectKorraRPG extends JavaPlugin {
 	@Override
 	public void onEnable() {
 		plugin = this;
+
 		new ConfigManager();
+		new TableCreator();
 
 		moduleManager = new ModuleManager();
 

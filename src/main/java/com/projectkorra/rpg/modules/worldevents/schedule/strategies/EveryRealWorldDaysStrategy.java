@@ -3,15 +3,13 @@ package com.projectkorra.rpg.modules.worldevents.schedule.strategies;
 import com.projectkorra.rpg.ProjectKorraRPG;
 import com.projectkorra.rpg.modules.worldevents.WorldEvent;
 import com.projectkorra.rpg.modules.worldevents.schedule.WorldEventScheduleStrategy;
+import com.projectkorra.rpg.modules.worldevents.schedule.storage.ScheduleStorage;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.sql.SQLException;
 import java.time.*;
-
-import com.projectkorra.rpg.modules.worldevents.schedule.storage.ScheduleStorage;
-
 import java.util.Optional;
 import java.util.Random;
 
@@ -35,14 +33,13 @@ public class EveryRealWorldDaysStrategy implements WorldEventScheduleStrategy {
      * @param chance     Probability of the event triggering when conditions are met (0.0-1.0)
      * @param cooldown  Minimum time between event triggers (e.g., 60 days)
      */
-    public EveryRealWorldDaysStrategy(LocalTime targetTime, Duration repeatInterval, Duration maxOffset, double chance, Duration cooldown) {
+    public EveryRealWorldDaysStrategy(LocalTime targetTime, Duration repeatInterval, Duration maxOffset, double chance, Duration cooldown, ScheduleStorage storage) {
         this.targetTime = targetTime;
         this.repeatInterval = repeatInterval;
         this.maxOffset = maxOffset;
         this.chance = chance;
         this.cooldown = cooldown;
-
-        this.storage = ProjectKorraRPG.getPlugin().getModuleManager().getWorldEventsModule().getScheduleStorage();
+        this.storage = storage;
     }
     
     @Override

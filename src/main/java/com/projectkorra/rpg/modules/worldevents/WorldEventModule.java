@@ -28,17 +28,17 @@ public class WorldEventModule extends Module {
 	public void enable() {
 		ProjectKorraRPG.getPlugin().getLogger().info("Enabling WorldEvent module...");
 
-		// Create DB Table
-		this.scheduleStorage = new ScheduleStorage();
-
 		// Initialize all valid WorldEvents found in each config file in the WorldEvents directory
 		WorldEvent.initAllWorldEvents();
 
 		// Create ModificationService for Listener
 		this.modificationService = new WorldEventModificationService();
 
+		// Contains necessary methods for DB data retrieval
+		this.scheduleStorage = new ScheduleStorage();
+
 		// Scheduler to make events start based on config
-		this.worldEventScheduler = new WorldEventScheduler(scheduleListener);
+		this.worldEventScheduler = new WorldEventScheduler(this.scheduleListener, this.scheduleStorage);
 
 		// Create and Register Modification Listener
 		this.modificationListener = new WorldEventModificationListener(this.modificationService);
@@ -67,7 +67,7 @@ public class WorldEventModule extends Module {
 
 		// Stop all active events
 		try {
-			new ArrayList<>(WorldEvent.getActiveEvents()).forEach( WorldEvent::stopEvent);
+			new ArrayList<>(WorldEvent.getActiveEvents()).forEach(WorldEvent::stopEvent);
 		} catch (Exception e) {
 			ProjectKorraRPG.getPlugin().getLogger().severe("Failed to stop all active events!" + e.getMessage());
 		}
@@ -99,6 +99,6 @@ public class WorldEventModule extends Module {
 	}
 
 	public ScheduleStorage getScheduleStorage() {
-		return scheduleStorage;
+		return this.scheduleStorage;
 	}
 }

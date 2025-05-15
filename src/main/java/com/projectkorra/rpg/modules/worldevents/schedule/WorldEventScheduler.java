@@ -3,6 +3,7 @@ package com.projectkorra.rpg.modules.worldevents.schedule;
 import com.projectkorra.rpg.ProjectKorraRPG;
 import com.projectkorra.rpg.modules.worldevents.WorldEvent;
 import com.projectkorra.rpg.modules.worldevents.listeners.WorldEventScheduleListener;
+import com.projectkorra.rpg.modules.worldevents.schedule.storage.ScheduleStorage;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.Plugin;
 
@@ -13,9 +14,11 @@ public class WorldEventScheduler {
 	private final Plugin plugin = ProjectKorraRPG.getPlugin();
 	private final Map<WorldEvent, ScheduledEventContext> scheduledEvents = new ConcurrentHashMap<>();
 	private WorldEventScheduleListener worldEventScheduleListener;
+	private final ScheduleStorage scheduleStorage;
 
-	public WorldEventScheduler(WorldEventScheduleListener worldEventScheduleListener) {
+	public WorldEventScheduler(WorldEventScheduleListener worldEventScheduleListener, ScheduleStorage scheduleStorage) {
 		this.worldEventScheduleListener = worldEventScheduleListener;
+		this.scheduleStorage = scheduleStorage;
 
 		initSchedules();
 	}
@@ -24,7 +27,7 @@ public class WorldEventScheduler {
 	 * Initialize all world event schedules
 	 */
 	private void initSchedules() {
-		// Clean up any existing strategies before initializing new ones
+		// Clean up any existing strategies before initializing
 		cleanup();
 
 		this.plugin.getLogger().info("Initializing WorldEventScheduler...");
@@ -46,7 +49,7 @@ public class WorldEventScheduler {
 		cancelEvent(event);
 
 		// Create a new strategy based on WorldEvent configuration
-		WorldEventScheduleStrategy scheduleStrategy = WorldEventScheduleStrategyFactory.get(event.getConfig());
+		WorldEventScheduleStrategy scheduleStrategy = WorldEventScheduleStrategyFactory.get(event.getConfig(), this.scheduleStorage);
 
 		// Store the event context
 		ScheduledEventContext context = new ScheduledEventContext(event, scheduleStrategy);
@@ -64,7 +67,7 @@ public class WorldEventScheduler {
 	 */
 	public void rescheduleEvent(WorldEvent event) {
 		ScheduledEventContext context = this.scheduledEvents.get(event);
-		if (context != null && context.isActive()) {
+		if (context != null) {
 			plugin.getLogger().info("Rescheduling event: " + event.getKey());
 			context.getStrategy().scheduleNext(context.getEvent(), this.plugin);;
 		}
@@ -122,6 +125,22 @@ public class WorldEventScheduler {
 			HandlerList.unregisterAll(this.worldEventScheduleListener);
 			this.worldEventScheduleListener = null;
 		}
+	}
+
+	public Plugin getPlugin() {
+		return plugin;
+	}
+
+	public Map<WorldEvent, ScheduledEventContext> getScheduledEvents() {
+		return scheduledEvents;
+	}
+
+	public WorldEventScheduleListener getWorldEventScheduleListener() {
+		return worldEventScheduleListener;
+	}
+
+	public ScheduleStorage getScheduleStorage() {
+		return scheduleStorage;
 	}
 
 	/**

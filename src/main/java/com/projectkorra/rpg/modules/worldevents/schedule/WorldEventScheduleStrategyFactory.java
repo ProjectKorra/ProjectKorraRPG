@@ -1,6 +1,7 @@
 package com.projectkorra.rpg.modules.worldevents.schedule;
 
 import com.projectkorra.rpg.ProjectKorraRPG;
+import com.projectkorra.rpg.modules.worldevents.schedule.storage.ScheduleStorage;
 import com.projectkorra.rpg.modules.worldevents.schedule.strategies.EveryInGameDaysStrategy;
 import com.projectkorra.rpg.modules.worldevents.schedule.strategies.EveryRealWorldDaysStrategy;
 import com.projectkorra.rpg.modules.worldevents.schedule.strategies.util.ScheduleType;
@@ -12,7 +13,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class WorldEventScheduleStrategyFactory {
-	public static WorldEventScheduleStrategy get(FileConfiguration config) {
+	public static WorldEventScheduleStrategy get(FileConfiguration config, ScheduleStorage scheduleStorage) {
 		String rawType = config.getString("Schedule.Calendar", "REALTIME");
 		ScheduleType scheduleType = ScheduleType.fromString(rawType);
 
@@ -28,7 +29,8 @@ public class WorldEventScheduleStrategyFactory {
 					repeatDuration,
 					offsetDuration,
 					chance,
-					cooldown
+					cooldown,
+					scheduleStorage
 			);
 
 			case IN_GAME_DAYS -> new EveryInGameDaysStrategy(
@@ -36,7 +38,8 @@ public class WorldEventScheduleStrategyFactory {
 					repeatDuration,
 					offsetDuration,
 					chance,
-					cooldown
+					cooldown,
+					scheduleStorage
 			);
 		};
 	}
@@ -73,7 +76,7 @@ public class WorldEventScheduleStrategyFactory {
 	}
 
 	/**
-	 * Parses a duration string like "7d", "3d12h", "30m" into a Duration
+	 * Parses a duration string like "7d", "3d12h", "30m2s" into a Duration
 	 */
 	private static Duration parseDuration(String durationStr) {
 		durationStr = durationStr.toLowerCase().trim();

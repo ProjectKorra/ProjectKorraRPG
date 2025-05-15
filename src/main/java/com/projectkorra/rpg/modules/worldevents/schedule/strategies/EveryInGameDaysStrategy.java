@@ -2,6 +2,7 @@ package com.projectkorra.rpg.modules.worldevents.schedule.strategies;
 
 import com.projectkorra.rpg.modules.worldevents.WorldEvent;
 import com.projectkorra.rpg.modules.worldevents.schedule.WorldEventScheduleStrategy;
+import com.projectkorra.rpg.modules.worldevents.schedule.storage.ScheduleStorage;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -15,16 +16,18 @@ public class EveryInGameDaysStrategy implements WorldEventScheduleStrategy {
 	private final Duration offsetDuration;
 	private final double chance;
 	private final Duration cooldownDuration;
+	private final ScheduleStorage storage;
 
 	private BukkitTask task;
 	private Instant lastTriggerTime = null;
 
-	public EveryInGameDaysStrategy(LocalTime timeOfDay, Duration repeatDuration, Duration offsetDuration, double chance, Duration cooldownDuration) {
+	public EveryInGameDaysStrategy(LocalTime timeOfDay, Duration repeatDuration, Duration offsetDuration, double chance, Duration cooldownDuration, ScheduleStorage storage) {
 		this.timeOfDay = timeOfDay;
 		this.repeatDuration = repeatDuration;
 		this.offsetDuration = offsetDuration;
 		this.chance = chance;
 		this.cooldownDuration = cooldownDuration;
+		this.storage = storage;
 	}
 
 	@Override

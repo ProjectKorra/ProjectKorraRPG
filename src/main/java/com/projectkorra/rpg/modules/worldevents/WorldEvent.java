@@ -130,10 +130,11 @@ public class WorldEvent {
 		File worldEventsFolder = new File(ProjectKorraRPG.getPlugin().getDataFolder(), "WorldEvents");
 		if (!worldEventsFolder.exists() || !worldEventsFolder.isDirectory()) {
 			ProjectKorraRPG.getPlugin().getLogger().warning("WorldEvents folder was not found!");
+   return;
 		}
 
 		File[] worldEventsFiles = worldEventsFolder.listFiles(((dir, name) -> name.endsWith(".yml")));
-		if (worldEventsFiles == null ||worldEventsFiles.length == 0) {
+		if (worldEventsFiles == null || worldEventsFiles.length == 0) {
 			ProjectKorraRPG.getPlugin().getLogger().info("No WorldEvents were found.");
 			return;
 		}

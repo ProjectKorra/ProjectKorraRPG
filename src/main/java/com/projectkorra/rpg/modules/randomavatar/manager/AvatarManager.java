@@ -6,11 +6,10 @@ package com.projectkorra.rpg.modules.randomavatar.manager;
 import com.projectkorra.projectkorra.BendingPlayer;
 import com.projectkorra.projectkorra.Element;
 import com.projectkorra.projectkorra.OfflineBendingPlayer;
-import com.projectkorra.projectkorra.ProjectKorra;
 import com.projectkorra.projectkorra.storage.DBConnection;
-import com.projectkorra.projectkorra.storage.MySQL;
 import com.projectkorra.rpg.ProjectKorraRPG;
 import com.projectkorra.rpg.configuration.ConfigManager;
+import com.projectkorra.rpg.storage.TableCreator;
 import com.projectkorra.rpg.util.ChatUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -91,62 +90,6 @@ public class AvatarManager {
         avatars = new HashSet<>();
     }
 
-    public void createRPGTables() {
-        if (DBConnection.sql instanceof MySQL) {
-            if (!DBConnection.sql.tableExists("pk_rpg_avatars")) {
-                ProjectKorra.log.info("Creating pk_rpg_avatars table");
-                final String query = "CREATE TABLE `pk_rpg_avatars` ("
-                        + "`uuid` varchar(36) NOT NULL,"
-                        + "`player` varchar(255) NOT NULL,"
-                        + "`startTime" + "` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,"
-                        + "`elements` varchar(255) NOT NULL,"
-                        + "PRIMARY KEY (`uuid`)"
-                        + ");";
-                DBConnection.sql.modifyQuery(query, false);
-            }
-
-            if (!DBConnection.sql.tableExists("pk_rpg_pastlives")) {
-                ProjectKorra.log.info("Creating pk_rpg_pastlives table");
-                final String query = "CREATE TABLE `pk_rpg_pastlives` ("
-                        + "`uuid` varchar(36) NOT NULL,"
-                        + "`startTime` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,"
-                        + "`player` varchar(255) NOT NULL,"
-                        + "`endTime` datetime DEFAULT NULL,"
-                        + "`elements` varchar(255) NOT NULL,"
-                        + "`endReason` varchar(255) DEFAULT NULL,"
-                        // Use composite key for uuid and startTime
-                        + "PRIMARY KEY (`uuid`, `startTime`)"
-                        + ");";
-                DBConnection.sql.modifyQuery(query, false);
-            }
-        } else {
-            if (!DBConnection.sql.tableExists("pk_rpg_avatars")) {
-                ProjectKorra.log.info("Creating pk_rpg_avatars table");
-                final String query = "CREATE TABLE `pk_rpg_avatars` ("
-                        + "`uuid` TEXT(36) PRIMARY KEY,"
-                        + "`player` TEXT(16) NOT NULL,"
-                        + "`startTime` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,"
-                        + "`elements` TEXT(255) NOT NULL"
-                        + ");";
-                DBConnection.sql.modifyQuery(query, false);
-            }
-
-            if (!DBConnection.sql.tableExists("pk_rpg_pastlives")) {
-                ProjectKorra.log.info("Creating pk_rpg_pastlives table");
-                final String query = "CREATE TABLE `pk_rpg_pastlives` ("
-                        + "`uuid` TEXT(36) NOT NULL,"
-                        + "`startTime` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,"
-                        + "`player` TEXT(16) NOT NULL,"
-                        + "`endTime` datetime DEFAULT NULL,"
-                        + "`elements` TEXT(255) NOT NULL,"
-                        + "`endReason` TEXT(255) DEFAULT NULL,"
-                        + "PRIMARY KEY (`uuid`, `startTime`)"
-                        + ");";
-                DBConnection.sql.modifyQuery(query, false);
-            }
-        }
-    }
-
     private void grantTempElements(OfflinePlayer p, Instant startTime) {
         long remaining = avatarDuration.toMillis() - Duration.between(startTime, Instant.now()).toMillis();
         BendingPlayer bp = BendingPlayer.getBendingPlayer(p);
@@ -174,7 +117,7 @@ public class AvatarManager {
     public void checkAvatars() {
         avatars.clear();
         try {
-            ResultSet rs =  DBConnection.sql.readQuery("SELECT uuid, player, startTime, elements FROM pk_rpg_avatars");
+            ResultSet rs =  DBConnection.sql.readQuery("SELECT uuid, player, startTime, elements FROM " + TableCreator.RPG_AVATAR_TABLE);
             while (rs.next()) {
                 UUID uuid = UUID.fromString(rs.getString("uuid"));
                 Instant start = rs.getTimestamp("startTime").toInstant();
@@ -270,7 +213,7 @@ public class AvatarManager {
 
         // Insert current avatar
         try {
-            DBConnection.sql.modifyQuery("INSERT INTO pk_rpg_avatars (uuid, player, startTime, elements) VALUES ('" + uuid.toString() + "', '" + off.getName() + "', '" + Timestamp.from(now) + "', '" + elements + "')", false);
+            DBConnection.sql.modifyQuery("INSERT INTO " + TableCreator.RPG_AVATAR_TABLE + " (uuid, player, startTime, elements) VALUES ('" + uuid.toString() + "', '" + off.getName() + "', '" + Timestamp.from(now) + "', '" + elements + "')", false);
             DBConnection.sql.getConnection().setAutoCommit(true);
 
         } catch (SQLException ex) {
@@ -310,7 +253,7 @@ public class AvatarManager {
         } else {
             // In theory we should never have to check the db for this but just in case
             try {
-                ResultSet rs = DBConnection.sql.readQuery("SELECT * FROM pk_rpg_avatars WHERE uuid = '" + uuid.toString() + "'");
+                ResultSet rs = DBConnection.sql.readQuery("SELECT * FROM " + TableCreator.RPG_AVATAR_TABLE + " WHERE uuid = '" + uuid.toString() + "'");
                 if (rs.next()) {
                     Statement stmt = rs.getStatement();
                     rs.close();
@@ -336,7 +279,7 @@ public class AvatarManager {
     public boolean hasBeenAvatar(UUID uuid) {
         if (isCurrentRPGAvatar(uuid))
             return true;
-        ResultSet rs = DBConnection.sql.readQuery("SELECT uuid FROM pk_rpg_pastlives WHERE uuid = '" + uuid.toString() + "'");
+        ResultSet rs = DBConnection.sql.readQuery("SELECT uuid FROM " + TableCreator.RPG_PASTLIVES_TABLE + " WHERE uuid = '" + uuid.toString() + "'");
         boolean valid;
         try {
             valid = rs.next();
@@ -367,7 +310,7 @@ public class AvatarManager {
         }
         // Check if they have been avatar recently
         try {
-            ResultSet rs = DBConnection.sql.readQuery("SELECT endTime FROM pk_rpg_pastlives WHERE uuid = '" + uuid.toString() + "' ORDER BY startTime DESC LIMIT 1");
+            ResultSet rs = DBConnection.sql.readQuery("SELECT endTime FROM " + TableCreator.RPG_PASTLIVES_TABLE + " WHERE uuid = '" + uuid + "' ORDER BY startTime DESC LIMIT 1");
             if (rs.next()) {
                 Timestamp endTime = rs.getTimestamp("endTime");
                 if (endTime != null && endTime.toInstant().plus(repeatSelectionCooldown).isAfter(Instant.now())) {
@@ -390,7 +333,7 @@ public class AvatarManager {
     private Set<UUID> fetchIneligiblePastAvatars() {
         Set<UUID> set = new HashSet<>();
         try {
-            ResultSet rs = DBConnection.sql.readQuery("SELECT uuid, MAX(endTime) AS lastEnd FROM pk_rpg_pastlives GROUP BY uuid");
+            ResultSet rs = DBConnection.sql.readQuery("SELECT uuid, MAX(endTime) AS lastEnd FROM " + TableCreator.RPG_PASTLIVES_TABLE + " GROUP BY uuid");
             while (rs.next()) {
                 UUID uuid = UUID.fromString(rs.getString("uuid"));
                 Instant lastEnd = rs.getTimestamp("lastEnd").toInstant();
@@ -421,7 +364,7 @@ public class AvatarManager {
         Instant start = Instant.now();
 
         try {
-            ResultSet rs = DBConnection.sql.readQuery("SELECT * FROM pk_rpg_avatars WHERE uuid = '" + uuid + "'");
+            ResultSet rs = DBConnection.sql.readQuery("SELECT * FROM " + TableCreator.RPG_AVATAR_TABLE + " WHERE uuid = '" + uuid + "'");
             if (rs.next()) {
                 start = rs.getTimestamp("startTime").toInstant();
                 String elements = rs.getString("elements");
@@ -442,7 +385,7 @@ public class AvatarManager {
         // Delete
         try {
             DBConnection.sql.getConnection().setAutoCommit(false);
-            DBConnection.sql.modifyQuery("DELETE FROM pk_rpg_avatars WHERE uuid = '" + uuid + "'");
+            DBConnection.sql.modifyQuery("DELETE FROM " + TableCreator.RPG_AVATAR_TABLE + " WHERE uuid = '" + uuid + "'");
             DBConnection.sql.getConnection().commit();
             DBConnection.sql.getConnection().setAutoCommit(true);
         } catch (SQLException ex) {
@@ -481,7 +424,7 @@ public class AvatarManager {
 
         // Record past life
         try {
-            DBConnection.sql.modifyQuery("INSERT INTO pk_rpg_pastlives (uuid, startTime, player, endTime, elements, endReason) VALUES ('" + uuid + "', '" + Timestamp.from(start) + "', '" + offlinePlayer.getName() + "', '" + Timestamp.from(Instant.now()) + "', '" + String.join(",", originalElements.stream().map(Element::getName).toArray(String[]::new)) + "', '" + reason + "')", false);
+            DBConnection.sql.modifyQuery("INSERT INTO " + TableCreator.RPG_PASTLIVES_TABLE + " (uuid, startTime, player, endTime, elements, endReason) VALUES ('" + uuid + "', '" + Timestamp.from(start) + "', '" + offlinePlayer.getName() + "', '" + Timestamp.from(Instant.now()) + "', '" + String.join(",", originalElements.stream().map(Element::getName).toArray(String[]::new)) + "', '" + reason + "')", false);
             DBConnection.sql.getConnection().setAutoCommit(true);
         } catch (SQLException ex) {
             plugin.getLogger().severe("Error recording past life: " + ex.getMessage());
@@ -510,7 +453,7 @@ public class AvatarManager {
 
         // Past lives
         try {
-            ResultSet rs = DBConnection.sql.readQuery("SELECT * FROM pk_rpg_pastlives ORDER BY startTime DESC");
+            ResultSet rs = DBConnection.sql.readQuery("SELECT * FROM " + TableCreator.RPG_PASTLIVES_TABLE + " ORDER BY startTime DESC");
             while (rs.next()) {
                 String player = rs.getString("player");
                 String elems = rs.getString("elements");
@@ -529,7 +472,7 @@ public class AvatarManager {
         // Current avatars
         avatars.forEach(off -> {
             try {
-                ResultSet rs = DBConnection.sql.readQuery("SELECT startTime, elements FROM pk_rpg_avatars WHERE uuid = '" + off.getUniqueId() + "'");
+                ResultSet rs = DBConnection.sql.readQuery("SELECT startTime, elements FROM " + TableCreator.RPG_AVATAR_TABLE + " WHERE uuid = '" + off.getUniqueId() + "'");
                 if (rs.next()) {
                     String elems = rs.getString("elements");
                     Instant st = rs.getTimestamp("startTime").toInstant();

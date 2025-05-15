@@ -25,7 +25,6 @@ public class AvatarCycleModule extends Module {
         );
 
         avatarManager.refreshRecentPlayersAsync();
-        avatarManager.createRPGTables();
 
         Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(ProjectKorraRPG.plugin, () -> {
             ProjectKorraRPG.plugin.getLogger().info("Avatar selection: Checking for new avatars.");

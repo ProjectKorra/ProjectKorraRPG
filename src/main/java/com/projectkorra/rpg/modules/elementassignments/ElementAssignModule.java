@@ -3,9 +3,11 @@ package com.projectkorra.rpg.modules.elementassignments;
 import com.projectkorra.rpg.modules.Module;
 import com.projectkorra.rpg.modules.elementassignments.listeners.AssignmentListener;
 import com.projectkorra.rpg.modules.elementassignments.manager.AssignmentManager;
+import org.bukkit.event.HandlerList;
 
 public class ElementAssignModule extends Module {
 	private AssignmentManager assignmentManager;
+	private AssignmentListener assignmentListener;
 
 	public ElementAssignModule() {
         super("ElementAssignments");
@@ -14,20 +16,24 @@ public class ElementAssignModule extends Module {
 	@Override
 	public void enable() {
 		this.assignmentManager = new AssignmentManager();
+		this.assignmentListener = new AssignmentListener();
 
 		registerListeners(
-				new AssignmentListener()
+				this.assignmentListener
 		);
 	}
 
     @Override
-    public void disable() {}
+    public void disable() {
+		this.assignmentManager = null;
+
+		if (this.assignmentListener != null) {
+			HandlerList.unregisterAll(this.assignmentListener);
+			this.assignmentListener = null;
+		}
+	}
 
 	public AssignmentManager getAssignmentManager() {
 		return assignmentManager;
-	}
-
-	public void setAssignmentManager(AssignmentManager assignmentManager) {
-		this.assignmentManager = assignmentManager;
 	}
 }

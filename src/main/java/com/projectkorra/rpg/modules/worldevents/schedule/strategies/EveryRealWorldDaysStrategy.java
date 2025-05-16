@@ -1,6 +1,5 @@
 package com.projectkorra.rpg.modules.worldevents.schedule.strategies;
 
-import com.projectkorra.rpg.ProjectKorraRPG;
 import com.projectkorra.rpg.modules.worldevents.WorldEvent;
 import com.projectkorra.rpg.modules.worldevents.schedule.WorldEventScheduleStrategy;
 import com.projectkorra.rpg.modules.worldevents.schedule.storage.ScheduleStorage;
@@ -184,7 +183,6 @@ public class EveryRealWorldDaysStrategy implements WorldEventScheduleStrategy {
 
         return sb.toString().trim();
     }
-
 
     public LocalTime getTargetTime() {
         return targetTime;

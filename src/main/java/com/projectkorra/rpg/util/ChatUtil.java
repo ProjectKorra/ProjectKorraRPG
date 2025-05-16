@@ -1,6 +1,3 @@
-/**
- * MANY ASPECTS FROM CLASS COPIED FROM com.projectkorra.projectkorra.util.ChatUtil
- */
 package com.projectkorra.rpg.util;
 
 import com.google.common.base.Strings;
@@ -14,6 +11,7 @@ import org.bukkit.entity.Player;
 public class ChatUtil {
 	public static void sendBrandingMessage(final CommandSender receiver, final String message) {
 		if (Strings.isNullOrEmpty(ChatColor.stripColor(message))) return;
+
 		sendBrandingMessage(receiver, TextComponent.fromLegacyText(com.projectkorra.projectkorra.util.ChatUtil.color(message)));
 	}
 
@@ -30,6 +28,7 @@ public class ChatUtil {
 		for (BaseComponent comp : message) {
 			newComp.addExtra(comp);
 		}
+
 		sendBrandingMessage(receiver, newComp);
 	}
 
@@ -42,12 +41,12 @@ public class ChatUtil {
 		FileConfiguration coreLanguageConfig = com.projectkorra.projectkorra.configuration.ConfigManager.languageConfig.get();
 		FileConfiguration addonLanguageConfig = ConfigManager.languageConfig.get();
 
-		ChatColor coreColor = ChatColor.of(coreLanguageConfig.getString("Chat.Branding.Color", "GOLD").toUpperCase());
+		ChatColor coreColor  = ChatColor.of(coreLanguageConfig.getString("Chat.Branding.Color", "GOLD").toUpperCase());
 		ChatColor addonColor = ChatColor.of(addonLanguageConfig.getString("Chat.Branding.Color", "LIGHT_PURPLE").toUpperCase());
 
-		String start = addonLanguageConfig.getString("Chat.Branding.ChatPrefix.Prefix", "");
-		String suffix = addonLanguageConfig.getString("Chat.Branding.ChatPrefix.Suffix", " \u00BB ");
-		String coreText = coreLanguageConfig.getString("Chat.Branding.ChatPrefix.Main", "ProjectKorra");
+		String start 	 = addonLanguageConfig.getString("Chat.Branding.ChatPrefix.Prefix", "");
+		String suffix 	 = addonLanguageConfig.getString("Chat.Branding.ChatPrefix.Suffix", " \u00BB ");
+		String coreText  = coreLanguageConfig.getString("Chat.Branding.ChatPrefix.Main", "ProjectKorra");
 		String addonText = addonLanguageConfig.getString("Chat.Branding.ChatPrefix.Main", "RPG");
 
 		String prefix = addonColor + start + coreColor + coreText + addonColor + addonText + addonColor + suffix;

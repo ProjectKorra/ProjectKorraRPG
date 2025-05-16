@@ -42,4 +42,36 @@ public class EveryInGameDaysStrategy implements WorldEventScheduleStrategy {
 			task = null;
 		}
 	}
+
+	public LocalTime getTimeOfDay() {
+		return timeOfDay;
+	}
+
+	public Duration getRepeatDuration() {
+		return repeatDuration;
+	}
+
+	public Duration getOffsetDuration() {
+		return offsetDuration;
+	}
+
+	public double getChance() {
+		return chance;
+	}
+
+	public Duration getCooldownDuration() {
+		return cooldownDuration;
+	}
+
+	public ScheduleStorage getStorage() {
+		return storage;
+	}
+
+	public BukkitTask getTask() {
+		return task;
+	}
+
+	public Instant getLastTriggerTime() {
+		return lastTriggerTime;
+	}
 }

@@ -19,7 +19,7 @@ public class ChatDisplay implements IWorldEventDisplay {
 	public void startDisplay(WorldEvent event) {
 		for (Player player : Bukkit.getOnlinePlayers()) {
 			if (WorldEvent.getAffectedPlayers().contains(player)) {
-				ChatUtil.sendBrandingMessage(player, startMessage);
+				ChatUtil.sendBrandingMessage(player, this.startMessage);
 			}
 		}
 	}
@@ -31,7 +31,7 @@ public class ChatDisplay implements IWorldEventDisplay {
 	public void stopDisplay(WorldEvent event) {
 		for (Player player : Bukkit.getOnlinePlayers()) {
 			if (WorldEvent.getAffectedPlayers().contains(player)) {
-				ChatUtil.sendBrandingMessage(player, stopMessage);
+				ChatUtil.sendBrandingMessage(player, this.stopMessage);
 			}
 		}
 	}

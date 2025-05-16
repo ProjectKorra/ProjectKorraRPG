@@ -11,13 +11,13 @@ import java.util.List;
 public class ModuleManager {
 	private final List<Module> modules = new ArrayList<>();
 
-	private final WorldEventModule worldEventModuleModule;
+	private final WorldEventModule worldEventModule;
 	private final LevelingModule levelingModuleModule;
 	private final AvatarCycleModule avatarCycleModule;
 	private final ElementAssignModule elementAssignModule;
 
 	public ModuleManager() {
-		modules.add(worldEventModuleModule = new WorldEventModule());
+		modules.add(worldEventModule = new WorldEventModule());
 		modules.add(levelingModuleModule = new LevelingModule());
 		modules.add(avatarCycleModule = new AvatarCycleModule());
 		modules.add(elementAssignModule = new ElementAssignModule());
@@ -42,8 +42,8 @@ public class ModuleManager {
 	}
 
 	public WorldEventModule getWorldEventsModule() {
-		if (worldEventModuleModule.isEnabled()) {
-			return worldEventModuleModule;
+		if (worldEventModule.isEnabled()) {
+			return worldEventModule;
 		}
 		throw new IllegalStateException("WorldEvents Module is disabled! Enable it in config.yml");
 	}

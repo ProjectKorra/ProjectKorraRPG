@@ -361,6 +361,7 @@ public class AvatarManager {
         OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(uuid);
         BendingPlayer bendingPlayer = BendingPlayer.getBendingPlayer(offlinePlayer);
         List<Element> originalElements = new ArrayList<>();
+        List<Element.SubElement> originalSubElements = new ArrayList<>();
         Instant start = Instant.now();
 
         try {
@@ -371,6 +372,9 @@ public class AvatarManager {
                 for (String elementName : elements.split(",")) {
                     Element element = Element.getElement(elementName);
                     if (element != null) {
+                        if (element instanceof Element.SubElement) {
+                            originalSubElements.add((Element.SubElement) element);
+                        }
                         originalElements.add(element);
                     }
                 }
@@ -411,11 +415,17 @@ public class AvatarManager {
             originalElements.forEach(el -> {
                 bendingPlayer.addElement(el);
 
-                if (el instanceof Element.SubElement) {
-                    bendingPlayer.addSubElement((Element.SubElement) el);
-                }
+                ChatUtil.sendBrandingMessage(bendingPlayer.getPlayer(), el.getColor() + "You are once again a " + el.getName() +  " bender.");
+                originalElements.clear();
+            });
+        }
+
+        if (!originalSubElements.isEmpty()) {
+            originalSubElements.forEach(el -> {
+                bendingPlayer.addSubElement(el);
 
                 ChatUtil.sendBrandingMessage(bendingPlayer.getPlayer(), el.getColor() + "You are once again a " + el.getName() +  " bender.");
+                originalSubElements.clear();
             });
         }
 

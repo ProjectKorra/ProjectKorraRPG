@@ -9,7 +9,6 @@ import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.Player;
 
 public class BossBarDisplay implements IWorldEventDisplay {
-
 	private final WorldEventBossBar worldEventBossBar;
 	private final BarColor barColor;
 	private final BarStyle barStyle;
@@ -26,7 +25,7 @@ public class BossBarDisplay implements IWorldEventDisplay {
 		this.barStyle = barStyle;
 		this.smooth = smooth;
 
-		worldEventBossBar = new WorldEventBossBar(ChatUtil.color(title), barColor, barStyle, smooth);
+		this.worldEventBossBar = new WorldEventBossBar(ChatUtil.color(title), barColor, barStyle, smooth);
 	}
 
 	@Override

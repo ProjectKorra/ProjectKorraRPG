@@ -19,7 +19,7 @@ public class Config {
      * @param file The file to create/load
      */
     public Config(File file) {
-        this.plugin = ProjectKorraRPG.plugin;
+        this.plugin = ProjectKorraRPG.getPlugin();
         this.file = new File(plugin.getDataFolder() + File.separator + file);
         this.config = YamlConfiguration.loadConfiguration(this.file);
         reload();
@@ -43,11 +43,11 @@ public class Config {
 
         if (!file.exists()) {
             try {
-                file.createNewFile();
-                plugin.getLogger().info("Generating new " + file.getName() + "!");
+                if (file.createNewFile()) {
+                    plugin.getLogger().info("Generating new " + file.getName() + "!");
+                };
             } catch (Exception e) {
-                plugin.getLogger().info("Failed to generate " + file.getName() + "!");
-                e.printStackTrace();
+                plugin.getLogger().info("Failed to generate " + file.getName() + "!" + e.getMessage());
             }
         }
     }
@@ -70,7 +70,7 @@ public class Config {
         try {
             config.load(file);
         } catch (Exception e) {
-            e.printStackTrace();
+            plugin.getLogger().severe("Failed to reload " + file.getName() + "!" + e.getMessage());
         }
     }
 
@@ -85,7 +85,7 @@ public class Config {
             config.options().parseComments(true);
             config.save(file);
         } catch (Exception e) {
-            e.printStackTrace();
+            plugin.getLogger().severe("Failed to save " + file.getName() + "!" + e.getMessage());
         }
     }
 }

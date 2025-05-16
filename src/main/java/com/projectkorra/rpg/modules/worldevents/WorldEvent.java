@@ -68,7 +68,7 @@ public class WorldEvent {
 		// Add all online players in the world to the Set
 		// And play Sound if user configured
 		for (Player player : Bukkit.getOnlinePlayers()) {
-			if (player.getWorld() == this.getWorld()) {
+			if (player.getWorld() == this.world) {
 				getAffectedPlayers().add(player);
 				if (getConfig().getBoolean("PlayEventStartSound")) {
 					String soundName = getConfig().getString("EventStart.Sound", "ENTITY_EXPERIENCE_ORB_PICKUP");
@@ -77,7 +77,7 @@ public class WorldEvent {
 					float volume = (float) getConfig().getDouble("EventStart.Volume");
 					float pitch = (float) getConfig().getDouble("EventStart.Pitch");
 
-					this.world.playSound(player.getLocation(), eventStartSound, volume, pitch);
+					player.getWorld().playSound(player.getLocation(), eventStartSound, volume, pitch);
 				}
 			}
 		}
@@ -99,14 +99,16 @@ public class WorldEvent {
 
 		// Play EventStop sound for each player in an active WorldEvent world
 		for (Player player : getWorld().getPlayers()) {
-			if (getConfig().getBoolean("PlayEventStopSound")) {
-				String soundName = getConfig().getString("EventStop.Sound", "ENTITY_EXPERIENCE_ORB_PICKUP");
+			if (getAffectedPlayers().contains(player)) {
+				if (getConfig().getBoolean("PlayEventStopSound")) {
+					String soundName = getConfig().getString("EventStop.Sound", "ENTITY_EXPERIENCE_ORB_PICKUP");
 
-				Sound eventStopSound = Sound.valueOf(soundName.toUpperCase());
-				float volume = (float) getConfig().getDouble("EventStop.Volume", 1.0);
-				float pitch = (float) getConfig().getDouble("EventStop.Pitch", 1.0);
+					Sound eventStopSound = Sound.valueOf(soundName.toUpperCase());
+					float volume = (float) getConfig().getDouble("EventStop.Volume", 1.0);
+					float pitch = (float) getConfig().getDouble("EventStop.Pitch", 1.0);
 
-				player.getWorld().playSound(player.getLocation(), eventStopSound, volume, pitch);
+					player.getWorld().playSound(player.getLocation(), eventStopSound, volume, pitch);
+				}
 			}
 		}
 
@@ -130,7 +132,7 @@ public class WorldEvent {
 		File worldEventsFolder = new File(ProjectKorraRPG.getPlugin().getDataFolder(), "WorldEvents");
 		if (!worldEventsFolder.exists() || !worldEventsFolder.isDirectory()) {
 			ProjectKorraRPG.getPlugin().getLogger().warning("WorldEvents folder was not found!");
-   return;
+			return;
 		}
 
 		File[] worldEventsFiles = worldEventsFolder.listFiles(((dir, name) -> name.endsWith(".yml")));
@@ -141,7 +143,7 @@ public class WorldEvent {
 
 		// Iterate through all WorldEvent configurations
 		Arrays.stream(worldEventsFiles).parallel().forEach(file -> {
-			String eventKey = file.getName().toLowerCase().replace(".yml", "");
+			String eventKey = file.getName().toLowerCase().replace(".yml", ""); // Event key is file name without yml extension
 			FileConfiguration config = YamlConfiguration.loadConfiguration(file);
 
 			String eventTitle = config.getString("Title", "&cConfig Title not defined!");

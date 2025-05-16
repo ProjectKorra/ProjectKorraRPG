@@ -14,7 +14,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.io.IOException;
 
 public class ProjectKorraRPG extends JavaPlugin {
-	public static ProjectKorraRPG plugin;
+	private static ProjectKorraRPG plugin;
 	public static LuckPerms luckPermsAPI;
 
 	private ModuleManager moduleManager;

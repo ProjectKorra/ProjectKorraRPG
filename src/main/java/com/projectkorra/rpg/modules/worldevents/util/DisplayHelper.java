@@ -8,13 +8,15 @@ public class DisplayHelper {
 		if (colorStr == null) {
 			return BarColor.RED;
 		}
+
 		return switch (colorStr.toUpperCase()) {
-			case "GREEN" -> BarColor.GREEN;
-			case "BLUE" -> BarColor.BLUE;
+			case "GREEN"  -> BarColor.GREEN;
+			case "BLUE"   -> BarColor.BLUE;
 			case "YELLOW" -> BarColor.YELLOW;
 			case "PURPLE" -> BarColor.PURPLE;
-			case "WHITE" -> BarColor.WHITE;
-			case "PINK" -> BarColor.PINK;
+			case "WHITE"  -> BarColor.WHITE;
+			case "PINK"   -> BarColor.PINK;
+
 			default -> BarColor.RED;
 		};
 	}
@@ -23,11 +25,13 @@ public class DisplayHelper {
 		if (styleStr == null) {
 			return BarStyle.SOLID;
 		}
+
 		return switch (styleStr.toUpperCase()) {
-			case "SEGMENTED_6" -> BarStyle.SEGMENTED_6;
+			case "SEGMENTED_6"  -> BarStyle.SEGMENTED_6;
 			case "SEGMENTED_10" -> BarStyle.SEGMENTED_10;
 			case "SEGMENTED_12" -> BarStyle.SEGMENTED_12;
 			case "SEGMENTED_20" -> BarStyle.SEGMENTED_20;
+
 			default -> BarStyle.SOLID;
 		};
 	}

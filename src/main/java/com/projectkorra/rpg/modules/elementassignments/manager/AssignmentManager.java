@@ -55,11 +55,11 @@ public class AssignmentManager {
                     totalWeight = totalWeight + weight;
                     AssignmentGroup group = new AssignmentGroup(groupKey, elements, weight, true, prefix, commandsToRun, permissionGroup);
                     groups.add(group);
-                    ProjectKorraRPG.plugin.getLogger().info("ElementAssignments: " + groupKey + " is enabled with weight: " + weight);
+                    ProjectKorraRPG.getPlugin().getLogger().info("ElementAssignments: " + groupKey + " is enabled with weight: " + weight);
                 }
             }
         } else {
-            ProjectKorraRPG.plugin.getLogger().info("ElementAssignments is disabled in the config.yml. Please enable it to use this feature.");
+            ProjectKorraRPG.getPlugin().getLogger().info("ElementAssignments is disabled in the config.yml. Please enable it to use this feature.");
             setEnabled(false);
         }
     }
@@ -106,7 +106,7 @@ public class AssignmentManager {
         for (String command : assignmentGroup.getCommandsToRun()) {
             String formattedCommand = command.replace("%player%", bendingPlayer.getName());
             if (bendingPlayer.isOnline()) {
-                ProjectKorraRPG.plugin.getServer().dispatchCommand(ProjectKorra.plugin.getServer().getConsoleSender(), formattedCommand);
+                ProjectKorraRPG.getPlugin().getServer().dispatchCommand(ProjectKorra.plugin.getServer().getConsoleSender(), formattedCommand);
             }
         }
 
@@ -124,7 +124,7 @@ public class AssignmentManager {
         }
 
         if (bendingPlayer.isOnline()) {
-            ProjectKorraRPG.plugin.getLogger().info(player.getName() + " has been assigned the " + assignmentGroup.getName() + " group.");
+            ProjectKorraRPG.getPlugin().getLogger().info(player.getName() + " has been assigned the " + assignmentGroup.getName() + " group.");
         }
     }
 

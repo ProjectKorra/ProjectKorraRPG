@@ -5,3 +5,4 @@ main: com.projectkorra.rpg.ProjectKorraRPG
 depend: [ ProjectKorra ]
 description: Rpg side-plugin for ProjectKorra core
 api-version: 1.20
+website: https://projectkorra.com

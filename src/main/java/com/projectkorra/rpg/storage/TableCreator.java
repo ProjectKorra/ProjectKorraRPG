@@ -1,6 +1,5 @@
 package com.projectkorra.rpg.storage;
 
-import com.projectkorra.projectkorra.ProjectKorra;
 import com.projectkorra.projectkorra.storage.DBConnection;
 import com.projectkorra.projectkorra.storage.MySQL;
 import com.projectkorra.rpg.ProjectKorraRPG;
@@ -81,13 +80,13 @@ public class TableCreator extends DBConnection {
     private void createRpgAvatarTable() {
         if (sql instanceof MySQL) {
             if (!sql.tableExists(RPG_AVATAR_TABLE)) {
-                ProjectKorra.log.info("Creating " + RPG_AVATAR_TABLE + " table");
+                ProjectKorraRPG.getPlugin().getLogger().info("Creating " + RPG_AVATAR_TABLE + " table");
 
                 final String query = "CREATE TABLE `" + RPG_AVATAR_TABLE + "` ("
                         + "`uuid` varchar(36) NOT NULL,"
-                        + "`player` varchar(255) NOT NULL,"
-                        + "`startTime" + "` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,"
-                        + "`elements` varchar(255) NOT NULL,"
+                        + "`main_element` varchar(255) NOT NULL,"
+                        + "`sub_elements` varchar(255) NOT NULL,"
+                        + "`chosen_time` datetime NOT NULL,"
                         + "PRIMARY KEY (`uuid`)"
                         + ");";
 
@@ -95,13 +94,14 @@ public class TableCreator extends DBConnection {
             }
         } else {
             if (!sql.tableExists(RPG_AVATAR_TABLE)) {
-                ProjectKorra.log.info("Creating " + RPG_AVATAR_TABLE + " table");
+                ProjectKorraRPG.getPlugin().getLogger().info("Creating " + RPG_AVATAR_TABLE + " table");
 
-                final String query = "CREATE TABLE `" + RPG_AVATAR_TABLE + "` ("
-                        + "`uuid` TEXT(36) PRIMARY KEY,"
-                        + "`player` TEXT(16) NOT NULL,"
-                        + "`startTime` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,"
-                        + "`elements` TEXT(255) NOT NULL"
+                final String query = "CREATE TABLE " + RPG_AVATAR_TABLE + " ("
+                        + "uuid TEXT NOT NULL, "
+                        + "main_element TEXT NOT NULL, "
+                        + "sub_elements TEXT NOT NULL, "
+                        + "chosen_time TIMESTAMP NOT NULL, "
+                        + "PRIMARY KEY (uuid)"
                         + ");";
 
                 sql.modifyQuery(query, false);
@@ -112,36 +112,103 @@ public class TableCreator extends DBConnection {
     private void createRpgPastLivesTable() {
         if (sql instanceof MySQL) {
             if (!sql.tableExists(RPG_PASTLIVES_TABLE)) {
-                ProjectKorra.log.info("Creating " + RPG_PASTLIVES_TABLE + " table");
+                ProjectKorraRPG.getPlugin().getLogger().info("Creating " + RPG_PASTLIVES_TABLE + " table");
 
                 final String query = "CREATE TABLE `" + RPG_PASTLIVES_TABLE + "` ("
                         + "`uuid` varchar(36) NOT NULL,"
-                        + "`startTime` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,"
-                        + "`player` varchar(255) NOT NULL,"
-                        + "`endTime` datetime DEFAULT NULL,"
-                        + "`elements` varchar(255) NOT NULL,"
-                        + "`endReason` varchar(255) DEFAULT NULL,"
-                        + "PRIMARY KEY (`uuid`, `startTime`)"
+                        + "`main_element` varchar(255) NOT NULL,"
+                        + "`sub_elements` varchar(255) NOT NULL,"
+                        + "`chosen_time` datetime NOT NULL,"
+                        + "`end_time` datetime NOT NULL,"
+                        + "`end_reason` varchar(255) DEFAULT NULL,"
+                        + "PRIMARY KEY (`uuid`)"
                         + ");";
 
                 sql.modifyQuery(query, false);
             }
         } else {
             if (!sql.tableExists(RPG_PASTLIVES_TABLE)) {
-                ProjectKorra.log.info("Creating " + RPG_PASTLIVES_TABLE + " table");
+                ProjectKorraRPG.getPlugin().getLogger().info("Creating " + RPG_PASTLIVES_TABLE + " table");
 
-                final String query = "CREATE TABLE `" + RPG_PASTLIVES_TABLE + "` ("
-                        + "`uuid` TEXT(36) NOT NULL,"
-                        + "`startTime` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,"
-                        + "`player` TEXT(16) NOT NULL,"
-                        + "`endTime` datetime DEFAULT NULL,"
-                        + "`elements` TEXT(255) NOT NULL,"
-                        + "`endReason` TEXT(255) DEFAULT NULL,"
-                        + "PRIMARY KEY (`uuid`, `startTime`)"
+                final String query = "CREATE TABLE " + RPG_PASTLIVES_TABLE + " ("
+                        + "uuid TEXT NOT NULL, "
+                        + "main_element TEXT NOT NULL, "
+                        + "sub_elements TEXT NOT NULL, "
+                        + "chosenTime TIMESTAMP NOT NULL, "
+                        + "endTime TIMESTAMP NOT NULL, "
+                        + "endReason TEXT DEFAULT NULL, "
+                        + "PRIMARY KEY (uuid)"
                         + ");";
 
                 sql.modifyQuery(query, false);
             }
         }
     }
+
+//    private void createRpgAvatarTable() {
+//        if (sql instanceof MySQL) {
+//            if (!sql.tableExists(RPG_AVATAR_TABLE)) {
+//                ProjectKorra.log.info("Creating " + RPG_AVATAR_TABLE + " table");
+//
+//                final String query = "CREATE TABLE `" + RPG_AVATAR_TABLE + "` ("
+//                        + "`uuid` varchar(36) NOT NULL,"
+//                        + "`player` varchar(255) NOT NULL,"
+//                        + "`startTime" + "` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,"
+//                        + "`elements` varchar(255) NOT NULL,"
+//                        + "PRIMARY KEY (`uuid`)"
+//                        + ");";
+//
+//                sql.modifyQuery(query, false);
+//            }
+//        } else {
+//            if (!sql.tableExists(RPG_AVATAR_TABLE)) {
+//                ProjectKorra.log.info("Creating " + RPG_AVATAR_TABLE + " table");
+//
+//                final String query = "CREATE TABLE `" + RPG_AVATAR_TABLE + "` ("
+//                        + "`uuid` TEXT(36) PRIMARY KEY,"
+//                        + "`player` TEXT(16) NOT NULL,"
+//                        + "`startTime` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,"
+//                        + "`elements` TEXT(255) NOT NULL"
+//                        + ");";
+//
+//                sql.modifyQuery(query, false);
+//            }
+//        }
+//    }
+//
+//    private void createRpgPastLivesTable() {
+//        if (sql instanceof MySQL) {
+//            if (!sql.tableExists(RPG_PASTLIVES_TABLE)) {
+//                ProjectKorra.log.info("Creating " + RPG_PASTLIVES_TABLE + " table");
+//
+//                final String query = "CREATE TABLE `" + RPG_PASTLIVES_TABLE + "` ("
+//                        + "`uuid` varchar(36) NOT NULL,"
+//                        + "`startTime` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,"
+//                        + "`player` varchar(255) NOT NULL,"
+//                        + "`endTime` datetime DEFAULT NULL,"
+//                        + "`elements` varchar(255) NOT NULL,"
+//                        + "`endReason` varchar(255) DEFAULT NULL,"
+//                        + "PRIMARY KEY (`uuid`, `startTime`)"
+//                        + ");";
+//
+//                sql.modifyQuery(query, false);
+//            }
+//        } else {
+//            if (!sql.tableExists(RPG_PASTLIVES_TABLE)) {
+//                ProjectKorra.log.info("Creating " + RPG_PASTLIVES_TABLE + " table");
+//
+//                final String query = "CREATE TABLE `" + RPG_PASTLIVES_TABLE + "` ("
+//                        + "`uuid` TEXT(36) NOT NULL,"
+//                        + "`startTime` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,"
+//                        + "`player` TEXT(16) NOT NULL,"
+//                        + "`endTime` datetime DEFAULT NULL,"
+//                        + "`elements` TEXT(255) NOT NULL,"
+//                        + "`endReason` TEXT(255) DEFAULT NULL,"
+//                        + "PRIMARY KEY (`uuid`, `startTime`)"
+//                        + ");";
+//
+//                sql.modifyQuery(query, false);
+//            }
+//        }
+//    }
 }

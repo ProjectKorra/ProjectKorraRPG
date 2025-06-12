@@ -8,6 +8,7 @@ import com.projectkorra.projectkorra.Element;
 import com.projectkorra.projectkorra.OfflineBendingPlayer;
 import com.projectkorra.projectkorra.storage.DBConnection;
 import com.projectkorra.rpg.ProjectKorraRPG;
+import com.projectkorra.rpg.RPGMethods;
 import com.projectkorra.rpg.configuration.ConfigManager;
 import com.projectkorra.rpg.storage.TableCreator;
 import com.projectkorra.rpg.util.ChatUtil;
@@ -56,14 +57,14 @@ public class AvatarManager {
         enabled = config.getBoolean("Modules.RandomAvatar.Enabled");
         recentPlayers = new HashSet<>();
         maxAvatars = config.getInt("Modules.RandomAvatar.MaxAvatars");
-        avatarDuration = periodStringToDuration(config.getString("Modules.RandomAvatar.AvatarDuration"));
+        avatarDuration = RPGMethods.periodStringToDuration(config.getString("Modules.RandomAvatar.AvatarDuration"));
         plugin.getLogger().info("Avatar selection: Avatar duration set to " + avatarDuration + " hours.");
         loseAvatarOnDeath = config.getBoolean("Modules.RandomAvatar.LoseAvatarOnDeath");
         loseOnAvatarStateDeath = config.getBoolean("Modules.RandomAvatar.OnlyLoseAvatarOnAvatarStateDeath");
         includeAllSubElements = config.getBoolean("Modules.RandomAvatar.IncludeAllSubElements");
         clearOnSelect = config.getBoolean("Modules.RandomAvatar.ClearOnSelection");
-        timeSinceLogonRequired = periodStringToDuration(config.getString("Modules.RandomAvatar.TimeSinceLoginRequired"));
-        repeatSelectionCooldown = periodStringToDuration(config.getString("Modules.RandomAvatar.RepeatSelectionCooldown"));
+        timeSinceLogonRequired = RPGMethods.periodStringToDuration(config.getString("Modules.RandomAvatar.TimeSinceLoginRequired"));
+        repeatSelectionCooldown = RPGMethods.periodStringToDuration(config.getString("Modules.RandomAvatar.RepeatSelectionCooldown"));
         broadcastAvatarSelection = config.getBoolean("Modules.RandomAvatar.Broadcast.Enabled");
         publicBroadcast = config.getBoolean("Modules.RandomAvatar.Broadcast.Public");
 
@@ -497,35 +498,6 @@ public class AvatarManager {
         });
 
         return list;
-    }
-
-    /**
-     * @param period String to convert to duration
-     * @return Duration in the period string
-     * @author CrashCringle
-     * @Description This method converts a period string like 3d4h to a duration object
-     */
-    private Duration periodStringToDuration(String period) {
-        // Can be in the formats like: 1s, 1m, 1h, 1d, 2d1h10s etc etc.
-        Duration duration = Duration.ZERO;
-        if (period == null || period.isEmpty()) {
-            plugin.getLogger().info("Invalid period string: " + period);
-            return duration;
-        }
-        String[] parts = period.split("(?<=\\D)(?=\\d)");
-        for (String part : parts) {
-            String unit = part.replaceAll("\\d", "");
-            double value = Double.parseDouble(part.replaceAll("\\D", ""));
-            duration = switch (unit) {
-                case "w" -> duration.plusHours((long) (value * 168));
-                case "d" -> duration.plusHours((long) (value * 24));
-                case "h" -> duration.plusHours((long) value);
-                case "m" -> duration.plusMinutes((long) value);
-                case "s" -> duration.plusSeconds((long) value);
-                default -> duration;
-            };
-        }
-        return duration;
     }
 
     public Set<OfflinePlayer> getRecentPlayers() {

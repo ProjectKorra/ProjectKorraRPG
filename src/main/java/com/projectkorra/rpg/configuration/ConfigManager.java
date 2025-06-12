@@ -2,6 +2,7 @@ package com.projectkorra.rpg.configuration;
 
 import com.projectkorra.projectkorra.Element;
 import com.projectkorra.projectkorra.configuration.ConfigType;
+import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.configuration.file.FileConfiguration;
 
@@ -58,8 +59,8 @@ public class ConfigManager {
             config.addDefault("Modules.RandomAvatar.Elements", List.of("earth", "water", "fire", "air", "avatar"));
             config.addDefault("Modules.RandomAvatar.IncludeAllSubElements", true);
             config.addDefault("Modules.RandomAvatar.SubElementBlacklist", List.of("blood"));
-            config.setComments("Modules.RandomAvatar.Enabled", List.of("Whether to enable the Avatar randomization system", "This gives every player a chance to become Avatar"));
 
+            config.setComments("Modules.RandomAvatar.Enabled", List.of("Whether to enable the Avatar randomization system", "This gives every player a chance to become Avatar"));
             config.setComments("Modules.RandomAvatar.MaxAvatars", List.of("Maximum number of RPG Avatars that can exist at once"));
             config.setComments("Modules.RandomAvatar.TimeSinceLoginRequired", List.of("A player must have logged in within this time frame to be eligible for Avatar selection.", "By default we only consider players that have logged in within the last 12 hours. Can be formatted like 3d2h5m"));
             config.setComments("Modules.RandomAvatar.RepeatSelectionCooldown", List.of("Amount of time that must pass before a player can become Avatar again"));
@@ -81,8 +82,6 @@ public class ConfigManager {
             config.addDefault("Modules.ElementAssignments.ChangeOnDeath.Chance", 0.2); // 20% chance to change element on death if
             config.addDefault("Modules.ElementAssignments.ChangeOnDeath.Bypass", false); // Allow bypassing cooldowns for changing
             config.addDefault("Modules.ElementAssignments.ChangeOnDeath.Permission", "projectkorra.rpg.elementassign.bypass");
-
-            config.addDefault("Modules.WorldEvents.Enabled", true);
 
             Set<String> elementNames = new HashSet<>();
 
@@ -208,10 +207,22 @@ public class ConfigManager {
                         "" // Permission Group to assign
                 );
             });
+
+            // ------------------------------- WorldEvents  --------------------------------
+            config.addDefault("Modules.WorldEvents.Enabled", true);
+
+
+            // --------------------------------- Leveling  ----------------------------------
+            config.addDefault("Modules.Leveling.Enabled", true);
+            config.addDefault("Modules.Leveling.Menu.FireIcon", Material.CAMPFIRE.toString());
+            config.addDefault("Modules.Leveling.Menu.AirIcon", Material.WIND_CHARGE.toString());
+            config.addDefault("Modules.Leveling.Menu.WaterIcon", Material.WATER_BUCKET.toString());
+            config.addDefault("Modules.Leveling.Menu.EarthIcon", Material.DIRT.toString());
+
             config.options().copyDefaults(true);
             config.options().parseComments(true);
-            ConfigManager.defaultConfig.save();
 
+            defaultConfig.save();
         } else if (type == LANGUAGE) {
             config = languageConfig.get();
 
@@ -223,6 +234,7 @@ public class ConfigManager {
             config.addDefault("Chat.Branding.ChatPrefix.Click", "https://projectkorra.com");
 
             config.options().copyDefaults(true);
+
             languageConfig.save();
         } else if (type == WORLDEVENTS) {
             config = sozinsCometConfig.get();
@@ -271,7 +283,6 @@ public class ConfigManager {
             config.options().copyDefaults(true);
             sozinsCometConfig.save();
         }
-
     }
 
     public static FileConfiguration getDefaultFileConfig() {

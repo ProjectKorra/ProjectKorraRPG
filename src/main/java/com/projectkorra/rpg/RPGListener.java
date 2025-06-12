@@ -11,7 +11,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 public class RPGListener implements Listener {
 	@EventHandler
 	public void onBendingConfigReload(BendingReloadEvent event) {
-		// Disable all enabled modules for clear module start
+		// Disable all enabled modules for clean module start
 		ProjectKorraRPG.getPlugin().getModuleManager().disableModules();
 
 		// Reload configs
@@ -27,6 +27,7 @@ public class RPGListener implements Listener {
 			}
 		}.runTaskLater(ProjectKorraRPG.getPlugin(), 20);
 
+		// Re-Enable all modules for clean start
 		ProjectKorraRPG.getPlugin().getModuleManager().enableModules();
 	}
 }

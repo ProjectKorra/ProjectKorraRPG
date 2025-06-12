@@ -1,6 +1,5 @@
 package com.projectkorra.rpg.modules.worldevents;
 
-import com.projectkorra.rpg.ProjectKorraRPG;
 import com.projectkorra.rpg.modules.Module;
 import com.projectkorra.rpg.modules.worldevents.commands.WorldEventCommand;
 import com.projectkorra.rpg.modules.worldevents.listeners.WorldEventModificationListener;
@@ -26,7 +25,7 @@ public class WorldEventModule extends Module {
 
 	@Override
 	public void enable() {
-		ProjectKorraRPG.getPlugin().getLogger().info("Enabling WorldEvent module...");
+		getPlugin().getLogger().info("Enabling WorldEvent module...");
 
 		// Initialize all valid WorldEvents found in each config file in the WorldEvents directory
 		WorldEvent.initAllWorldEvents();
@@ -52,12 +51,12 @@ public class WorldEventModule extends Module {
 				this.scheduleListener
 		);
 
-		ProjectKorraRPG.getPlugin().getLogger().info("WorldEvent module enabled successfully!");
+		getPlugin().getLogger().info("WorldEvent module enabled successfully!");
 	}
 
 	@Override
 	public void disable() {
-		ProjectKorraRPG.getPlugin().getLogger().info("Disabling WorldEvent module...");
+		getPlugin().getLogger().info("Disabling WorldEvent module...");
 
 		// Cleanup Scheduler
 		if (this.worldEventScheduler != null) {
@@ -69,7 +68,7 @@ public class WorldEventModule extends Module {
 		try {
 			new ArrayList<>(WorldEvent.getActiveEvents()).forEach(WorldEvent::stopEvent);
 		} catch (Exception e) {
-			ProjectKorraRPG.getPlugin().getLogger().severe("Failed to stop all active events!" + e.getMessage());
+			getPlugin().getLogger().severe("Failed to stop all active events!" + e.getMessage());
 		}
 
 		// Unregister ModificationListener
@@ -83,7 +82,7 @@ public class WorldEventModule extends Module {
 		WorldEvent.getAllEvents().clear();
 		WorldEvent.getAffectedPlayers().clear();
 
-		ProjectKorraRPG.getPlugin().getLogger().info("WorldEvent module disabled successfully!");
+		getPlugin().getLogger().info("WorldEvent module disabled successfully!");
 	}
 
 	public WorldEventModificationListener getModificationListener() {

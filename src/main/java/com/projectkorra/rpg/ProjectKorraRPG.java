@@ -28,7 +28,7 @@ public class ProjectKorraRPG extends JavaPlugin {
 
 		moduleManager = new ModuleManager();
 
-		Bukkit.getServer().getPluginManager().registerEvents(new RPGListener(), this);
+		Bukkit.getServer().getPluginManager().registerEvents(new RPGListener(), plugin);
 
 		RegisteredServiceProvider<LuckPerms> provider = Bukkit.getServicesManager().getRegistration(LuckPerms.class);
 		if (provider != null) {

@@ -27,7 +27,7 @@
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
-            <version>1.20.4-R0.1-SNAPSHOT</version>
+            <version>1.21.5-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <!-- ProjectKorra Core -->
@@ -50,6 +50,12 @@
             <artifactId>commons-lang3</artifactId>
             <version>3.17.0</version>
             <scope>provided</scope>
+        </dependency>
+        <!-- Inventory Framework -->
+        <dependency>
+            <groupId>com.github.stefvanschie.inventoryframework</groupId>
+            <artifactId>IF</artifactId>
+            <version>0.11.0</version>
         </dependency>
     </dependencies>
 
@@ -76,11 +82,18 @@
                 </configuration>
             </plugin>
 	        <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
 	            <artifactId>maven-shade-plugin</artifactId>
+                <version>3.6.0</version>
                 <configuration>
                     <createDependencyReducedPom>false</createDependencyReducedPom>
+                    <relocations>
+                        <relocation>
+                            <pattern>com.github.stefvanschie.inventoryframework</pattern>
+                            <shadedPattern>com.projectkorra.rpg.inventoryframework</shadedPattern>
+                        </relocation>
+                    </relocations>
                 </configuration>
-		        <version>3.5.2</version>
 		        <executions>
 		            <execution>
 		                <phase>package</phase>

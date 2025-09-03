@@ -17,17 +17,13 @@
             <id>spigot-repo</id>
             <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
         </repository>
-        <repository>
-            <id>sonatype</id>
-            <url>https://oss.sonatype.org/content/groups/public/</url>
-        </repository>
     </repositories>
     <dependencies>
         <!--Bukkit API-->
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
-            <version>1.21.5-R0.1-SNAPSHOT</version>
+            <version>1.21-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <!-- ProjectKorra Core -->
@@ -48,14 +44,14 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
-            <version>3.17.0</version>
+            <version>3.18.0</version>
             <scope>provided</scope>
         </dependency>
-        <!-- Inventory Framework -->
         <dependency>
-            <groupId>com.github.stefvanschie.inventoryframework</groupId>
-            <artifactId>IF</artifactId>
-            <version>0.11.0</version>
+            <groupId>org.jetbrains</groupId>
+            <artifactId>annotations</artifactId>
+            <version>26.0.2</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 
@@ -87,21 +83,7 @@
                 <version>3.6.0</version>
                 <configuration>
                     <createDependencyReducedPom>false</createDependencyReducedPom>
-                    <relocations>
-                        <relocation>
-                            <pattern>com.github.stefvanschie.inventoryframework</pattern>
-                            <shadedPattern>com.projectkorra.rpg.inventoryframework</shadedPattern>
-                        </relocation>
-                    </relocations>
                 </configuration>
-		        <executions>
-		            <execution>
-		                <phase>package</phase>
-			            <goals>
-			                <goal>shade</goal>
-			            </goals>
-		            </execution>
-		        </executions>
 	        </plugin>
         </plugins>
     </build>

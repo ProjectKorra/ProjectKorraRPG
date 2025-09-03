@@ -17,12 +17,8 @@ import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.java.JavaPlugin;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Timestamp;
+import java.sql.*;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
@@ -31,7 +27,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class AvatarManager {
-    private final JavaPlugin plugin = ProjectKorraRPG.getPlugin();
+    private final ProjectKorraRPG plugin = ProjectKorraRPG.getPlugin();
 
     // In-memory caches
     public final Set<OfflinePlayer> recentPlayers;
@@ -93,7 +89,8 @@ public class AvatarManager {
 
     private void grantTempElements(OfflinePlayer p, Instant startTime) {
         long remaining = avatarDuration.toMillis() - Duration.between(startTime, Instant.now()).toMillis();
-        BendingPlayer bp = BendingPlayer.getBendingPlayer(p);
+        OfflineBendingPlayer bp = new OfflineBendingPlayer(p);
+
         avatarElements.stream()
                 .filter(el -> !bp.hasElement(el) && !bp.hasTempElement(el))
                 .forEach(el -> Bukkit.getScheduler().runTaskLater(plugin,
@@ -278,20 +275,21 @@ public class AvatarManager {
      * @return if player with uuid has been the avatar
      */
     public boolean hasBeenAvatar(UUID uuid) {
-        if (isCurrentRPGAvatar(uuid))
-            return true;
-        ResultSet rs = DBConnection.sql.readQuery("SELECT uuid FROM " + TableCreator.RPG_PASTLIVES_TABLE + " WHERE uuid = '" + uuid.toString() + "'");
-        boolean valid;
-        try {
-            valid = rs.next();
-            Statement stmt = rs.getStatement();
-            rs.close();
-            stmt.close();
-        } catch (SQLException e) {
-            plugin.getLogger().severe("Error checking past avatar: " + e.getMessage());
-            valid = false;
+        if (isCurrentRPGAvatar(uuid)) return true;
+
+        final String sql = "SELECT uuid FROM " + TableCreator.RPG_PAST_LIVES_TABLE + " WHERE uuid = ?";
+
+        try (Connection connection = DBConnection.sql.getConnection();
+            PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, uuid.toString());
+
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
+            }
+        } catch (SQLException exception) {
+            plugin.getLogger().severe("Error checking past avatar: " + exception.getMessage());
+            return false;
         }
-        return valid;
     }
 
     public boolean isAvatarEligible(UUID uuid) {
@@ -303,38 +301,42 @@ public class AvatarManager {
             return false;
 
         BendingPlayer bPlayer = BendingPlayer.getBendingPlayer(Bukkit.getOfflinePlayer(uuid));
-        if (bPlayer == null)
-            return false;
+        if (bPlayer == null) return false;
+
         // Check if they have played in the last timeSinceLogonRequired hours
         if (!bPlayer.isOnline() && (bPlayer.getPlayer().getLastPlayed() <= System.currentTimeMillis() - timeSinceLogonRequired.toMillis())) {
             return false;
         }
-        // Check if they have been avatar recently
-        try {
-            ResultSet rs = DBConnection.sql.readQuery("SELECT endTime FROM " + TableCreator.RPG_PASTLIVES_TABLE + " WHERE uuid = '" + uuid + "' ORDER BY startTime DESC LIMIT 1");
-            if (rs.next()) {
-                Timestamp endTime = rs.getTimestamp("endTime");
-                if (endTime != null && endTime.toInstant().plus(repeatSelectionCooldown).isAfter(Instant.now())) {
-                    Statement stmt = rs.getStatement();
-                    rs.close();
-                    stmt.close();
-                    return false;
+
+        final String sql = "SELECT endTime FROM " + TableCreator.RPG_PAST_LIVES_TABLE + " WHERE uuid = ? ORDER BY startTime DESC LIMIT 1";
+
+        try (Connection connection = DBConnection.sql.getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, uuid.toString());
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    Timestamp endTime = rs.getTimestamp("endTime");
+                    if (endTime != null) {
+                        Instant eligibleAt = endTime.toInstant().plus(repeatSelectionCooldown);
+                        if (eligibleAt.isAfter(Instant.now())) {
+                            return false;
+                        }
+                    }
                 }
             }
-            Statement stmt = rs.getStatement();
-            rs.close();
-            stmt.close();
-        } catch (SQLException e) {
-            plugin.getLogger().severe("Error checking past avatar: " + e.getMessage());
+        } catch (SQLException exception) {
+            plugin.getLogger().severe("Error checking past avatar: " + exception.getMessage());
             return false;
         }
+
         return true;
     }
 
     private Set<UUID> fetchIneligiblePastAvatars() {
         Set<UUID> set = new HashSet<>();
         try {
-            ResultSet rs = DBConnection.sql.readQuery("SELECT uuid, MAX(endTime) AS lastEnd FROM " + TableCreator.RPG_PASTLIVES_TABLE + " GROUP BY uuid");
+            ResultSet rs = DBConnection.sql.readQuery("SELECT uuid, MAX(endTime) AS lastEnd FROM " + TableCreator.RPG_PAST_LIVES_TABLE + " GROUP BY uuid");
             while (rs.next()) {
                 UUID uuid = UUID.fromString(rs.getString("uuid"));
                 Instant lastEnd = rs.getTimestamp("lastEnd").toInstant();
@@ -365,36 +367,42 @@ public class AvatarManager {
         List<Element.SubElement> originalSubElements = new ArrayList<>();
         Instant start = Instant.now();
 
-        try {
-            ResultSet rs = DBConnection.sql.readQuery("SELECT * FROM " + TableCreator.RPG_AVATAR_TABLE + " WHERE uuid = '" + uuid + "'");
-            if (rs.next()) {
-                start = rs.getTimestamp("startTime").toInstant();
-                String elements = rs.getString("elements");
-                for (String elementName : elements.split(",")) {
-                    Element element = Element.getElement(elementName);
-                    if (element != null) {
-                        if (element instanceof Element.SubElement) {
-                            originalSubElements.add((Element.SubElement) element);
+        final String selectSql = "SELECT * FROM " + TableCreator.RPG_AVATAR_TABLE + " WHERE uuid = ?";
+
+        try (Connection connection = DBConnection.sql.getConnection();
+             PreparedStatement ps = connection.prepareStatement(selectSql)) {
+            ps.setString(1, uuid.toString());
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    start = rs.getTimestamp("startTime").toInstant();
+                    String elements = rs.getString("elements");
+                    for (String elementName : elements.split(",")) {
+                        Element element = Element.getElement(elementName);
+                        if (element != null) {
+                            if (element instanceof Element.SubElement sub) {
+                                originalSubElements.add(sub);
+                            }
+                            originalElements.add(element);
                         }
-                        originalElements.add(element);
                     }
                 }
-                Statement stmt = rs.getStatement();
-                rs.close();
-                stmt.close();
             }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+        } catch (SQLException exception) {
+            throw new RuntimeException(exception);
         }
 
-        // Delete
-        try {
-            DBConnection.sql.getConnection().setAutoCommit(false);
-            DBConnection.sql.modifyQuery("DELETE FROM " + TableCreator.RPG_AVATAR_TABLE + " WHERE uuid = '" + uuid + "'");
-            DBConnection.sql.getConnection().commit();
-            DBConnection.sql.getConnection().setAutoCommit(true);
-        } catch (SQLException ex) {
-            throw new RuntimeException(ex);
+        final String deleteSql = "DELETE FROM" + TableCreator.RPG_AVATAR_TABLE + " WHERE uuid = ?";
+
+        try (Connection connection = DBConnection.sql.getConnection();
+             PreparedStatement ps = connection.prepareStatement(deleteSql)) {
+            connection.setAutoCommit(false);
+            ps.setString(1, uuid.toString());
+            ps.executeUpdate();
+            connection.commit();
+            connection.setAutoCommit(true);
+        } catch (SQLException exception) {
+            throw new RuntimeException(exception);
         }
 
         // Restore perms and send message
@@ -433,12 +441,20 @@ public class AvatarManager {
         plugin.getLogger().info(offlinePlayer.getName() + " is no longer the Avatar.");
         avatars.remove(offlinePlayer);
 
-        // Record past life
-        try {
-            DBConnection.sql.modifyQuery("INSERT INTO " + TableCreator.RPG_PASTLIVES_TABLE + " (uuid, startTime, player, endTime, elements, endReason) VALUES ('" + uuid + "', '" + Timestamp.from(start) + "', '" + offlinePlayer.getName() + "', '" + Timestamp.from(Instant.now()) + "', '" + String.join(",", originalElements.stream().map(Element::getName).toArray(String[]::new)) + "', '" + reason + "')", false);
-            DBConnection.sql.getConnection().setAutoCommit(true);
-        } catch (SQLException ex) {
-            plugin.getLogger().severe("Error recording past life: " + ex.getMessage());
+        final String insertSql = "INSERT INTO " + TableCreator.RPG_PAST_LIVES_TABLE + " (uuid, startTime, player, endTime, elements, endReason) VALUES (?, ?, ?, ?, ?, ?)";
+
+        try (Connection connection = DBConnection.sql.getConnection();
+             PreparedStatement ps = connection.prepareStatement(insertSql)) {
+            ps.setString(1, uuid.toString());
+            ps.setTimestamp(2, Timestamp.from(start));
+            ps.setString(3, offlinePlayer.getName());
+            ps.setTimestamp(4, Timestamp.from(Instant.now()));
+            ps.setString(5, String.join(",", originalElements.stream().map(Element::getName).toArray(String[]::new)));
+            ps.setString(6, reason.name());
+
+            ps.executeUpdate();
+        } catch (SQLException exception) {
+            plugin.getLogger().severe("Error recording past life: " + exception.getMessage());
         }
     }
 
@@ -464,7 +480,7 @@ public class AvatarManager {
 
         // Past lives
         try {
-            ResultSet rs = DBConnection.sql.readQuery("SELECT * FROM " + TableCreator.RPG_PASTLIVES_TABLE + " ORDER BY startTime DESC");
+            ResultSet rs = DBConnection.sql.readQuery("SELECT * FROM " + TableCreator.RPG_PAST_LIVES_TABLE + " ORDER BY startTime DESC");
             while (rs.next()) {
                 String player = rs.getString("player");
                 String elems = rs.getString("elements");

@@ -1,14 +1,21 @@
 package com.projectkorra.rpg;
 
 import net.luckperms.api.node.Node;
+import org.bukkit.NamespacedKey;
+import org.bukkit.Registry;
+import org.bukkit.Sound;
+import org.bukkit.boss.BarColor;
+import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Nullable;
 
 import java.time.Duration;
+import java.util.Arrays;
+import java.util.Locale;
 
 import static com.projectkorra.rpg.ProjectKorraRPG.luckPermsAPI;
 
 public class RPGMethods {
-	private static final ProjectKorraRPG plugin = ProjectKorraRPG.getPlugin();
 
 	/**
 	 * @param player     Player who will lose permission
@@ -17,7 +24,7 @@ public class RPGMethods {
 	 * @Description This method is a simplified way of removing
 	 * Permissions to players via LuckPerms
 	 */
-	public static void removePermission(Player player, String permission) {
+	public static void removePermission(final Player player, final String permission) {
 		if (luckPermsAPI == null)
 			return;
 
@@ -34,13 +41,50 @@ public class RPGMethods {
 	 * @Description This method is a simplified way of adding
 	 * Permissions to players via LuckPerms
 	 */
-	public static void addPermission(Player player, String permission) {
+	public static void addPermission(final Player player, final String permission) {
 		if (luckPermsAPI == null)
 			return;
+
 		luckPermsAPI.getUserManager().getUser(player.getUniqueId()).data()
 				.add(Node.builder(permission).build());
 		luckPermsAPI.getUserManager().saveUser(luckPermsAPI.getUserManager().getUser(player.getUniqueId()));
 	}
+
+    public static BarColor convertStringToBarColor(final String colorStr) {
+        if (colorStr == null) {
+            return BarColor.RED;
+        }
+
+        try {
+            return BarColor.valueOf(colorStr.toUpperCase(Locale.ROOT));
+        } catch (IllegalArgumentException exception) {
+            ProjectKorraRPG.getPlugin().getLogger().warning("Failed BarColor conversion for String: '" + colorStr + "'! Possible values: " + Arrays.toString(BarColor.values()));
+            return null;
+        }
+    }
+
+    public static BarStyle convertStringToBarStyle(final String styleStr) {
+        if (styleStr == null) {
+            return BarStyle.SOLID;
+        }
+
+        try {
+            return BarStyle.valueOf(styleStr.toUpperCase(Locale.ROOT));
+        } catch (IllegalArgumentException exception) {
+            ProjectKorraRPG.getPlugin().getLogger().warning("Failed BarColor conversion for String: '" + styleStr + "'! Possible values: " + Arrays.toString(BarStyle.values()));
+            return null;
+        }
+    }
+
+    public static @Nullable Sound resolveSound(final String raw) {
+        if (raw == null) return null;
+        String soundId = raw.trim().toLowerCase(Locale.ROOT);
+        if (soundId.isEmpty()) return null;
+
+        NamespacedKey key = soundId.contains(":") ? NamespacedKey.fromString(soundId) : NamespacedKey.minecraft(soundId);
+
+        return (key == null) ? null : Registry.SOUNDS.get(key);
+    }
 
 	/**
 	 * @param period String to convert to duration
@@ -48,11 +92,11 @@ public class RPGMethods {
 	 * @author CrashCringle
 	 * @Description This method converts a period string like 3d4h to a duration object
 	 */
-	public static Duration periodStringToDuration(String period) {
+	public static Duration periodStringToDuration(final String period) {
 		// Can be in the formats like: 1s, 1m, 1h, 1d, 2d1h10s etc etc.
 		Duration duration = Duration.ZERO;
 		if (period == null || period.isEmpty()) {
-			plugin.getLogger().info("Invalid period string: " + period);
+			ProjectKorraRPG.getPlugin().getLogger().info("Invalid period string: " + period);
 			return duration;
 		}
 		String[] parts = period.split("(?<=\\D)(?=\\d)");

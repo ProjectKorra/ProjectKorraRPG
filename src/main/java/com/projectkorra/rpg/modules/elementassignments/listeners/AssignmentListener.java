@@ -14,9 +14,9 @@ public class AssignmentListener implements Listener {
     private final AssignmentManager assignmentManager;
     private final AvatarManager avatarManager;
 
-    public AssignmentListener() {
-        this.assignmentManager = ProjectKorraRPG.getPlugin().getModuleManager().getElementAssignmentsModule().getAssignmentManager();
-        this.avatarManager = ProjectKorraRPG.getPlugin().getModuleManager().getRandomAvatarModule().getAvatarManager();
+    public AssignmentListener(ProjectKorraRPG plugin) {
+        this.assignmentManager = plugin.getModuleManager().getElementAssignmentsModule().getAssignmentManager();
+        this.avatarManager = plugin.getModuleManager().getRandomAvatarModule().getAvatarManager();
     }
 
     @EventHandler (priority = EventPriority.LOW)

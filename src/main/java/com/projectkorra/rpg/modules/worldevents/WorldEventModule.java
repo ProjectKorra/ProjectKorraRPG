@@ -1,75 +1,81 @@
 package com.projectkorra.rpg.modules.worldevents;
 
+import com.projectkorra.rpg.ProjectKorraRPG;
 import com.projectkorra.rpg.modules.Module;
 import com.projectkorra.rpg.modules.worldevents.commands.WorldEventCommand;
-import com.projectkorra.rpg.modules.worldevents.listeners.WorldEventModificationListener;
-import com.projectkorra.rpg.modules.worldevents.listeners.WorldEventScheduleListener;
-import com.projectkorra.rpg.modules.worldevents.methods.WorldEventModificationService;
-import com.projectkorra.rpg.modules.worldevents.schedule.WorldEventScheduler;
-import com.projectkorra.rpg.modules.worldevents.schedule.storage.ScheduleStorage;
+import com.projectkorra.rpg.modules.worldevents.factory.WorldEventLoader;
+import com.projectkorra.rpg.modules.worldevents.listener.HandleWorldEventDisplayListener;
+import com.projectkorra.rpg.modules.worldevents.listener.WorldEventModificationListener;
+import com.projectkorra.rpg.modules.worldevents.service.WorldEventModificationService;
+import com.projectkorra.rpg.modules.worldevents.service.WorldEventService;
+import com.projectkorra.rpg.modules.worldevents.storage.ActiveWorldEventIndex;
+import com.projectkorra.rpg.modules.worldevents.storage.WorldEventRegistry;
+import com.projectkorra.rpg.modules.worldevents.util.BossBarCleanup;
 import org.bukkit.event.HandlerList;
 
-import java.util.ArrayList;
-
-public class WorldEventModule extends Module {
+public final class WorldEventModule extends Module {
+    private WorldEventService worldEventService;
+    private WorldEventRegistry worldEventRegistry;
+    private ActiveWorldEventIndex activeWorldEventIndex;
 	private WorldEventModificationListener modificationListener;
-	private WorldEventModificationService modificationService;
+    private HandleWorldEventDisplayListener handleWorldEventDisplayListener;
 
-	private WorldEventScheduleListener scheduleListener;
-	private WorldEventScheduler worldEventScheduler;
-	private ScheduleStorage scheduleStorage;
-
-	public WorldEventModule() {
-		super("WorldEvents");
+	public WorldEventModule(ProjectKorraRPG plugin) {
+		super(plugin, "WorldEvents");
 	}
 
 	@Override
 	public void enable() {
-		getPlugin().getLogger().info("Enabling WorldEvent module...");
+		this.getPlugin().getLogger().info("Enabling WorldEvent module...");
 
-		// Initialize all valid WorldEvents found in each config file in the WorldEvents directory
-		WorldEvent.initAllWorldEvents();
+        // Store all stale WorldEvents (Not active ones)
+        this.worldEventRegistry = new WorldEventRegistry();
 
-		// Create ModificationService for Listener
-		this.modificationService = new WorldEventModificationService();
+        // Register / Store all valid WorldEvents from configurations
+        this.worldEventRegistry.registerAll(new WorldEventLoader(getPlugin()).loadEventsFromFolder().values());
 
-		// Contains necessary methods for DB data retrieval
-		this.scheduleStorage = new ScheduleStorage();
+        // Handles Active World Event instances
+        this.activeWorldEventIndex = new ActiveWorldEventIndex();
 
-		// Scheduler to make events start based on config
-		this.worldEventScheduler = new WorldEventScheduler(this.scheduleListener, this.scheduleStorage);
+        // Handle business logic of active world events and ticks them
+        this.worldEventService = new WorldEventService(this.getPlugin(), this.activeWorldEventIndex);
 
-		// Create and Register Modification Listener
-		this.modificationListener = new WorldEventModificationListener(this.modificationService);
-		this.scheduleListener = new WorldEventScheduleListener(this.worldEventScheduler);
+		// Create Listeners
+		this.modificationListener = new WorldEventModificationListener(new WorldEventModificationService(this.activeWorldEventIndex));
+        this.handleWorldEventDisplayListener = new HandleWorldEventDisplayListener(this.worldEventService);
 
-		// Register Commands
-		new WorldEventCommand();
-
+        // Register Listeners
 		registerListeners(
 				this.modificationListener,
-				this.scheduleListener
+                this.handleWorldEventDisplayListener
 		);
 
-		getPlugin().getLogger().info("WorldEvent module enabled successfully!");
+        // Register Commands
+        new WorldEventCommand(this.worldEventService, this.worldEventRegistry);
+
+		this.getPlugin().getLogger().info("WorldEvent module enabled successfully!");
 	}
 
 	@Override
 	public void disable() {
-		getPlugin().getLogger().info("Disabling WorldEvent module...");
+		this.getPlugin().getLogger().info("Disabling WorldEvent module...");
 
-		// Cleanup Scheduler
-		if (this.worldEventScheduler != null) {
-			this.worldEventScheduler.cleanup();
-			this.worldEventScheduler = null;
-		}
+        // Shutdown Service
+        if (this.worldEventService != null) {
+            this.worldEventService.shutdown();
+            this.worldEventService = null;
+        }
 
-		// Stop all active events
-		try {
-			new ArrayList<>(WorldEvent.getActiveEvents()).forEach(WorldEvent::stopEvent);
-		} catch (Exception e) {
-			getPlugin().getLogger().severe("Failed to stop all active events!" + e.getMessage());
-		}
+        // Nullify Registry
+        if (this.worldEventRegistry != null) {
+            this.worldEventRegistry = null;
+        }
+
+        // Cleanup Active Events Index
+        if (this.activeWorldEventIndex != null) {
+            this.activeWorldEventIndex.clearAll();
+            this.activeWorldEventIndex = null;
+        }
 
 		// Unregister ModificationListener
 		if (this.modificationListener != null) {
@@ -77,27 +83,35 @@ public class WorldEventModule extends Module {
 			this.modificationListener = null;
 		}
 
-		// Clear Worldevent maps
-		WorldEvent.getActiveEvents().clear();
-		WorldEvent.getAllEvents().clear();
-		WorldEvent.getAffectedPlayers().clear();
+        // Unregister EventDisplayListener
+        if (this.handleWorldEventDisplayListener != null) {
+            HandlerList.unregisterAll(this.handleWorldEventDisplayListener);
+            this.handleWorldEventDisplayListener = null;
+        }
 
-		getPlugin().getLogger().info("WorldEvent module disabled successfully!");
+        // Remove Stale / Dead BossBars
+        BossBarCleanup.removeAllFor(this.getPlugin());
+
+		this.getPlugin().getLogger().info(getName() + " module disabled successfully!");
 	}
 
-	public WorldEventModificationListener getModificationListener() {
+    public WorldEventService getWorldEventService() {
+        return worldEventService;
+    }
+
+    public WorldEventRegistry getWorldEventRegistry() {
+        return worldEventRegistry;
+    }
+
+    public ActiveWorldEventIndex getActiveWorldEventIndex() {
+        return activeWorldEventIndex;
+    }
+
+    public WorldEventModificationListener getModificationListener() {
 		return modificationListener;
 	}
 
-	public WorldEventModificationService getModificationService() {
-		return modificationService;
-	}
-
-	public WorldEventScheduler getWorldEventScheduler() {
-		return this.worldEventScheduler;
-	}
-
-	public ScheduleStorage getScheduleStorage() {
-		return this.scheduleStorage;
-	}
+    public HandleWorldEventDisplayListener getPlayerSwitchWorldListener() {
+        return handleWorldEventDisplayListener;
+    }
 }

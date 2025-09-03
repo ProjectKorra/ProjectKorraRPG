@@ -3,11 +3,13 @@ package com.projectkorra.rpg.configuration;
 import com.projectkorra.projectkorra.Element;
 import com.projectkorra.projectkorra.configuration.ConfigType;
 import org.bukkit.Material;
-import org.bukkit.Sound;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.io.File;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class ConfigManager {
     private static final ConfigType DEFAULT = new ConfigType("Default");
@@ -239,18 +241,16 @@ public class ConfigManager {
         } else if (type == WORLDEVENTS) {
             config = sozinsCometConfig.get();
 
-            List<String> disabledWorlds = new ArrayList<>();
-            disabledWorlds.add("none");
-
-            config.addDefault("Title", "&cSozins Comet");
+            config.addDefault("Title", "&cSozin's Comet");
             config.addDefault("Duration", 5000);
-            config.addDefault("World", "world");
+
+            config.addDefault("Worlds", List.of("world"));
 
             config.addDefault("Schedule.At", "7am");
             config.addDefault("Schedule.Repeat", "7d");
             config.addDefault("Schedule.Calendar", "REALTIME");
             config.addDefault("Schedule.Offset", "3d12h");
-            config.addDefault("Schedule.TriggerChance", "0.1");
+            config.addDefault("Schedule.TriggerChance", 0.1);
             config.addDefault("Schedule.Cooldown", "60d");
 
             config.addDefault("DisplayMethods.BossBar.Enabled", true);
@@ -258,18 +258,19 @@ public class ConfigManager {
             config.addDefault("DisplayMethods.BossBar.Style", "SOLID");
             config.addDefault("DisplayMethods.BossBar.Smooth", true);
             config.addDefault("DisplayMethods.Chat.Enabled", true);
-            config.addDefault("DisplayMethods.Chat.EventStartMessage", "&cSozins Comet has entered the world's atmosphere. Firebenders bending has been extremely hightened");
-            config.addDefault("DisplayMethods.Chat.EventStopMessage", "&cSozins Comet has left the world's atmosphere. Firebenders bending has been normalized");
-            config.addDefault("DisplayMethods.ScoreBoard.Enabled", false);
+            config.addDefault("DisplayMethods.Chat.EventStartMessage", "&cSozin's Comet has entered the world's atmosphere. Fire benders bending has been extremely heightened!");
+            config.addDefault("DisplayMethods.Chat.EventStopMessage", "&cSozin's Comet has left the world's atmosphere. Fire benders bending has been normalized!");
+            config.addDefault("DisplayMethods.Chat.EventCurrentlyRunning", "&cSozin's Comet is currently in the world's atmosphere. Fire benders bending is extremely heightened!");
+            config.addDefault("DisplayMethods.Scoreboard.Enabled", false);
             config.addDefault("PlayEventStartSound", true);
-            config.addDefault("EventStart.Sound", Sound.ENTITY_ENDER_DRAGON_GROWL.toString());
-            config.addDefault("EventStart.Volume", "1F");
-            config.addDefault("EventStart.Pitch", "0.5F");
+            config.addDefault("EventStart.Sound", "entity.ender_dragon.growl");
+            config.addDefault("EventStart.Volume", 1);
+            config.addDefault("EventStart.Pitch", 0.5);
             config.addDefault("PlayEventStopSound", true);
-            config.addDefault("EventStop.Sound", Sound.ENTITY_ENDER_DRAGON_AMBIENT.toString());
-            config.addDefault("EventStop.Volume", "1F");
-            config.addDefault("EventStop.Pitch", "0.5F");
-            config.addDefault("DisabledWorlds", disabledWorlds);
+            config.addDefault("EventStop.Sound", "entity.ender_dragon.growl");
+            config.addDefault("EventStop.Volume", 1);
+            config.addDefault("EventStop.Pitch", 0.5);
+            config.addDefault("DisabledWorlds", List.of("none"));
             config.addDefault("Abilities.Fire._All.Damage", "x2.0");
             config.addDefault("Abilities.Fire._All.Speed", "x2.0");
             config.addDefault("Abilities.Fire._All.Cooldown", "x0.5");

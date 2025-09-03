@@ -103,6 +103,9 @@ public class AssignmentManager {
             ChatUtil.sendBrandingMessage(bendingPlayer.getPlayer(), element.getColor() + "You are now a " + element.getName() + "bender.");
         }
 
+        bendingPlayer.saveElements();
+        bendingPlayer.saveSubElements();
+
         for (String command : assignmentGroup.getCommandsToRun()) {
             String formattedCommand = command.replace("%player%", bendingPlayer.getName());
             if (bendingPlayer.isOnline()) {

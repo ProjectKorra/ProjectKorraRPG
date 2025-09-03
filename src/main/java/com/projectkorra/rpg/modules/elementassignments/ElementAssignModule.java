@@ -1,5 +1,6 @@
 package com.projectkorra.rpg.modules.elementassignments;
 
+import com.projectkorra.rpg.ProjectKorraRPG;
 import com.projectkorra.rpg.modules.Module;
 import com.projectkorra.rpg.modules.elementassignments.listeners.AssignmentListener;
 import com.projectkorra.rpg.modules.elementassignments.manager.AssignmentManager;
@@ -9,14 +10,14 @@ public class ElementAssignModule extends Module {
 	private AssignmentManager assignmentManager;
 	private AssignmentListener assignmentListener;
 
-	public ElementAssignModule() {
-        super("ElementAssignments");
+	public ElementAssignModule(ProjectKorraRPG plugin) {
+		super(plugin, "ElementAssignments");
     }
 
 	@Override
 	public void enable() {
 		this.assignmentManager = new AssignmentManager();
-		this.assignmentListener = new AssignmentListener();
+		this.assignmentListener = new AssignmentListener(getPlugin());
 
 		registerListeners(
 				this.assignmentListener

@@ -1,7 +1,7 @@
 package com.projectkorra.rpg.modules.leveling.commands;
 
 import com.projectkorra.rpg.commands.RPGCommand;
-import com.projectkorra.rpg.modules.leveling.gui.master.MainGui;
+import com.projectkorra.rpg.modules.leveling.gui.MainMenu;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -21,7 +21,7 @@ public class LevelCommand extends RPGCommand {
 		}
 
 		if (args.isEmpty()) {
-			new MainGui(player).show(player);
+			new MainMenu().open(player);
 		} else {
 			help(sender, true);
 		}

@@ -1,40 +1,59 @@
 package com.projectkorra.rpg.modules;
 
+import com.projectkorra.rpg.ProjectKorraRPG;
 import com.projectkorra.rpg.modules.elementassignments.ElementAssignModule;
 import com.projectkorra.rpg.modules.leveling.LevelingModule;
 import com.projectkorra.rpg.modules.randomavatar.AvatarCycleModule;
 import com.projectkorra.rpg.modules.worldevents.WorldEventModule;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class ModuleManager {
-	private final List<Module> modules = new ArrayList<>();
+    private final ProjectKorraRPG plugin;
+	private final List<Module> modules;
 
 	private final WorldEventModule worldEventModule;
 	private final LevelingModule levelingModuleModule;
 	private final AvatarCycleModule avatarCycleModule;
 	private final ElementAssignModule elementAssignModule;
 
-	public ModuleManager() {
-		modules.add(worldEventModule = new WorldEventModule());
-		modules.add(levelingModuleModule = new LevelingModule());
-		modules.add(avatarCycleModule = new AvatarCycleModule());
-		modules.add(elementAssignModule = new ElementAssignModule());
+	public ModuleManager(ProjectKorraRPG plugin) {
+        this.plugin = plugin;
+
+		this.worldEventModule = new WorldEventModule(plugin);
+		this.levelingModuleModule = new LevelingModule(plugin);
+		this.avatarCycleModule = new AvatarCycleModule(plugin);
+		this.elementAssignModule = new ElementAssignModule(plugin);
+
+		this.modules = List.of(
+				worldEventModule,
+				levelingModuleModule,
+				avatarCycleModule,
+				elementAssignModule
+		);
 	}
 
 	public void enableModules() {
-		for (Module module : modules) {
-			if (module.isEnabled()) {
-				module.enable();
-			}
-		}
+        for (Module module : modules) {
+            if (module.isEnabled()) {
+                try {
+                    module.enable();
+                } catch (Throwable t) {
+                    plugin.getLogger().severe("[Module: " + module.getName() +"] enable failed: " + t);
+                }
+            }
+        }
 	}
 
 	public void disableModules() {
-		for (Module module : modules) {
-			module.disable();
-		}
+        for (int i = modules.size() - 1; i >= 0; i--) {
+            Module module = modules.get(i);
+            try {
+                module.disable();
+            } catch (Throwable t) {
+                plugin.getLogger().severe("[Module: " + module.getName() + "] disable failed: " + t);
+            }
+        }
 	}
 
 	public List<Module> getModules() {

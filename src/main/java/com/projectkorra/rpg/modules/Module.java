@@ -5,10 +5,11 @@ import com.projectkorra.rpg.configuration.ConfigManager;
 import org.bukkit.event.Listener;
 
 public abstract class Module {
-    private final ProjectKorraRPG plugin = ProjectKorraRPG.getPlugin();
+    private final ProjectKorraRPG plugin;
     private final String name;
 
-    public Module(String name) {
+    public Module(ProjectKorraRPG plugin, String name) {
+        this.plugin = plugin;
         this.name = name;
     }
 
@@ -18,7 +19,7 @@ public abstract class Module {
 
     public void registerListeners(Listener... l) {
         for (Listener listener : l) {
-            ProjectKorraRPG.getPlugin().getServer().getPluginManager().registerEvents(listener, ProjectKorraRPG.getPlugin());
+            this.plugin.getServer().getPluginManager().registerEvents(listener, this.plugin);
         }
     }
 
